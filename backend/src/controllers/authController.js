@@ -8,13 +8,14 @@ const {
   getLoginNotificationEmail, 
   getPasswordResetEmail 
 } = require('../utils/emailTemplates');
+const { ADMIN_DEFAULT_ROLES, PERMISSION_LIST } = require('../config/permissions');
 const { OAuth2Client } = require('google-auth-library');
 const axios = require('axios');
 
 // Helper to verify reCAPTCHA
 const verifyRecaptcha = async (captchaToken) => {
   if (!captchaToken) return false;
-  // If no secret key is set, we bypass captcha in dev (or if disabled intentionally)
+  // Bypassed if secret key not found in env
   if (!process.env.RECAPTCHA_SECRET_KEY) return true; 
   
   try {
@@ -34,76 +35,29 @@ const signToken = (id) => {
 };
 const getExpiresAt = () => Date.now() + TOKEN_TTL_DAYS * 24 * 60 * 60 * 1000;
 
-// @desc    Register user (Shop Owner or First Admin)
-// @route   POST /api/v1/auth/register
-// @access  Public
-exports.register = async (req, res, next) => {
-  try {
-    const { fullname, email, countryCode, phoneNumber, password, confirmPassword, captchaToken } = req.body;
-
-    if (!fullname || !email || !password || !confirmPassword) {
-      return res.status(400).json({ success: false, statusCode: 400, message: 'Please provide all required fields', data: null });
+// Helper to get Permissions based on Role
+const getPermissionsForUser = async (user) => {
+  let permissions = [];
+  
+  if (user.role === 'super_admin') {
+    permissions = PERMISSION_LIST;
+  } else if (user.role === 'shop_owner') {
+    permissions = PERMISSION_LIST; // Can refine if shop owners have slightly less
+  } else if (user.customRoleId) {
+    const CustomRole = require('../models/CustomRole');
+    const role = await CustomRole.findById(user.customRoleId);
+    if (role && role.isActive) {
+      permissions = role.permissions || [];
     }
-
-    if (process.env.RECAPTCHA_SECRET_KEY && !captchaToken) {
-        return res.status(400).json({ success: false, statusCode: 400, message: 'reCAPTCHA token missing', data: null });
-    }
-
-    const isCaptchaValid = await verifyRecaptcha(captchaToken);
-    if (!isCaptchaValid) {
-      return res.status(400).json({ success: false, statusCode: 400, message: 'reCAPTCHA verification failed', data: null });
-    }
-
-    if (password !== confirmPassword) {
-      return res.status(400).json({ success: false, statusCode: 400, message: 'Passwords do not match', data: null });
-    }
-
-    const normalizedEmail = email.trim().toLowerCase();
-    const userExists = await User.findOne({ email: normalizedEmail });
-
-    if (userExists) {
-      if (userExists.isActive) {
-        return res.status(409).json({ success: false, statusCode: 409, message: 'User already exists', data: null });
-      } else {
-        // Reactivation Flow
-        const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false });
-        userExists.otp = otp;
-        userExists.otpExpiry = Date.now() + 10 * 60 * 1000;
-        userExists.isOtpVerified = false;
-        await userExists.save({ validateBeforeSave: false });
-
-        try {
-          await sendEmail({ email: userExists.email, subject: 'Account Reactivation OTP', html: getReactivationEmail(userExists.fullname, otp) });
-          return res.status(200).json({ success: true, statusCode: 200, message: 'Account deactivated. OTP sent for reactivation.', data: { isReactivation: true } });
-        } catch (err) {
-          userExists.otp = undefined; userExists.otpExpiry = undefined;
-          await userExists.save({ validateBeforeSave: false });
-          return res.status(400).json({ success: false, statusCode: 400, message: 'Email could not be sent', data: null });
-        }
-      }
-    }
-
-    // Default to shop_owner if registering publicly
-    const user = await User.create({
-      fullname, email: normalizedEmail,
-      countryCode: countryCode || '+91',
-      phoneNumber, password,
-      role: 'shop_owner' 
-    });
-
-    const token = signToken(user._id);
-
-    sendEmail({ email: user.email, subject: 'Welcome to Thori Technical Shop', html: getWelcomeEmail(user.fullname) }).catch(err => console.log(err));
-
-    res.status(201).json({
-      success: true, statusCode: 201, message: 'User registered successfully',
-      data: {
-        user: { _id: user._id, fullname: user.fullname, email: user.email, role: user.role },
-        token, expiresAt: getExpiresAt()
-      }
-    });
-  } catch (error) { next(error); }
+  } else if (user.role === 'manager') {
+    permissions = ADMIN_DEFAULT_ROLES.MANAGER.permissions;
+  } else if (user.role === 'staff') {
+    permissions = ADMIN_DEFAULT_ROLES.STAFF.permissions;
+  }
+  
+  return permissions;
 };
+
 
 // @desc    Login user
 // @route   POST /api/v1/auth/login
@@ -133,20 +87,19 @@ exports.login = async (req, res, next) => {
     if (user.isActive === false) {
       return res.status(403).json({ success: false, statusCode: 403, message: 'Account deactivated. Contact support.', data: null });
     }
+    
+    // Clear isPending if this is a first time login from invite
+    if (user.isPending) {
+      user.isPending = false;
+      await user.save({ validateBeforeSave: false });
+    }
 
     const token = signToken(user._id);
 
     // Send Login Notification Async
     sendEmail({ email: user.email, subject: 'Secure Login Alert', html: getLoginNotificationEmail(user.fullname) }).catch(e => console.log(e));
 
-    let permissions = [];
-    if (user.role === 'super_admin') {
-      permissions = ['*'];
-    } else if (user.adminRole) {
-      const AdminRole = require('../models/AdminRole');
-      const adminRole = await AdminRole.findById(user.adminRole);
-      if (adminRole) permissions = adminRole.permissions || [];
-    }
+    const permissions = await getPermissionsForUser(user);
 
     res.status(200).json({
       success: true, statusCode: 200, message: 'Login successful',
@@ -183,6 +136,9 @@ exports.googleLogin = async (req, res, next) => {
     if (user && user.isActive === false) {
       user.isActive = true; await user.save();
     }
+    if (user && user.isPending === true) {
+      user.isPending = false; await user.save();
+    }
     if (user && !user.profilePhoto && profilePhoto) {
       user.profilePhoto = profilePhoto; await user.save();
     }
@@ -196,14 +152,7 @@ exports.googleLogin = async (req, res, next) => {
     }
 
     const token = signToken(user._id);
-    let permissions = [];
-    if (user.role === 'super_admin') {
-      permissions = ['*'];
-    } else if (user.adminRole) {
-      const AdminRole = require('../models/AdminRole');
-      const adminRole = await AdminRole.findById(user.adminRole);
-      if (adminRole) permissions = adminRole.permissions || [];
-    }
+    const permissions = await getPermissionsForUser(user);
 
     res.status(200).json({
       success: true, statusCode: 200, message: 'Google login successful',

@@ -11,7 +11,6 @@ const initSocket = (server) => {
         process.env.ADMIN_URL,
         'http://localhost:3000',
         'https://thoritechnicalshop.com',
-        'https://admin.thoritechnicalshop.com',
       ].filter(Boolean),
       credentials: true
     }
@@ -20,7 +19,7 @@ const initSocket = (server) => {
   // Middleware: Authenticate Socket Connection
   io.use((socket, next) => {
     const token = socket.handshake.auth.token || socket.handshake.headers.token;
-    
+
     if (!token) {
       return next(new Error('Authentication error: Token missing'));
     }
@@ -79,7 +78,7 @@ const getIo = () => {
     console.warn('⚠️ Socket.io not initialized! Using mock socket interface.');
     return {
       to: () => ({
-        emit: () => {}
+        emit: () => { }
       })
     };
   }

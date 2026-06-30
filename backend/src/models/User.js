@@ -50,9 +50,14 @@ const userSchema = new mongoose.Schema({
     ref: 'Shop',
     default: null, // null for super_admin
   },
-  adminRole: {
+  assignedShops: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'AdminRole' // For advanced granular permissions
+    ref: 'Shop'
+  }],
+  customRoleId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'CustomRole',
+    default: null
   },
   // ───────────────────────────────────────
   isActive: {
