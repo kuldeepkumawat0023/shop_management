@@ -1,19 +1,33 @@
 import apiClient, { ApiResponse } from '../apiClient';
 
+export interface ShopData {
+  _id?: string;
+  name: string;
+  ownerId?: string;
+  gstNumber?: string;
+  contactNumber?: string;
+  email?: string;
+  address?: string;
+  logo?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export const shopService = {
-  createShop: async (data: any): Promise<ApiResponse<any>> => {
+  createShop: async (data: ShopData): Promise<ApiResponse<ShopData>> => {
     const response = await apiClient.post('/shops/create', data);
     return response.data;
   },
-  getShops: async (): Promise<ApiResponse<any>> => {
+  getShops: async (): Promise<ApiResponse<ShopData[]>> => {
     const response = await apiClient.get('/shops/all');
     return response.data;
   },
-  getMyShop: async (): Promise<ApiResponse<any>> => {
+  getMyShop: async (): Promise<ApiResponse<ShopData>> => {
     const response = await apiClient.get('/shops/my-shop');
     return response.data;
   },
-  updateShop: async (id: string, data: any): Promise<ApiResponse<any>> => {
+  updateShop: async (id: string, data: FormData | Partial<ShopData>): Promise<ApiResponse<ShopData>> => {
     const response = await apiClient.put(`/shops/update/${id}`, data);
     return response.data;
   },

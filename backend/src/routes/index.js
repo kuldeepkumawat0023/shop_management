@@ -19,18 +19,12 @@ const adjustmentRoutes = require('./adjustmentRoutes');
 const manufacturingRoutes = require('./manufacturingRoutes');
 const dashboardRoutes = require('./dashboardRoutes');
 const reportRoutes = require('./reportRoutes');
-const recipeRoutes = require('./recipeRoutes');
-const productionRoutes = require('./productionRoutes');
-const damageRoutes = require('./damageRoutes');
-const teamRoutes = require('./teamRoutes');
-const settingsRoutes = require('./settingsRoutes');
 
 // --- Future Modules (To be created) ---
 // const inventoryRoutes = require('./inventoryRoutes');
 // const productionRoutes = require('./productionRoutes');
 // const payrollRoutes = require('./payrollRoutes');
 // const expenseRoutes = require('./expenseRoutes');
-// const adminRoleRoutes = require('./adminRoleRoutes');
 // const dashboardRoutes = require('./dashboardRoutes');
 // const notificationRoutes = require('./notificationRoutes');
 
@@ -48,12 +42,9 @@ router.use('/purchases', purchaseRoutes);
 router.use('/sales', saleRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/expenses', expenseRoutes);
+router.use('/adjustments', adjustmentRoutes);
+router.use('/manufacturing', manufacturingRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/reports', reportRoutes);
-router.use('/recipes', recipeRoutes);
-router.use('/production', productionRoutes);
-router.use('/damages', damageRoutes);
-router.use('/team', teamRoutes);
-router.use('/settings', settingsRoutes);
 
 module.exports = router;
