@@ -1,0 +1,246 @@
+dashboard/
+├── .env.example
+├── .env.local
+├── .gitignore
+├── eslint.config.mjs
+├── generate_missing.js
+├── generate_tree.js
+├── next-env.d.ts
+├── next.config.ts
+├── package-lock.json
+├── package.json
+├── postcss.config.mjs
+├── public
+│   ├── file.svg
+│   ├── globe.svg
+│   ├── images
+│   │   └── ChatGPT Image Jun 30, 2026, 05_19_15 PM.png
+│   ├── next.svg
+│   ├── vercel.svg
+│   └── window.svg
+├── README.md
+├── src
+│   ├── app
+│   │   ├── (auth)
+│   │   │   ├── forgot-password
+│   │   │   │   └── page.tsx
+│   │   │   ├── layout.tsx
+│   │   │   ├── login
+│   │   │   │   └── page.tsx
+│   │   │   └── reset-password
+│   │   │       └── page.tsx
+│   │   ├── (dashboard)
+│   │   │   ├── brands
+│   │   │   │   └── page.tsx
+│   │   │   ├── categories
+│   │   │   │   └── page.tsx
+│   │   │   ├── customers
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [id]
+│   │   │   │       └── page.tsx
+│   │   │   ├── expenses
+│   │   │   │   └── page.tsx
+│   │   │   ├── inventory
+│   │   │   │   └── page.tsx
+│   │   │   ├── layout.tsx
+│   │   │   ├── manufacturing
+│   │   │   │   ├── productions
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── recipes
+│   │   │   │       └── page.tsx
+│   │   │   ├── page.tsx
+│   │   │   ├── payments
+│   │   │   │   └── page.tsx
+│   │   │   ├── payroll
+│   │   │   │   ├── advances
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── staff
+│   │   │   │       └── page.tsx
+│   │   │   ├── products
+│   │   │   │   ├── new
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [id]
+│   │   │   │       └── page.tsx
+│   │   │   ├── purchases
+│   │   │   │   ├── new
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [id]
+│   │   │   │       └── page.tsx
+│   │   │   ├── reports
+│   │   │   │   ├── gst
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── profit
+│   │   │   │       └── page.tsx
+│   │   │   ├── sales
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [id]
+│   │   │   │       └── page.tsx
+│   │   │   ├── settings
+│   │   │   │   ├── billing
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── page.tsx
+│   │   │   │   ├── preferences
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── profile
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── roles
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── store
+│   │   │   │       └── page.tsx
+│   │   │   ├── suppliers
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [id]
+│   │   │   │       └── page.tsx
+│   │   │   ├── team
+│   │   │   │   └── page.tsx
+│   │   │   └── users
+│   │   │       └── page.tsx
+│   │   ├── favicon.ico
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   ├── not-found.tsx
+│   │   └── pos
+│   │       ├── layout.tsx
+│   │       └── page.tsx
+│   ├── components
+│   │   ├── auth
+│   │   │   ├── AuthGuard.tsx
+│   │   │   ├── ForgotPasswordForm.tsx
+│   │   │   ├── LoginForm.tsx
+│   │   │   ├── ResetPasswordForm.tsx
+│   │   │   └── RoleGuard.tsx
+│   │   ├── common
+│   │   │   ├── AutoScrollToTop.tsx
+│   │   │   ├── Button.tsx
+│   │   │   ├── Card.tsx
+│   │   │   ├── ConfirmModal.tsx
+│   │   │   ├── DataTable.tsx
+│   │   │   ├── FormDrawer.tsx
+│   │   │   ├── Input.tsx
+│   │   │   ├── InstallPWAButton.tsx
+│   │   │   ├── PageHeader.tsx
+│   │   │   ├── Pagination.tsx
+│   │   │   ├── StatsCard.tsx
+│   │   │   └── StatusBadge.tsx
+│   │   ├── dashboard
+│   │   │   ├── brands
+│   │   │   │   ├── BrandForm.tsx
+│   │   │   │   └── BrandsView.tsx
+│   │   │   ├── categories
+│   │   │   │   ├── CategoriesView.tsx
+│   │   │   │   └── CategoryForm.tsx
+│   │   │   ├── customers
+│   │   │   │   ├── CustomerDetailView.tsx
+│   │   │   │   ├── CustomerForm.tsx
+│   │   │   │   └── CustomersView.tsx
+│   │   │   ├── dashboard
+│   │   │   │   └── DashboardView.tsx
+│   │   │   ├── expenses
+│   │   │   │   ├── ExpenseForm.tsx
+│   │   │   │   └── ExpensesView.tsx
+│   │   │   ├── inventory
+│   │   │   │   └── InventoryView.tsx
+│   │   │   ├── layout
+│   │   │   │   ├── DashboardLayout.tsx
+│   │   │   │   ├── ShopSwitcher.tsx
+│   │   │   │   ├── SideNavBar.tsx
+│   │   │   │   └── TopNavBar.tsx
+│   │   │   ├── manufacturing
+│   │   │   │   ├── ProductionLogView.tsx
+│   │   │   │   └── RecipeForm.tsx
+│   │   │   ├── payments
+│   │   │   │   ├── PaymentForm.tsx
+│   │   │   │   └── PaymentsView.tsx
+│   │   │   ├── payroll
+│   │   │   │   ├── SalaryAdvanceForm.tsx
+│   │   │   │   └── StaffListView.tsx
+│   │   │   ├── products
+│   │   │   │   ├── NewProductView.tsx
+│   │   │   │   ├── ProductDetailView.tsx
+│   │   │   │   └── ProductsView.tsx
+│   │   │   ├── purchases
+│   │   │   │   ├── NewPurchaseView.tsx
+│   │   │   │   ├── PurchaseDetailView.tsx
+│   │   │   │   └── PurchasesView.tsx
+│   │   │   ├── reports
+│   │   │   │   ├── GstReportView.tsx
+│   │   │   │   └── ProfitReportView.tsx
+│   │   │   ├── sales
+│   │   │   │   ├── SaleDetailView.tsx
+│   │   │   │   └── SalesHistoryView.tsx
+│   │   │   ├── settings
+│   │   │   │   ├── PreferencesView.tsx
+│   │   │   │   ├── RolesPermissionsView.tsx
+│   │   │   │   ├── SettingsView.tsx
+│   │   │   │   ├── StoreProfileView.tsx
+│   │   │   │   ├── TaxBillingView.tsx
+│   │   │   │   └── UserProfileView.tsx
+│   │   │   ├── suppliers
+│   │   │   │   ├── SupplierDetailView.tsx
+│   │   │   │   ├── SupplierForm.tsx
+│   │   │   │   └── SuppliersView.tsx
+│   │   │   ├── team
+│   │   │   │   ├── TeamMemberForm.tsx
+│   │   │   │   └── TeamMembersView.tsx
+│   │   │   └── users
+│   │   │       ├── UserForm.tsx
+│   │   │       └── UsersView.tsx
+│   │   └── pos
+│   │       ├── BarcodeScanner.tsx
+│   │       ├── CartPanel.tsx
+│   │       ├── CategoryFilter.tsx
+│   │       ├── CustomerSelection.tsx
+│   │       ├── HoldBillModal.tsx
+│   │       ├── PaymentModal.tsx
+│   │       └── ProductGrid.tsx
+│   ├── hooks
+│   │   ├── useAuth.ts
+│   │   ├── useDebounce.ts
+│   │   ├── useOffline.ts
+│   │   ├── usePermissions.ts
+│   │   └── useShop.ts
+│   ├── lib
+│   │   ├── apiClient.ts
+│   │   ├── constants
+│   │   │   └── permissions.ts
+│   │   └── services
+│   │       ├── auth.services.ts
+│   │       ├── brand.services.ts
+│   │       ├── category.services.ts
+│   │       ├── customer.services.ts
+│   │       ├── damage.services.ts
+│   │       ├── dashboard.services.ts
+│   │       ├── expense.services.ts
+│   │       ├── manufacturing.services.ts
+│   │       ├── payment.services.ts
+│   │       ├── product.services.ts
+│   │       ├── production.services.ts
+│   │       ├── purchase.services.ts
+│   │       ├── recipe.services.ts
+│   │       ├── report.services.ts
+│   │       ├── role.services.ts
+│   │       ├── sale.services.ts
+│   │       ├── settings.services.ts
+│   │       ├── shop.services.ts
+│   │       ├── supplier.services.ts
+│   │       ├── team.services.ts
+│   │       └── user.services.ts
+│   ├── provider
+│   │   ├── GoogleAuthProvider.tsx
+│   │   ├── HydrationGuard.tsx
+│   │   ├── StoreProvider.tsx
+│   │   └── ThemeProvider.tsx
+│   ├── proxy.ts
+│   ├── store
+│   │   ├── hooks
+│   │   │   └── redux.ts
+│   │   ├── slices
+│   │   │   ├── authSlice.ts
+│   │   │   └── shopSlice.ts
+│   │   └── store.ts
+│   └── utils
+│       ├── cn.ts
+│       └── seoConfig.ts
+└── tsconfig.json

@@ -15,7 +15,7 @@ export default function GoogleAuthProvider({
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
   if (!clientId) {
-    console.error('Google Client ID is missing in environment variables!');
+    console.warn('Google Client ID is missing in environment variables. Google Login will be disabled.');
     return <>{children}</>;
   }
 

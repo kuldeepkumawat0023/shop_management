@@ -1,6 +1,7 @@
 import { useAppSelector, useAppDispatch } from '../store/hooks/redux';
-import { logout as logoutAction } from '../store/slices/authSlice';
+import { logout as logoutAction, setCredentials } from '../store/slices/authSlice';
 import { authService } from '../lib/services/auth.services';
+import { AuthUser } from '../lib/apiClient';
 
 /**
  * Custom hook for accessing authentication state and actions
@@ -8,6 +9,10 @@ import { authService } from '../lib/services/auth.services';
 export const useAuth = () => {
   const dispatch = useAppDispatch();
   const { user, token, isAuthenticated, isInitialized } = useAppSelector((state) => state.auth);
+
+  const login = (user: AuthUser, token: string, expiresAt?: number) => {
+    dispatch(setCredentials({ user, token, expiresAt }));
+  };
 
   const logout = async () => {
     try {
@@ -25,6 +30,7 @@ export const useAuth = () => {
     token,
     isAuthenticated,
     isInitialized,
+    login,
     logout,
     role: user?.role || 'staff',
     shopId: user?.shopId || null,
