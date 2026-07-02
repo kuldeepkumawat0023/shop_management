@@ -32,7 +32,8 @@ import {
   BookOpen,
   Banknote,
   Receipt,
-  TrendingUp
+  TrendingUp,
+  PauseCircle
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { Button } from '@/components/common/Button';
@@ -46,7 +47,16 @@ interface NavLink {
 
 const erpNavLinks: NavLink[] = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'POS Billing', href: '/pos', icon: ReceiptText },
+  { 
+    name: 'POS Billing', 
+    href: '/pos-group',
+    icon: ReceiptText,
+    children: [
+      { name: 'New Sale', href: '/pos', icon: ShoppingCart },
+      { name: 'Hold Bills', href: '/pos/hold-bills', icon: PauseCircle },
+      { name: 'Today\'s Sales', href: '/pos/today-sales', icon: Receipt },
+    ]
+  },
   { 
     name: 'Inventory & Products', 
     href: '/inventory-group',

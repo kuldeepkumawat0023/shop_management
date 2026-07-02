@@ -182,33 +182,35 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
               whileTap={{ scale: 0.95 }}
               className="rounded-xl"
             >
-              <Button
-                variant="gradient"
-                size="sm"
-                className="relative overflow-hidden rounded-xl text-white font-extrabold text-xs tracking-wider flex items-center gap-2 shadow-lg shadow-primary/30 cursor-pointer border border-white/10"
-              >
-              {/* Infinite looping glass highlight sweep from left to right */}
-              <motion.div
-                className="absolute inset-0 w-[50%] h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12"
-                style={{ zIndex: 0 }}
-                animate={{
-                  x: ["-180%", "280%"]
-                }}
-                transition={{
-                  repeat: Infinity,
-                  repeatType: "loop",
-                  duration: 2,
-                  ease: "easeInOut",
-                  repeatDelay: 1.2
-                }}
-              />
+              <Link href="/pos">
+                <Button
+                  variant="gradient"
+                  size="sm"
+                  className="relative overflow-hidden rounded-xl text-white font-extrabold text-xs tracking-wider flex items-center gap-2 shadow-lg shadow-primary/30 cursor-pointer border border-white/10"
+                >
+                {/* Infinite looping glass highlight sweep from left to right */}
+                <motion.div
+                  className="absolute inset-0 w-[50%] h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12"
+                  style={{ zIndex: 0 }}
+                  animate={{
+                    x: ["-180%", "280%"]
+                  }}
+                  transition={{
+                    repeat: Infinity,
+                    repeatType: "loop",
+                    duration: 2,
+                    ease: "easeInOut",
+                    repeatDelay: 1.2
+                  }}
+                />
 
-              {/* Text and Icon with explicit relative layering to stay on top */}
-              <span className="relative z-10 flex items-center gap-2">
-                <ShoppingCart className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
-                New Sale
-              </span>
-            </Button>
+                {/* Text and Icon with explicit relative layering to stay on top */}
+                <span className="relative z-10 flex items-center gap-2">
+                  <ShoppingCart className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
+                  New Sale
+                </span>
+                </Button>
+              </Link>
             </motion.div>
           </motion.div>
         </div>
