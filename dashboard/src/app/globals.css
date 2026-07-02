@@ -46,17 +46,17 @@
   --on-surface-variant: #3e4850;
   
   /* Utilities */
-  --outline: #6e7881;
-  --outline-variant: #bec8d2;
+  --outline: #0284c7; /* sky-600 */
+  --outline-variant: #bae6fd; /* sky-200 */
   
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
+  --muted: #f0f9ff; /* sky-50 */
+  --muted-foreground: #0284c7; /* sky-600 */
   
   --accent: #f0f9ff;
   --accent-foreground: #0ea5e9;
   
-  --border: #e2e8f0;
-  --input: #e2e8f0;
+  --border: #bae6fd; /* sky-200 */
+  --input: #bae6fd; /* sky-200 */
   --ring: #0ea5e9;
   
   /* Semantic Status Colors */
@@ -109,17 +109,17 @@
   --on-surface-variant: #94a3b8;
   
   /* Utilities */
-  --outline: #475569;
-  --outline-variant: #334155;
+  --outline: #0284c7; /* sky-600 */
+  --outline-variant: #075985; /* sky-800 */
   
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
+  --muted: #082f49; /* sky-950 */
+  --muted-foreground: #38bdf8; /* sky-400 */
   
-  --accent: #1e293b;
+  --accent: #0c4a6e; /* sky-900 */
   --accent-foreground: #38bdf8;
   
-  --border: #334155;
-  --input: #1e293b;
+  --border: #075985; /* sky-800 */
+  --input: #075985; /* sky-800 */
   --ring: #38bdf8;
   
   /* Semantic Status Colors */

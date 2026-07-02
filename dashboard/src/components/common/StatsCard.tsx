@@ -93,7 +93,7 @@ export function StatsCard({
   const theme = getThemeStyles();
 
   return (
-    <div className={cn("bg-white/50 backdrop-blur-md rounded-2xl shadow-sm border border-outline-variant/20 p-5 flex flex-col justify-between hover:shadow-md transition-shadow", className)}>
+    <div className={cn("group relative bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/50 hover:border-primary/50 p-5 flex flex-col justify-between hover:shadow-lg transition-all duration-300", className)}>
       <div className="flex items-start gap-4 mb-3">
         <div className={cn("w-11 h-11 rounded-xl flex items-center justify-center shrink-0", theme.bgLight, theme.text)}>
           <Icon className="w-5 h-5" />

@@ -116,7 +116,7 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
       <div className="flex items-center gap-2 md:gap-4 ml-4">
         
         {/* Action Icons */}
-        <button className="relative p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors cursor-pointer hidden sm:block">
+        <button className="relative p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors cursor-pointer">
           <Bell className="w-5 h-5" />
           <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-error rounded-full border-2 border-surface"></span>
         </button>
@@ -126,13 +126,13 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
             variant="ghost"
             size="icon"
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="text-on-surface-variant hover:text-primary transition-colors hidden sm:flex"
+            className="text-on-surface-variant hover:text-primary transition-colors"
           >
             {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </Button>
         )}
 
-        <div className="hidden md:flex items-center ml-2">
+        <div className="flex items-center ml-1 sm:ml-2">
           <motion.div
             className="relative inline-block group"
             whileHover="hover"
@@ -140,7 +140,7 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
           >
             {/* Magnetic Energy Ripples - expanding only on hover for maximum premium interaction */}
             <motion.div
-              className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/40 to-secondary/40 pointer-events-none blur-[4px]"
+              className="absolute inset-0 rounded-xl gradient-button opacity-40 pointer-events-none blur-[4px]"
               style={{ zIndex: 0 }}
               variants={{
                 initial: { scale: 1, opacity: 0 },
@@ -156,7 +156,7 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
               }}
             />
             <motion.div
-              className="absolute inset-0 rounded-xl bg-gradient-to-r from-secondary/30 to-primary/30 pointer-events-none blur-[4px]"
+              className="absolute inset-0 rounded-xl gradient-button opacity-30 pointer-events-none blur-[4px]"
               style={{ zIndex: 0 }}
               variants={{
                 initial: { scale: 1, opacity: 0 },
@@ -215,15 +215,13 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
           </motion.div>
         </div>
 
-        <div className="h-8 w-[1px] bg-outline-variant/20 mx-1 hidden sm:block" />
+        {/* Divider */}
+        <div className="w-px h-8 bg-outline-variant/30 hidden sm:block mx-1"></div>
 
         {/* User Dropdown */}
         <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-2 p-1.5 rounded-full hover:bg-surface-container transition-colors group cursor-pointer"
-          >
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-[10px] font-bold overflow-hidden border border-primary/20 shadow-sm transition-transform group-hover:scale-105">
+          <button className="flex items-center gap-2 group focus:outline-none" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+            <div className="w-9 h-9 rounded-full gradient-button flex items-center justify-center text-white text-[10px] font-bold overflow-hidden border border-white/20 shadow-sm transition-transform group-hover:scale-105">
               {profilePhoto ? (
                 <img
                   src={profilePhoto}
@@ -285,16 +283,6 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
                     Settings
                   </Link>
 
-                  {/* Theme Switcher for Mobile inside Dropdown */}
-                  <div className="sm:hidden flex items-center justify-between px-3 py-2 text-sm font-semibold text-on-surface hover:bg-primary/10 hover:text-primary rounded-xl transition-colors group/item cursor-pointer" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-                    <div className="flex items-center gap-3">
-                      <div className="p-1.5 rounded-lg bg-surface-container text-on-surface-variant group-hover/item:bg-primary/20 group-hover/item:text-primary transition-colors">
-                        {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-                      </div>
-                      Theme
-                    </div>
-                    <span className="text-xs opacity-60 uppercase">{theme}</span>
-                  </div>
 
                   {!isStandalone && (
                     <button

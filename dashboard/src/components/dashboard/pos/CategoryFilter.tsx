@@ -30,7 +30,7 @@ export default function CategoryFilter() {
               className={cn(
                 "flex items-center gap-2 px-4 py-2.5 rounded-full whitespace-nowrap transition-all duration-300 border shrink-0",
                 isActive 
-                  ? "bg-primary text-white border-primary shadow-md shadow-primary/20" 
+                  ? "gradient-button text-white border-transparent shadow-md shadow-primary/20" 
                   : "bg-surface-container-low text-on-surface-variant border-outline-variant/30 hover:border-primary/50 hover:text-primary hover:bg-primary/5"
               )}
             >

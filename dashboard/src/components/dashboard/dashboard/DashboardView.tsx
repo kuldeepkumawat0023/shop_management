@@ -564,7 +564,7 @@ export default function DashboardView() {
                             <div className="py-1.5 hover:bg-surface-container rounded-lg cursor-pointer text-on-surface">15</div>
                             <div className="py-1.5 hover:bg-surface-container rounded-lg cursor-pointer text-on-surface">16</div>
                             <div className="py-1.5 hover:bg-surface-container rounded-lg cursor-pointer text-on-surface">17</div>
-                            <div className="py-1.5 bg-primary text-white font-bold rounded-lg cursor-pointer shadow-sm shadow-primary/30">18</div>
+                            <div className="py-1.5 gradient-button text-white font-bold rounded-lg cursor-pointer shadow-sm shadow-primary/30">18</div>
                             <div className="py-1.5 hover:bg-surface-container rounded-lg cursor-pointer text-on-surface">19</div>
                             <div className="py-1.5 hover:bg-surface-container rounded-lg cursor-pointer text-on-surface">20</div>
                             <div className="py-1.5 hover:bg-surface-container rounded-lg cursor-pointer text-on-surface">21</div>

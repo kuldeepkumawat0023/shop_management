@@ -105,7 +105,7 @@ export default function HoldBillsView() {
           className={cn(
             "px-4 py-1.5 text-xs font-black uppercase tracking-widest rounded-md transition-all",
             activeTab === tab
-              ? "bg-primary text-white shadow-md"
+              ? "gradient-button text-white shadow-md"
               : "text-on-surface-variant hover:text-on-surface hover:bg-surface"
           )}
         >
@@ -159,20 +159,22 @@ export default function HoldBillsView() {
         />
       </div>
 
-      <div className="flex-1 min-h-0 bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-2 lg:p-4">
-        <div className="px-4 py-3 flex items-center justify-between border-b border-outline-variant/10 mb-4">
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-on-surface">Active Holds</h2>
-            <StatusBadge variant="dot" animate status="Live Status" />
-          </div>
-        </div>
-
+      <div className="w-full bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 flex flex-col">
         <DataTable 
           data={filteredData}
           columns={columns}
-          headerContent={TabsComponent}
-          searchPlaceholder="Search customer, status..."
+          headerContent={
+            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-6 w-full">
+              <div className="flex items-center gap-2 shrink-0">
+                <h2 className="text-lg font-bold text-on-surface">Active Holds</h2>
+                <StatusBadge status="Live Status" variant="dot" colorTheme="success" className="ml-2 bg-success/10 text-success border-success/20" />
+              </div>
+              {TabsComponent}
+            </div>
+          }
+          searchPlaceholder="Search by customer name or phone..."
           className="border-none shadow-none bg-transparent"
+          itemsPerPage={10}
         />
       </div>
     </div>

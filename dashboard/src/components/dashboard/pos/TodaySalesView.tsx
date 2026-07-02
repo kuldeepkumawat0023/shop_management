@@ -109,19 +109,19 @@ export default function TodaySalesView() {
         />
       </div>
 
-      <div className="flex-1 min-h-0 bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-2 lg:p-4">
-        <div className="px-4 py-3 flex items-center justify-between border-b border-outline-variant/10 mb-4">
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-on-surface">Recent Invoices</h2>
-            <StatusBadge variant="dot" animate status="Live Sync" />
-          </div>
-        </div>
-
+      <div className="w-full bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 flex flex-col">
         <DataTable 
           data={todaySalesData}
           columns={columns}
-          searchPlaceholder="Search by Invoice ID or Customer..."
+          headerContent={
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-bold text-on-surface">Recent Transactions</h2>
+              <StatusBadge status="Live Sync" variant="dot" colorTheme="success" className="ml-2 bg-success/10 text-success border-success/20" />
+            </div>
+          }
+          searchPlaceholder="Search by receipt or customer..."
           className="border-none shadow-none bg-transparent"
+          itemsPerPage={10}
         />
       </div>
     </div>

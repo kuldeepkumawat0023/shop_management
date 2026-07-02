@@ -18,18 +18,18 @@ export function StatusBadge({ status, variant = 'default', animate = false, colo
       switch (theme) {
         case 'success':
         case 'green':
-          return { bg: 'bg-success/10', text: 'text-success-dark', border: 'border-success/20', dot: 'bg-success' };
+          return { bg: 'bg-success/10', text: 'text-success', border: 'border-success/20', dot: 'bg-success' };
         case 'secondary':
         case 'blue':
-          return { bg: 'bg-secondary/10', text: 'text-secondary-dark', border: 'border-secondary/20', dot: 'bg-secondary' };
+          return { bg: 'bg-secondary/10', text: 'text-secondary', border: 'border-secondary/20', dot: 'bg-secondary' };
         case 'purple':
           return { bg: 'bg-purple-500/10', text: 'text-purple-600', border: 'border-purple-500/20', dot: 'bg-purple-600' };
         case 'error':
-          return { bg: 'bg-error/10', text: 'text-error-dark', border: 'border-error/20', dot: 'bg-error' };
+          return { bg: 'bg-error/10', text: 'text-error', border: 'border-error/20', dot: 'bg-error' };
         case 'warning':
         case 'orange':
         case 'yellow':
-          return { bg: 'bg-warning/10', text: 'text-warning-dark', border: 'border-warning/20', dot: 'bg-warning' };
+          return { bg: 'bg-warning/10', text: 'text-warning', border: 'border-warning/20', dot: 'bg-warning' };
         case 'primary':
           return { bg: 'bg-primary/10', text: 'text-primary', border: 'border-primary/20', dot: 'bg-primary' };
       }
@@ -39,7 +39,7 @@ export function StatusBadge({ status, variant = 'default', animate = false, colo
     if (s.includes('paid') || s.includes('success') || s.includes('completed') || s.includes('active') || s.includes('live') || s.includes('joined')) {
       return {
         bg: 'bg-success/10',
-        text: 'text-success-dark',
+        text: 'text-success',
         border: 'border-success/20',
         dot: 'bg-success'
       };
@@ -47,7 +47,7 @@ export function StatusBadge({ status, variant = 'default', animate = false, colo
     if (s.includes('pending') || s.includes('hold') || s.includes('processing')) {
       return {
         bg: 'bg-secondary/10',
-        text: 'text-secondary-dark',
+        text: 'text-secondary',
         border: 'border-secondary/20',
         dot: 'bg-secondary'
       };
@@ -63,7 +63,7 @@ export function StatusBadge({ status, variant = 'default', animate = false, colo
     if (s.includes('failed') || s.includes('cancelled') || s.includes('error') || s.includes('inactive')) {
       return {
         bg: 'bg-error/10',
-        text: 'text-error-dark',
+        text: 'text-error',
         border: 'border-error/20',
         dot: 'bg-error'
       };

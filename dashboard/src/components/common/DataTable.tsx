@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { cn } from '@/utils/cn';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/common/Input';
+import { Pagination } from '@/components/common/Pagination';
 
 interface ColumnDef {
   header: string | React.ReactNode;
@@ -15,13 +16,20 @@ interface DataTableProps {
   searchPlaceholder?: string;
   headerContent?: React.ReactNode;
   className?: string;
+  itemsPerPage?: number;
 }
 
-export function DataTable({ data, columns, searchPlaceholder, headerContent, className }: DataTableProps) {
+export function DataTable({ data, columns, searchPlaceholder, headerContent, className, itemsPerPage }: DataTableProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Reset to first page when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   // Basic filtering based on search query
-  const filteredData = React.useMemo(() => {
+  const filteredData = useMemo(() => {
     if (!searchQuery) return data;
     return data.filter(item => 
       Object.values(item).some(val => 
@@ -30,8 +38,17 @@ export function DataTable({ data, columns, searchPlaceholder, headerContent, cla
     );
   }, [data, searchQuery]);
 
+  // Pagination logic
+  const paginatedData = useMemo(() => {
+    if (!itemsPerPage) return filteredData;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredData.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredData, currentPage, itemsPerPage]);
+
+  const totalPages = itemsPerPage ? Math.ceil(filteredData.length / itemsPerPage) : 1;
+
   return (
-    <div className={cn("flex flex-col h-full bg-surface-container-lowest border border-outline-variant/20 rounded-2xl overflow-hidden shadow-sm", className)}>
+    <div className={cn("flex flex-col w-full bg-surface-container-lowest border border-outline-variant/20 rounded-2xl overflow-hidden shadow-sm", className)}>
       {(searchPlaceholder || headerContent) && (
         <div className="p-4 border-b border-outline-variant/10 flex flex-col sm:flex-row items-center justify-between gap-4 bg-surface/50">
           <div className="flex-1 w-full flex overflow-x-auto custom-scrollbar">
@@ -52,7 +69,7 @@ export function DataTable({ data, columns, searchPlaceholder, headerContent, cla
         </div>
       )}
       
-      <div className="flex-1 overflow-auto custom-scrollbar">
+      <div className="w-full overflow-x-auto custom-scrollbar">
         <table className="w-full text-left border-collapse">
           <thead className="sticky top-0 bg-surface-container border-b border-outline-variant/10 z-10">
             <tr>
@@ -67,8 +84,8 @@ export function DataTable({ data, columns, searchPlaceholder, headerContent, cla
             </tr>
           </thead>
           <tbody className="divide-y divide-outline-variant/5">
-            {filteredData.length > 0 ? (
-              filteredData.map((row, rowIdx) => (
+            {paginatedData.length > 0 ? (
+              paginatedData.map((row, rowIdx) => (
                 <tr 
                   key={row.id || rowIdx} 
                   className="hover:bg-surface/40 transition-colors group"
@@ -96,6 +113,17 @@ export function DataTable({ data, columns, searchPlaceholder, headerContent, cla
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Footer */}
+      {itemsPerPage && totalPages > 1 && (
+        <div className="border-t border-outline-variant/10 bg-surface/50 px-4">
+          <Pagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </div>
+      )}
     </div>
   );
 }

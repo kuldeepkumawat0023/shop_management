@@ -128,7 +128,7 @@ export default function CartPanel({ onClose, onPay, onHold }: CartPanelProps) {
             Hold Bill
           </Button>
           <Button 
-            className="w-full h-12 bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/25"
+            className="w-full h-12 gradient-button text-white shadow-lg shadow-primary/25 border-none"
             onClick={onPay}
           >
             <Banknote className="w-4 h-4 mr-2" />
