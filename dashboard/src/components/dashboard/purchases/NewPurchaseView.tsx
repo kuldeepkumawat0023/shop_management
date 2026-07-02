@@ -37,9 +37,7 @@ export default function NewPurchaseView() {
             </div>
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <Link href="/purchases" className="flex-1 sm:flex-none">
-              <Button variant="outline" className="w-full sm:w-auto font-bold border-outline-variant/30">Cancel</Button>
-            </Link>
+            <Button onClick={() => router.back()} variant="outline" className="w-full sm:w-auto font-bold border-outline-variant/30">Cancel</Button>
             <Button className="flex-1 sm:w-auto gradient-button text-white font-bold shadow-md hover:shadow-lg gap-2">
               <Save className="w-4 h-4" />
               Save Order
