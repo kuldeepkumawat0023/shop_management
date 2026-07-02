@@ -48,8 +48,8 @@ interface NavLink {
 
 const erpNavLinks: NavLink[] = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { 
-    name: 'POS Billing', 
+  {
+    name: 'POS Billing',
     href: '/pos-group',
     icon: ReceiptText,
     children: [
@@ -58,8 +58,8 @@ const erpNavLinks: NavLink[] = [
       { name: 'Today\'s Sales', href: '/pos/today-sales', icon: Receipt },
     ]
   },
-  { 
-    name: 'Inventory & Products', 
+  {
+    name: 'Inventory & Products',
     href: '/inventory-group',
     icon: Package,
     children: [
@@ -78,8 +78,8 @@ const erpNavLinks: NavLink[] = [
       { name: 'Recipes', href: '/manufacturing/recipes', icon: BookOpen },
     ]
   },
-  { 
-    name: 'Sales & Purchases', 
+  {
+    name: 'Sales & Purchases',
     href: '/sales-group',
     icon: ShoppingCart,
     children: [
@@ -88,25 +88,33 @@ const erpNavLinks: NavLink[] = [
       { name: 'Expenses', href: '/expenses', icon: ReceiptText },
     ]
   },
-  { name: 'Parties', href: '/parties-group', icon: Users, children: [
+  {
+    name: 'Parties', href: '/parties-group', icon: Users, children: [
       { name: 'Customers', href: '/customers', icon: Users },
       { name: 'Suppliers', href: '/suppliers', icon: Truck },
-  ]},
-  { name: 'HR & Team', href: '/hr-group', icon: User, children: [
+    ]
+  },
+  {
+    name: 'HR & Team', href: '/hr-group', icon: User, children: [
       { name: 'Team Members', href: '/team', icon: Users },
       { name: 'System Users', href: '/users', icon: User },
-  ]},
-  { name: 'Payroll', href: '/payroll-group', icon: CreditCard, children: [
+    ]
+  },
+  {
+    name: 'Payroll', href: '/payroll-group', icon: CreditCard, children: [
       { name: 'Staff Salary', href: '/payroll/staff', icon: Users },
       { name: 'Salary Advances', href: '/payroll/advances', icon: Banknote },
-  ]},
+    ]
+  },
   { name: 'Payments', href: '/payments', icon: Wallet },
-  { name: 'Reports', href: '/reports-group', icon: BarChart3, children: [
+  {
+    name: 'Reports', href: '/reports-group', icon: BarChart3, children: [
       { name: 'GST Report', href: '/reports/gst', icon: Receipt },
       { name: 'Profit & Loss', href: '/reports/profit', icon: TrendingUp },
-  ]},
-  { 
-    name: 'Settings', 
+    ]
+  },
+  {
+    name: 'Settings',
     href: '/settings',
     icon: Settings,
     children: [

@@ -82,8 +82,8 @@ export default function TodaySalesView() {
         </div>
       </div>
 
-      {/* Stats Cards Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 shrink-0">
+      {/* KPI Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8 shrink-0">
         <StatsCard 
           title="Total Revenue"
           value="₹5,010.50"

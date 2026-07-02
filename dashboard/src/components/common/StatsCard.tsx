@@ -93,19 +93,19 @@ export function StatsCard({
   const theme = getThemeStyles();
 
   return (
-    <div className={cn("group relative bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/50 hover:border-primary/50 p-5 flex flex-col justify-between hover:shadow-lg transition-all duration-300", className)}>
-      <div className="flex items-start gap-4 mb-3">
-        <div className={cn("w-11 h-11 rounded-xl flex items-center justify-center shrink-0", theme.bgLight, theme.text)}>
-          <Icon className="w-5 h-5" />
+    <div className={cn("group relative bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/50 hover:border-primary/50 p-3 sm:p-5 flex flex-col justify-between hover:shadow-lg transition-all duration-300", className)}>
+      <div className="flex items-start gap-2 sm:gap-4 mb-2 sm:mb-3">
+        <div className={cn("w-8 h-8 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0", theme.bgLight, theme.text)}>
+          <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
         </div>
-        <div>
-          <span className="text-on-surface-variant font-medium text-xs">{title}</span>
-          <h3 className="text-2xl font-bold text-on-surface">{value}</h3>
+        <div className="min-w-0 flex-1">
+          <span className="text-on-surface-variant font-medium text-[10px] sm:text-xs truncate block">{title}</span>
+          <h3 className="text-lg sm:text-2xl font-bold text-on-surface truncate">{value}</h3>
         </div>
       </div>
       
       {(trend || trendLabel) && (
-        <div className="flex items-center gap-1.5 text-[11px]">
+        <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 text-[10px] sm:text-[11px]">
           {trend && (
             <span className={cn(
               "flex items-center font-semibold",

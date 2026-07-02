@@ -90,7 +90,7 @@ export function StatusBadge({ status, variant = 'default', animate = false, colo
   if (variant === 'soft') {
     return (
       <span className={cn(
-        "px-2.5 py-1 rounded-full text-[10px] font-bold",
+        "px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[9px] sm:text-[10px] font-bold",
         scheme.bg, scheme.text,
         className
       )}>
@@ -102,16 +102,16 @@ export function StatusBadge({ status, variant = 'default', animate = false, colo
   if (variant === 'dot') {
     return (
       <div className={cn(
-        "flex items-center gap-1.5 px-2.5 py-1 rounded-full border w-fit",
+        "flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border w-fit",
         scheme.bg, scheme.text, scheme.border,
         className
       )}>
         <div className={cn(
-          "w-1.5 h-1.5 rounded-full",
+          "w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full",
           scheme.dot,
           animate ? "animate-pulse" : ""
         )} />
-        <span className="text-[10px] font-black uppercase tracking-widest">{status}</span>
+        <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest">{status}</span>
       </div>
     );
   }
@@ -119,7 +119,7 @@ export function StatusBadge({ status, variant = 'default', animate = false, colo
   // Default variant (pill without dot)
   return (
     <span className={cn(
-      "inline-flex items-center justify-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border",
+      "inline-flex items-center justify-center px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded-md text-[9px] sm:text-[10px] font-bold uppercase tracking-wider border",
       scheme.bg, scheme.text, scheme.border,
       className
     )}>
