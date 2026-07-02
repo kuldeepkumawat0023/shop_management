@@ -6,7 +6,10 @@ import { Input } from '@/components/common/Input';
 import { ArrowLeft, Save, Plus, Trash2, ShoppingCart, Truck, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 
+import { useRouter } from 'next/navigation';
+
 export default function NewPurchaseView() {
+  const router = useRouter();
   const [items, setItems] = useState([
     { id: 1, name: '', quantity: '', rate: '', tax: '' }
   ]);
@@ -25,11 +28,9 @@ export default function NewPurchaseView() {
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-3">
-            <Link href="/purchases">
-              <Button variant="outline" className="w-10 h-10 p-0 rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary/50 transition-all">
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            </Link>
+            <Button onClick={() => router.back()} variant="outline" className="w-10 h-10 p-0 rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary/50 transition-all">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
             <div>
               <h2 className="text-2xl font-black text-on-surface tracking-tight">Create Purchase Order</h2>
               <p className="text-sm font-medium text-on-surface-variant">Log a new bill or order from a supplier</p>

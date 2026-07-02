@@ -5,19 +5,20 @@ import { Button } from '@/components/common/Button';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { ArrowLeft, Printer, Download, ShoppingCart, Truck, CheckCircle2, FileText, Share2 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function PurchaseDetailView() {
+  const router = useRouter();
+
   return (
     <div className="flex flex-col h-full bg-background overflow-y-auto custom-scrollbar w-full mx-auto">
       {/* Header Sticky */}
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-3">
-            <Link href="/purchases">
-              <Button variant="outline" className="w-10 h-10 p-0 rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary/50 transition-all">
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            </Link>
+            <Button onClick={() => router.back()} variant="outline" className="w-10 h-10 p-0 rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary/50 transition-all">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-2xl font-black text-on-surface tracking-tight">PO-2023-001</h2>

@@ -6,6 +6,7 @@ import { DataTable } from '@/components/common/DataTable';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { ArrowLeft, Tag, Layers, Search, Filter, Download, MoreVertical, Edit, Trash2, Globe, Archive, Package, Plus, ImageIcon, Type, Link as LinkIcon, Eye, CheckCircle2, AlertCircle, FolderTree, LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/utils/cn';
 
 interface CategoryDetailViewProps {
@@ -37,6 +38,7 @@ const categoryProducts = [
 ];
 
 export default function CategoryDetailView({ categoryId }: CategoryDetailViewProps) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('Overview');
   
   // Product Table columns
@@ -132,11 +134,9 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-outline-variant/20 px-4 md:px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/categories">
-            <Button variant="ghost" size="icon" className="text-on-surface-variant hover:text-on-surface hover:bg-surface-container">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
+          <Button onClick={() => router.back()} variant="ghost" size="icon" className="text-on-surface-variant hover:text-on-surface hover:bg-surface-container">
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
           <div>
             <h1 className="text-2xl font-black text-on-surface tracking-tight">Category Details</h1>
           </div>

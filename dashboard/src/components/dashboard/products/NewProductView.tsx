@@ -1,23 +1,24 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
 import { ArrowLeft, UploadCloud, Save, X } from 'lucide-react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/utils/cn';
 
 export default function NewProductView() {
+  const router = useRouter();
+  const [images, setImages] = useState<string[]>([]);
+
   return (
     <div className="flex flex-col h-full bg-background overflow-y-auto custom-scrollbar">
       {/* Sticky Header */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-outline-variant/20 px-4 md:px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/products">
-            <Button variant="ghost" size="icon" className="text-on-surface-variant hover:text-on-surface hover:bg-surface-container">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
+          <Button onClick={() => router.back()} variant="ghost" size="icon" className="text-on-surface-variant hover:text-on-surface hover:bg-surface-container">
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
           <div>
             <h1 className="text-2xl font-black text-on-surface tracking-tight">Add New Product</h1>
             <p className="text-xs font-medium text-on-surface-variant mt-0.5">Create a new item in your catalog</p>
