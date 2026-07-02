@@ -130,36 +130,32 @@ export default function HoldBillsView() {
       {/* Stats Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 shrink-0">
         <StatsCard 
-          variant="advanced"
           title="Total Hold Bills"
           value="3"
           icon={Users}
-          progressSubtitle="100% OF TOTAL"
-          colorTheme="blue"
+          trendLabel="100% OF TOTAL"
+          colorTheme="primary"
         />
         <StatsCard 
-          variant="advanced"
           title="Today's Paused"
           value="2"
           icon={Clock}
-          progressSubtitle="66% OF TOTAL"
-          colorTheme="yellow"
+          trendLabel="66% OF TOTAL"
+          colorTheme="warning"
         />
         <StatsCard 
-          variant="advanced"
           title="Total Value Held"
           value="₹4,515"
           icon={Banknote}
-          progressSubtitle="POTENTIAL REVENUE"
+          trendLabel="POTENTIAL REVENUE"
           colorTheme="purple"
         />
         <StatsCard 
-          variant="advanced"
           title="Total Items"
           value="18"
           icon={ListPlus}
-          progressSubtitle="AWAITING CHECKOUT"
-          colorTheme="green"
+          trendLabel="AWAITING CHECKOUT"
+          colorTheme="success"
         />
       </div>
 

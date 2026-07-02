@@ -9,6 +9,7 @@ import {
     Bell, CheckCircle2, Clock, User, Truck, UserPlus
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
+import { StatsCard } from '@/components/common/StatsCard';
 
 export default function DashboardView() {
     return (
@@ -51,138 +52,82 @@ export default function DashboardView() {
 
                 {/* KPI Row (Horizontal Scroll) */}
                 <div className="flex overflow-x-auto gap-4 pb-2 snap-x [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-outline-variant/30 [&::-webkit-scrollbar-thumb]:rounded-full">
-                    {/* Card 1: Revenue */}
-                    <GlassCard className="p-5 min-w-[220px] shrink-0 snap-start flex flex-col justify-between border-outline-variant/20 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-start gap-4 mb-3">
-                            <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                                <ShoppingBag className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <span className="text-on-surface-variant font-medium text-xs">Total Revenue</span>
-                                <h3 className="text-2xl font-bold text-on-surface">₹52,450</h3>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-[11px]">
-                            <span className="flex items-center text-success font-semibold">
-                                <ArrowUp className="w-3 h-3 mr-0.5" /> 18.2%
-                            </span>
-                            <span className="text-muted-foreground">vs yesterday</span>
-                        </div>
-                    </GlassCard>
+                    <StatsCard
+                        className="min-w-[220px] shrink-0 snap-start"
+                        title="Total Revenue"
+                        value="₹52,450"
+                        icon={ShoppingBag}
+                        colorTheme="primary"
+                        trend="18.2%"
+                        trendDirection="up"
+                        trendLabel="vs yesterday"
+                    />
+                    
+                    <StatsCard
+                        className="min-w-[220px] shrink-0 snap-start"
+                        title="Total Orders"
+                        value="324"
+                        icon={Receipt}
+                        colorTheme="secondary"
+                        trend="12.5%"
+                        trendDirection="up"
+                        trendLabel="vs yesterday"
+                    />
 
-                    {/* Card 2: Orders */}
-                    <GlassCard className="p-5 min-w-[220px] shrink-0 snap-start flex flex-col justify-between border-outline-variant/20 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-start gap-4 mb-3">
-                            <div className="w-11 h-11 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shrink-0">
-                                <Receipt className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <span className="text-on-surface-variant font-medium text-xs">Total Orders</span>
-                                <h3 className="text-2xl font-bold text-on-surface">324</h3>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-[11px]">
-                            <span className="flex items-center text-success font-semibold">
-                                <ArrowUp className="w-3 h-3 mr-0.5" /> 12.5%
-                            </span>
-                            <span className="text-muted-foreground">vs yesterday</span>
-                        </div>
-                    </GlassCard>
+                    <StatsCard
+                        className="min-w-[220px] shrink-0 snap-start"
+                        title="Total Profit"
+                        value="₹12,850"
+                        icon={LineChart}
+                        colorTheme="success"
+                        trend="9.3%"
+                        trendDirection="up"
+                        trendLabel="vs yesterday"
+                    />
 
-                    {/* Card 3: Profit */}
-                    <GlassCard className="p-5 min-w-[220px] shrink-0 snap-start flex flex-col justify-between border-outline-variant/20 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-start gap-4 mb-3">
-                            <div className="w-11 h-11 rounded-xl bg-success/10 flex items-center justify-center text-success shrink-0">
-                                <LineChart className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <span className="text-on-surface-variant font-medium text-xs">Total Profit</span>
-                                <h3 className="text-2xl font-bold text-on-surface">₹12,850</h3>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-[11px]">
-                            <span className="flex items-center text-success font-semibold">
-                                <ArrowUp className="w-3 h-3 mr-0.5" /> 9.3%
-                            </span>
-                            <span className="text-muted-foreground">vs yesterday</span>
-                        </div>
-                    </GlassCard>
+                    <StatsCard
+                        className="min-w-[220px] shrink-0 snap-start"
+                        title="Total Customers"
+                        value="865"
+                        icon={Users}
+                        colorTheme="warning"
+                        trend="7.6%"
+                        trendDirection="up"
+                        trendLabel="vs yesterday"
+                    />
 
-                    {/* Card 4: Customers */}
-                    <GlassCard className="p-5 min-w-[220px] shrink-0 snap-start flex flex-col justify-between border-outline-variant/20 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-start gap-4 mb-3">
-                            <div className="w-11 h-11 rounded-xl bg-warning/10 flex items-center justify-center text-warning shrink-0">
-                                <Users className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <span className="text-on-surface-variant font-medium text-xs">Total Customers</span>
-                                <h3 className="text-2xl font-bold text-on-surface">865</h3>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-[11px]">
-                            <span className="flex items-center text-success font-semibold">
-                                <ArrowUp className="w-3 h-3 mr-0.5" /> 7.6%
-                            </span>
-                            <span className="text-muted-foreground">vs yesterday</span>
-                        </div>
-                    </GlassCard>
+                    <StatsCard
+                        className="min-w-[220px] shrink-0 snap-start"
+                        title="Total Products"
+                        value="1,240"
+                        icon={Package}
+                        colorTheme="primary"
+                        trend="4.3%"
+                        trendDirection="up"
+                        trendLabel="vs yesterday"
+                    />
 
-                    {/* Card 5: Products */}
-                    <GlassCard className="p-5 min-w-[220px] shrink-0 snap-start flex flex-col justify-between border-outline-variant/20 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-start gap-4 mb-3">
-                            <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                                <Package className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <span className="text-on-surface-variant font-medium text-xs">Total Products</span>
-                                <h3 className="text-2xl font-bold text-on-surface">1,240</h3>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-[11px]">
-                            <span className="flex items-center text-success font-semibold">
-                                <ArrowUp className="w-3 h-3 mr-0.5" /> 4.3%
-                            </span>
-                            <span className="text-muted-foreground">vs yesterday</span>
-                        </div>
-                    </GlassCard>
+                    <StatsCard
+                        className="min-w-[220px] shrink-0 snap-start"
+                        title="Low Stock Items"
+                        value="15"
+                        icon={AlertTriangle}
+                        colorTheme="error"
+                        trend="3"
+                        trendDirection="down"
+                        trendLabel="vs yesterday"
+                    />
 
-                    {/* Card 6: Low Stock */}
-                    <GlassCard className="p-5 min-w-[220px] shrink-0 snap-start flex flex-col justify-between border-outline-variant/20 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-start gap-4 mb-3">
-                            <div className="w-11 h-11 rounded-xl bg-error/10 flex items-center justify-center text-error shrink-0">
-                                <AlertTriangle className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <span className="text-on-surface-variant font-medium text-xs">Low Stock Items</span>
-                                <h3 className="text-2xl font-bold text-on-surface">15</h3>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-[11px]">
-                            <span className="flex items-center text-error font-semibold">
-                                <ArrowDown className="w-3 h-3 mr-0.5" /> 3
-                            </span>
-                            <span className="text-muted-foreground">vs yesterday</span>
-                        </div>
-                    </GlassCard>
-
-                    {/* Card 7: Expenses */}
-                    <GlassCard className="p-5 min-w-[220px] shrink-0 snap-start flex flex-col justify-between border-outline-variant/20 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-start gap-4 mb-3">
-                            <div className="w-11 h-11 rounded-xl bg-warning/10 flex items-center justify-center text-warning shrink-0">
-                                <Wallet className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <span className="text-on-surface-variant font-medium text-xs">Total Expenses</span>
-                                <h3 className="text-2xl font-bold text-on-surface">₹21,400</h3>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-[11px]">
-                            <span className="flex items-center text-success font-semibold">
-                                <ArrowUp className="w-3 h-3 mr-0.5" /> 11.2%
-                            </span>
-                            <span className="text-muted-foreground">vs yesterday</span>
-                        </div>
-                    </GlassCard>
+                    <StatsCard
+                        className="min-w-[220px] shrink-0 snap-start"
+                        title="Total Expenses"
+                        value="₹21,400"
+                        icon={Wallet}
+                        colorTheme="warning"
+                        trend="11.2%"
+                        trendDirection="up"
+                        trendLabel="vs yesterday"
+                    />
                 </div>
 
                 {/* Analytics & Revenue Breakdown */}

@@ -85,27 +85,26 @@ export default function TodaySalesView() {
       {/* Stats Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 shrink-0">
         <StatsCard 
-          variant="advanced"
           title="Total Revenue"
           value="₹5,010.50"
           icon={TrendingUp}
-          progressSubtitle="+12.5% VS YESTERDAY"
-          colorTheme="blue"
+          trend="+12.5%"
+          trendDirection="up"
+          trendLabel="vs yesterday"
+          colorTheme="primary"
         />
         <StatsCard 
-          variant="advanced"
           title="Total Invoices"
           value="5"
           icon={CheckCircle2}
-          progressSubtitle="COMPLETED TODAY"
-          colorTheme="green"
+          trendLabel="COMPLETED TODAY"
+          colorTheme="success"
         />
         <StatsCard 
-          variant="advanced"
           title="Avg Order Value"
           value="₹1,002.10"
           icon={TrendingUp}
-          progressSubtitle="HIGHER THAN USUAL"
+          trendLabel="HIGHER THAN USUAL"
           colorTheme="purple"
         />
       </div>
