@@ -3,10 +3,11 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
-import { ArrowLeft, Save, Plus, Trash2, BookOpen } from 'lucide-react';
-import Link from 'next/link';
+import { ArrowLeft, Save, Plus, Trash2, BookOpen, FileText } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function RecipeForm() {
+  const router = useRouter();
   const [ingredients, setIngredients] = useState([
     { id: 1, name: '', quantity: '', unit: '' }
   ]);
@@ -25,20 +26,16 @@ export default function RecipeForm() {
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-3">
-            <Link href="/manufacturing/recipes">
-              <Button variant="outline" className="w-10 h-10 p-0 rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary/50 transition-all">
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            </Link>
+            <Button onClick={() => router.back()} variant="outline" className="w-10 h-10 p-0 rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary/50 transition-all">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
             <div>
               <h2 className="text-2xl font-black text-on-surface tracking-tight">Create New Recipe</h2>
               <p className="text-sm font-medium text-on-surface-variant">Define formula and raw materials</p>
             </div>
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <Link href="/manufacturing/recipes" className="flex-1 sm:flex-none">
-              <Button variant="outline" className="w-full sm:w-auto font-bold border-outline-variant/30">Cancel</Button>
-            </Link>
+            <Button onClick={() => router.back()} variant="outline" className="w-full sm:w-auto font-bold border-outline-variant/30">Cancel</Button>
             <Button className="flex-1 sm:w-auto gradient-button text-white font-bold shadow-md hover:shadow-lg gap-2">
               <Save className="w-4 h-4" />
               Save Recipe

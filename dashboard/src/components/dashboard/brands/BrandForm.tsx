@@ -4,9 +4,11 @@ import React, { useState } from 'react';
 import { Button } from '@/components/common/Button';
 import { ArrowLeft, Save, UploadCloud, Tag, FileText, Globe, User } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/utils/cn';
 
 export default function BrandForm() {
+  const router = useRouter();
   const [dragActive, setDragActive] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -46,22 +48,18 @@ export default function BrandForm() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Link href="/brands">
-            <Button variant="ghost" size="icon" className="w-10 h-10 rounded-xl bg-surface-container-low border border-outline-variant/20 text-on-surface hover:text-primary hover:bg-primary/10 transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
+          <Button onClick={() => router.back()} variant="ghost" size="icon" className="w-10 h-10 rounded-xl bg-surface-container-low border border-outline-variant/20 text-on-surface hover:text-primary hover:bg-primary/10 transition-colors">
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
           <div>
             <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">Add New Brand</h1>
             <p className="text-sm text-on-surface-variant mt-1 font-medium">Onboard a new brand partner to the catalog</p>
           </div>
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <Link href="/brands" className="flex-1 sm:flex-none">
-            <Button variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
-              Cancel
-            </Button>
-          </Link>
+          <Button onClick={() => router.back()} variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
+            Cancel
+          </Button>
           <Button className="flex-1 sm:flex-none gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl">
             <Save className="w-4 h-4" />
             <span className="font-bold tracking-wide">Save Brand</span>

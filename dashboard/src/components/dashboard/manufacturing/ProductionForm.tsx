@@ -4,29 +4,27 @@ import React from 'react';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
 import { ArrowLeft, Save, PlayCircle, ClipboardList, CheckCircle2 } from 'lucide-react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function ProductionForm() {
+  const router = useRouter();
+
   return (
     <div className="flex flex-col h-full bg-background overflow-y-auto custom-scrollbar w-full mx-auto">
       {/* Header Sticky */}
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-3">
-            <Link href="/manufacturing/productions">
-              <Button variant="outline" className="w-10 h-10 p-0 rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary/50 transition-all">
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            </Link>
+            <Button onClick={() => router.back()} variant="outline" className="w-10 h-10 p-0 rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary/50 transition-all">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
             <div>
               <h2 className="text-2xl font-black text-on-surface tracking-tight">New Production Run</h2>
               <p className="text-sm font-medium text-on-surface-variant">Log a new manufacturing process</p>
             </div>
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <Link href="/manufacturing/productions" className="flex-1 sm:flex-none">
-              <Button variant="outline" className="w-full sm:w-auto font-bold border-outline-variant/30">Cancel</Button>
-            </Link>
+            <Button onClick={() => router.back()} variant="outline" className="flex-1 sm:flex-none font-bold border-outline-variant/30">Cancel</Button>
             <Button className="flex-1 sm:w-auto gradient-button text-white font-bold shadow-md hover:shadow-lg gap-2">
               <PlayCircle className="w-4 h-4" />
               Start Production
