@@ -154,7 +154,7 @@ export default function SideNavBar({ isOpen, onClose }: SideNavBarProps) {
 
   const toggleSubMenu = (name: string) => {
     setOpenSubMenus(prev =>
-      prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name]
+      prev.includes(name) ? [] : [name]
     );
   };
 
@@ -162,7 +162,7 @@ export default function SideNavBar({ isOpen, onClose }: SideNavBarProps) {
   useEffect(() => {
     erpNavLinks.forEach(item => {
       if (item.children?.some(child => pathname === child.href)) {
-        setOpenSubMenus(prev => prev.includes(item.name) ? prev : [...prev, item.name]);
+        setOpenSubMenus([item.name]);
       }
     });
   }, [pathname]);
