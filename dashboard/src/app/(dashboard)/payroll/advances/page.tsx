@@ -1,6 +1,6 @@
 import React from 'react';
-import SalaryAdvanceForm from '@/components/dashboard/payroll/SalaryAdvanceForm';
+import SalaryAdvancesView from '@/components/dashboard/payroll/SalaryAdvancesView';
 
-export default function Page() {
-  return <SalaryAdvanceForm />;
+export default function SalaryAdvancesPage() {
+  return <SalaryAdvancesView />;
 }

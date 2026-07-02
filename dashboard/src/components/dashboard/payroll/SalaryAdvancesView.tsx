@@ -5,52 +5,34 @@ import { DataTable } from '@/components/common/DataTable';
 import { Button } from '@/components/common/Button';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { StatsCard } from '@/components/common/StatsCard';
-import { Plus, Download, Filter, Search, Users, UserCheck, CalendarOff, UserPlus, Eye, Edit, Trash2 } from 'lucide-react';
+import { Plus, Download, Filter, Search, Banknote, HandCoins, UserMinus, Eye, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
 // Mock Data
-const teamKPIs = [
-  { title: "Total Employees", value: "24", trend: "+2 this month", isPositive: true, icon: Users },
-  { title: "Active Staff", value: "21", trend: "Currently working", isPositive: true, icon: UserCheck },
-  { title: "On Leave", value: "3", trend: "Returning next week", isPositive: false, icon: CalendarOff },
-  { title: "New Hires", value: "2", trend: "In last 30 days", isPositive: true, icon: UserPlus },
+const advanceKPIs = [
+  { title: "Total Granted", value: "₹45,000", trend: "This month", isPositive: true, icon: Banknote },
+  { title: "Recovered", value: "₹15,000", trend: "Via deductions", isPositive: true, icon: HandCoins },
+  { title: "Outstanding", value: "₹30,000", trend: "Active balances", isPositive: false, icon: UserMinus },
 ];
 
-const teamList = [
-  { id: 'EMP-001', name: 'Ravi Verma', role: 'Store Manager', department: 'Management', email: 'ravi.v@example.com', phone: '+91 98765 11111', status: 'Active', joinDate: 'Jan 10, 2025' },
-  { id: 'EMP-002', name: 'Anjali Sharma', role: 'Sales Executive', department: 'Sales', email: 'anjali.s@example.com', phone: '+91 98765 11112', status: 'Active', joinDate: 'Feb 15, 2025' },
-  { id: 'EMP-003', name: 'Suresh Kumar', role: 'Warehouse Staff', department: 'Operations', email: 'suresh.k@example.com', phone: '+91 98765 11113', status: 'On Leave', joinDate: 'Mar 01, 2025' },
-  { id: 'EMP-004', name: 'Megha Gupta', role: 'Cashier', department: 'Finance', email: 'megha.g@example.com', phone: '+91 98765 11114', status: 'Active', joinDate: 'Apr 20, 2025' },
-  { id: 'EMP-005', name: 'Rahul Desai', role: 'Delivery Agent', department: 'Logistics', email: 'rahul.d@example.com', phone: '+91 98765 11115', status: 'Inactive', joinDate: 'Jun 05, 2025' },
+const advanceList = [
+  { id: 'ADV-010', employeeName: 'Suresh Kumar', amount: 10000, dateRequested: 'Jul 15, 2026', repaymentTerm: '₹2,000/mo', status: 'Approved' },
+  { id: 'ADV-011', employeeName: 'Megha Gupta', amount: 5000, dateRequested: 'Jul 20, 2026', repaymentTerm: 'Next Salary', status: 'Pending' },
+  { id: 'ADV-012', employeeName: 'Ravi Verma', amount: 15000, dateRequested: 'May 10, 2026', repaymentTerm: '₹3,000/mo', status: 'Settled' },
 ];
 
-export default function TeamMembersView() {
+export default function SalaryAdvancesView() {
   const columns = [
-    { header: 'ID', accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id}</span> },
-    { header: 'Name', accessorKey: 'name', cell: (row: any) => (
-      <div className="flex flex-col">
-        <span className="font-semibold text-primary">{row.name}</span>
-        <span className="text-xs text-on-surface-variant">{row.email}</span>
-      </div>
-    )},
-    { header: 'Role & Dept', accessorKey: 'role', cell: (row: any) => (
-      <div className="flex flex-col">
-        <span className="text-sm font-medium text-on-surface">{row.role}</span>
-        <span className="text-xs text-on-surface-variant">{row.department}</span>
-      </div>
-    )},
-    { header: 'Phone', accessorKey: 'phone', cell: (row: any) => <span className="text-sm font-medium text-on-surface">{row.phone}</span> },
-    { header: 'Join Date', accessorKey: 'joinDate', cell: (row: any) => <span className="text-sm text-on-surface-variant">{row.joinDate}</span> },
+    { header: 'Ref ID', accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id}</span> },
+    { header: 'Employee', accessorKey: 'employeeName', cell: (row: any) => <span className="font-semibold text-primary">{row.employeeName}</span> },
+    { header: 'Amount', accessorKey: 'amount', cell: (row: any) => <span className="font-bold text-on-surface">₹{row.amount.toLocaleString()}</span> },
+    { header: 'Date Requested', accessorKey: 'dateRequested', cell: (row: any) => <span className="text-sm text-on-surface-variant">{row.dateRequested}</span> },
+    { header: 'Repayment Terms', accessorKey: 'repaymentTerm', cell: (row: any) => <span className="text-sm font-medium text-on-surface">{row.repaymentTerm}</span> },
     { header: 'Status', accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
     { header: 'Actions', accessorKey: 'actions', cell: (row: any) => (
       <div className="flex items-center gap-2">
-        <Link href={`/team/${row.id}`}>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
-            <Eye className="w-4 h-4" />
-          </Button>
-        </Link>
         <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
-          <Edit className="w-4 h-4" />
+          <Eye className="w-4 h-4" />
         </Button>
         <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
           <Trash2 className="w-4 h-4" />
@@ -64,26 +46,26 @@ export default function TeamMembersView() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
         <div>
-          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">Team Members</h2>
-          <p className="text-sm font-medium text-on-surface-variant">Manage your employees, roles, and HR details.</p>
+          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">Salary Advances</h2>
+          <p className="text-sm font-medium text-on-surface-variant">Manage employee advance requests and EMI deductions.</p>
         </div>
         <div className="flex gap-3 w-full md:w-auto">
           <Button variant="outline" className="flex-1 md:flex-none bg-surface-container-lowest border-primary text-primary px-4 py-2 rounded-lg font-bold hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2 shadow-sm">
             <Download className="w-4 h-4" />
-            Export
+            Export Data
           </Button>
-          <Link href="/team/new" className="flex-1 md:flex-none">
+          <Link href="/payroll/advances/new" className="flex-1 md:flex-none">
             <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 border-none">
               <Plus className="w-4 h-4" />
-              Add Member
+              Grant Advance
             </Button>
           </Link>
         </div>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-        {teamKPIs.map((kpi, idx) => (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
+        {advanceKPIs.map((kpi, idx) => (
           <StatsCard key={idx} {...kpi} />
         ))}
       </div>
@@ -96,7 +78,7 @@ export default function TeamMembersView() {
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
             <input 
               type="text"
-              placeholder="Search by name, role, or email..."
+              placeholder="Search employee name..."
               className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface border border-outline-variant/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm font-medium transition-all text-on-surface placeholder:text-on-surface-variant/50"
             />
           </div>
@@ -110,7 +92,7 @@ export default function TeamMembersView() {
         <div className="flex-1 overflow-auto custom-scrollbar">
           <DataTable 
             columns={columns} 
-            data={teamList} 
+            data={advanceList} 
           />
         </div>
       </div>

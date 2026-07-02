@@ -5,56 +5,51 @@ import { DataTable } from '@/components/common/DataTable';
 import { Button } from '@/components/common/Button';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { StatsCard } from '@/components/common/StatsCard';
-import { Plus, Download, Filter, Search, Users, UserCheck, CalendarOff, UserPlus, Eye, Edit, Trash2 } from 'lucide-react';
+import { Plus, Download, Filter, Search, Wallet, CheckCircle2, AlertCircle, CalendarClock, Eye, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 
 // Mock Data
-const teamKPIs = [
-  { title: "Total Employees", value: "24", trend: "+2 this month", isPositive: true, icon: Users },
-  { title: "Active Staff", value: "21", trend: "Currently working", isPositive: true, icon: UserCheck },
-  { title: "On Leave", value: "3", trend: "Returning next week", isPositive: false, icon: CalendarOff },
-  { title: "New Hires", value: "2", trend: "In last 30 days", isPositive: true, icon: UserPlus },
+const salaryKPIs = [
+  { title: "Total Payroll (July)", value: "₹2,45,000", trend: "+5% vs last month", isPositive: true, icon: Wallet },
+  { title: "Amount Paid", value: "₹1,80,000", trend: "75% completed", isPositive: true, icon: CheckCircle2 },
+  { title: "Pending Amount", value: "₹65,000", trend: "5 employees pending", isPositive: false, icon: AlertCircle },
+  { title: "Next Payday", value: "Aug 1st", trend: "In 7 days", isPositive: true, icon: CalendarClock },
 ];
 
-const teamList = [
-  { id: 'EMP-001', name: 'Ravi Verma', role: 'Store Manager', department: 'Management', email: 'ravi.v@example.com', phone: '+91 98765 11111', status: 'Active', joinDate: 'Jan 10, 2025' },
-  { id: 'EMP-002', name: 'Anjali Sharma', role: 'Sales Executive', department: 'Sales', email: 'anjali.s@example.com', phone: '+91 98765 11112', status: 'Active', joinDate: 'Feb 15, 2025' },
-  { id: 'EMP-003', name: 'Suresh Kumar', role: 'Warehouse Staff', department: 'Operations', email: 'suresh.k@example.com', phone: '+91 98765 11113', status: 'On Leave', joinDate: 'Mar 01, 2025' },
-  { id: 'EMP-004', name: 'Megha Gupta', role: 'Cashier', department: 'Finance', email: 'megha.g@example.com', phone: '+91 98765 11114', status: 'Active', joinDate: 'Apr 20, 2025' },
-  { id: 'EMP-005', name: 'Rahul Desai', role: 'Delivery Agent', department: 'Logistics', email: 'rahul.d@example.com', phone: '+91 98765 11115', status: 'Inactive', joinDate: 'Jun 05, 2025' },
+const salaryList = [
+  { id: 'SAL-001', employeeName: 'Ravi Verma', role: 'Store Manager', baseSalary: 45000, deductions: 2000, netSalary: 43000, status: 'Paid', date: 'Jul 24, 2026' },
+  { id: 'SAL-002', employeeName: 'Anjali Sharma', role: 'Sales Executive', baseSalary: 30000, deductions: 500, netSalary: 29500, status: 'Paid', date: 'Jul 24, 2026' },
+  { id: 'SAL-003', employeeName: 'Suresh Kumar', role: 'Warehouse Staff', baseSalary: 25000, deductions: 0, netSalary: 25000, status: 'Pending', date: '-' },
+  { id: 'SAL-004', employeeName: 'Megha Gupta', role: 'Cashier', baseSalary: 28000, deductions: 1000, netSalary: 27000, status: 'Pending', date: '-' },
+  { id: 'SAL-005', employeeName: 'Rahul Desai', role: 'Delivery Agent', baseSalary: 22000, deductions: 0, netSalary: 22000, status: 'Paid', date: 'Jul 20, 2026' },
 ];
 
-export default function TeamMembersView() {
+export default function StaffSalaryView() {
   const columns = [
     { header: 'ID', accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id}</span> },
-    { header: 'Name', accessorKey: 'name', cell: (row: any) => (
+    { header: 'Employee', accessorKey: 'employeeName', cell: (row: any) => (
       <div className="flex flex-col">
-        <span className="font-semibold text-primary">{row.name}</span>
-        <span className="text-xs text-on-surface-variant">{row.email}</span>
+        <span className="font-semibold text-primary">{row.employeeName}</span>
+        <span className="text-xs text-on-surface-variant">{row.role}</span>
       </div>
     )},
-    { header: 'Role & Dept', accessorKey: 'role', cell: (row: any) => (
-      <div className="flex flex-col">
-        <span className="text-sm font-medium text-on-surface">{row.role}</span>
-        <span className="text-xs text-on-surface-variant">{row.department}</span>
-      </div>
-    )},
-    { header: 'Phone', accessorKey: 'phone', cell: (row: any) => <span className="text-sm font-medium text-on-surface">{row.phone}</span> },
-    { header: 'Join Date', accessorKey: 'joinDate', cell: (row: any) => <span className="text-sm text-on-surface-variant">{row.joinDate}</span> },
+    { header: 'Base Salary', accessorKey: 'baseSalary', cell: (row: any) => <span className="font-medium text-on-surface">₹{row.baseSalary.toLocaleString()}</span> },
+    { header: 'Deductions', accessorKey: 'deductions', cell: (row: any) => <span className="font-medium text-error">-₹{row.deductions.toLocaleString()}</span> },
+    { header: 'Net Salary', accessorKey: 'netSalary', cell: (row: any) => <span className="font-black text-on-surface">₹{row.netSalary.toLocaleString()}</span> },
+    { header: 'Payment Date', accessorKey: 'date', cell: (row: any) => <span className="text-sm text-on-surface-variant">{row.date}</span> },
     { header: 'Status', accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
     { header: 'Actions', accessorKey: 'actions', cell: (row: any) => (
       <div className="flex items-center gap-2">
-        <Link href={`/team/${row.id}`}>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
-            <Eye className="w-4 h-4" />
-          </Button>
-        </Link>
         <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
-          <Edit className="w-4 h-4" />
+          <Eye className="w-4 h-4" />
         </Button>
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
-          <Trash2 className="w-4 h-4" />
-        </Button>
+        {row.status === 'Pending' && (
+          <Link href={`/payroll/staff/pay?employeeId=${row.id}`}>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-success hover:text-success hover:bg-success/10 transition-colors" title="Process Payment">
+              <CreditCard className="w-4 h-4" />
+            </Button>
+          </Link>
+        )}
       </div>
     )},
   ];
@@ -64,18 +59,18 @@ export default function TeamMembersView() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
         <div>
-          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">Team Members</h2>
-          <p className="text-sm font-medium text-on-surface-variant">Manage your employees, roles, and HR details.</p>
+          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">Staff Salary</h2>
+          <p className="text-sm font-medium text-on-surface-variant">Manage employee payroll and track monthly disbursements.</p>
         </div>
         <div className="flex gap-3 w-full md:w-auto">
           <Button variant="outline" className="flex-1 md:flex-none bg-surface-container-lowest border-primary text-primary px-4 py-2 rounded-lg font-bold hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2 shadow-sm">
             <Download className="w-4 h-4" />
-            Export
+            Export Payroll
           </Button>
-          <Link href="/team/new" className="flex-1 md:flex-none">
+          <Link href="/payroll/staff/pay" className="flex-1 md:flex-none">
             <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 border-none">
               <Plus className="w-4 h-4" />
-              Add Member
+              Process Salary
             </Button>
           </Link>
         </div>
@@ -83,7 +78,7 @@ export default function TeamMembersView() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-        {teamKPIs.map((kpi, idx) => (
+        {salaryKPIs.map((kpi, idx) => (
           <StatsCard key={idx} {...kpi} />
         ))}
       </div>
@@ -96,7 +91,7 @@ export default function TeamMembersView() {
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
             <input 
               type="text"
-              placeholder="Search by name, role, or email..."
+              placeholder="Search employee name..."
               className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface border border-outline-variant/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm font-medium transition-all text-on-surface placeholder:text-on-surface-variant/50"
             />
           </div>
@@ -110,7 +105,7 @@ export default function TeamMembersView() {
         <div className="flex-1 overflow-auto custom-scrollbar">
           <DataTable 
             columns={columns} 
-            data={teamList} 
+            data={salaryList} 
           />
         </div>
       </div>

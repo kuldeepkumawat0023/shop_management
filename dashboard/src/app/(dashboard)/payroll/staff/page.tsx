@@ -1,6 +1,6 @@
 import React from 'react';
-import StaffListView from '@/components/dashboard/payroll/StaffListView';
+import StaffSalaryView from '@/components/dashboard/payroll/StaffSalaryView';
 
-export default function Page() {
-  return <StaffListView />;
+export default function StaffSalaryPage() {
+  return <StaffSalaryView />;
 }

@@ -1,11 +1,124 @@
+'use client';
+
 import React from 'react';
+import { DataTable } from '@/components/common/DataTable';
+import { Button } from '@/components/common/Button';
+import { StatusBadge } from '@/components/common/StatusBadge';
+import { StatsCard } from '@/components/common/StatsCard';
+import { Plus, Download, Filter, Search, ArrowDownLeft, ArrowUpRight, Clock, AlertCircle, Eye, Printer, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+
+// Mock Data
+const paymentKPIs = [
+  { title: "Total Received", value: "₹3,25,000", trend: "Money In (This Month)", isPositive: true, icon: ArrowDownLeft },
+  { title: "Total Paid", value: "₹1,45,000", trend: "Money Out (This Month)", isPositive: false, icon: ArrowUpRight },
+  { title: "Pending Receivables", value: "₹45,000", trend: "To collect from customers", isPositive: true, icon: Clock },
+  { title: "Pending Payables", value: "₹12,000", trend: "To pay to suppliers", isPositive: false, icon: AlertCircle },
+];
+
+const paymentList = [
+  { id: 'PAY-2026-081', date: 'Jul 24, 2026', party: 'Ramesh Singh', type: 'Money In', amount: 15000, method: 'UPI', status: 'Completed' },
+  { id: 'PAY-2026-080', date: 'Jul 24, 2026', party: 'Global Traders', type: 'Money Out', amount: 45000, method: 'Bank Transfer', status: 'Completed' },
+  { id: 'PAY-2026-079', date: 'Jul 23, 2026', party: 'TechCorp Solutions', type: 'Money In', amount: 85000, method: 'Cheque', status: 'Pending' },
+  { id: 'PAY-2026-078', date: 'Jul 22, 2026', party: 'Local Suppliers', type: 'Money Out', amount: 12000, method: 'Cash', status: 'Completed' },
+  { id: 'PAY-2026-077', date: 'Jul 20, 2026', party: 'Walk-in Customer', type: 'Money In', amount: 5000, method: 'Cash', status: 'Completed' },
+];
 
 export default function PaymentsView() {
+  const columns = [
+    { header: 'Date', accessorKey: 'date', cell: (row: any) => <span className="text-sm font-medium text-on-surface-variant">{row.date}</span> },
+    { header: 'Ref ID', accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id}</span> },
+    { header: 'Type', accessorKey: 'type', cell: (row: any) => (
+      <div className="flex items-center gap-1.5">
+        {row.type === 'Money In' ? (
+          <ArrowDownLeft className="w-4 h-4 text-success" />
+        ) : (
+          <ArrowUpRight className="w-4 h-4 text-error" />
+        )}
+        <span className={`text-xs font-bold ${row.type === 'Money In' ? 'text-success' : 'text-error'}`}>
+          {row.type}
+        </span>
+      </div>
+    )},
+    { header: 'Party Name', accessorKey: 'party', cell: (row: any) => <span className="font-semibold text-on-surface">{row.party}</span> },
+    { header: 'Amount', accessorKey: 'amount', cell: (row: any) => (
+      <span className={`font-black ${row.type === 'Money In' ? 'text-success' : 'text-on-surface'}`}>
+        {row.type === 'Money In' ? '+' : '-'}₹{row.amount.toLocaleString()}
+      </span>
+    )},
+    { header: 'Method', accessorKey: 'method', cell: (row: any) => <span className="text-sm font-medium text-on-surface-variant">{row.method}</span> },
+    { header: 'Status', accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
+    { header: 'Actions', accessorKey: 'actions', cell: (row: any) => (
+      <div className="flex items-center gap-2">
+        <Link href={`/payments/${row.id}`}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
+            <Eye className="w-4 h-4" />
+          </Button>
+        </Link>
+        <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
+          <Printer className="w-4 h-4" />
+        </Button>
+        <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+          <Trash2 className="w-4 h-4" />
+        </Button>
+      </div>
+    )},
+  ];
+
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">PaymentsView</h2>
-      <div className="glass-panel p-6 rounded-xl">
-        <p className="text-on-surface-variant">Content for PaymentsView goes here.</p>
+    <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full mx-auto">
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
+        <div>
+          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">Payments</h2>
+          <p className="text-sm font-medium text-on-surface-variant">Track all incoming receipts and outgoing payments.</p>
+        </div>
+        <div className="flex gap-3 w-full md:w-auto">
+          <Button variant="outline" className="flex-1 md:flex-none bg-surface-container-lowest border-primary text-primary px-4 py-2 rounded-lg font-bold hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2 shadow-sm">
+            <Download className="w-4 h-4" />
+            Export Statement
+          </Button>
+          <Link href="/payments/new" className="flex-1 md:flex-none">
+            <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 border-none">
+              <Plus className="w-4 h-4" />
+              Record Payment
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+        {paymentKPIs.map((kpi, idx) => (
+          <StatsCard key={idx} {...kpi} />
+        ))}
+      </div>
+
+      {/* Table Section */}
+      <div className="flex flex-col flex-1 min-h-0 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm overflow-hidden">
+        {/* Table Toolbar */}
+        <div className="p-4 md:p-5 border-b border-outline-variant/20 flex flex-col sm:flex-row justify-between items-center gap-4 bg-surface-container-lowest/50">
+          <div className="relative w-full sm:w-96">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
+            <input 
+              type="text"
+              placeholder="Search by Party or Ref ID..."
+              className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface border border-outline-variant/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm font-medium transition-all text-on-surface placeholder:text-on-surface-variant/50"
+            />
+          </div>
+          <Button variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface bg-surface font-semibold gap-2">
+            <Filter className="w-4 h-4" />
+            Filters
+          </Button>
+        </div>
+
+        {/* Data Table */}
+        <div className="flex-1 overflow-auto custom-scrollbar">
+          <DataTable 
+            columns={columns} 
+            data={paymentList} 
+          />
+        </div>
       </div>
     </div>
   );
