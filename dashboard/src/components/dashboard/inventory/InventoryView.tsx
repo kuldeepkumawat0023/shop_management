@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { DataTable } from '@/components/common/DataTable';
 import { Button } from '@/components/common/Button';
-import { Package, AlertTriangle, AlertCircle, Banknote, Edit, Eye } from 'lucide-react';
+import { Package, AlertTriangle, AlertCircle, Banknote, Edit, Eye, Trash2 } from 'lucide-react';
 import { StatsCard } from '@/components/common/StatsCard';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { cn } from '@/utils/cn';
@@ -92,6 +92,9 @@ export default function InventoryView() {
           </Button>
           <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10">
             <Edit className="w-4 h-4" />
+          </Button>
+          <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10">
+            <Trash2 className="w-4 h-4" />
           </Button>
         </div>
       )

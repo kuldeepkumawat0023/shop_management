@@ -4,7 +4,7 @@ import React from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { DataTable } from '@/components/common/DataTable';
 import { Button } from '@/components/common/Button';
-import { Printer, Eye, TrendingUp, CheckCircle2 } from 'lucide-react';
+import { Printer, Eye, TrendingUp, CheckCircle2, Edit, Trash2 } from 'lucide-react';
 import { StatsCard } from '@/components/common/StatsCard';
 import { StatusBadge } from '@/components/common/StatusBadge';
 
@@ -60,11 +60,14 @@ export default function TodaySalesView() {
       accessorKey: 'actions',
       cell: (row: any) => (
         <div className="flex items-center gap-2">
-          <Button size="icon" variant="ghost" className="h-8 w-8 text-primary hover:bg-primary/10">
+          <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
             <Eye className="w-4 h-4" />
           </Button>
-          <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10">
-            <Printer className="w-4 h-4" />
+          <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
+            <Edit className="w-4 h-4" />
+          </Button>
+          <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+            <Trash2 className="w-4 h-4" />
           </Button>
         </div>
       )

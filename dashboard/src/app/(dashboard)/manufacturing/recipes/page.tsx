@@ -1,6 +1,6 @@
 import React from 'react';
-import RecipeForm from '@/components/dashboard/manufacturing/RecipeForm';
+import RecipesView from '@/components/dashboard/manufacturing/RecipesView';
 
 export default function Page() {
-  return <RecipeForm />;
+  return <RecipesView />;
 }

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/common/Button';
 import { DataTable } from '@/components/common/DataTable';
 import { StatusBadge } from '@/components/common/StatusBadge';
-import { ArrowLeft, Edit, Trash2, Package, CheckCircle2, AlertCircle, Eye, FolderTree, LayoutGrid } from 'lucide-react';
+import { ArrowLeft, Tag, Layers, Search, Filter, Download, MoreVertical, Edit, Trash2, Globe, Archive, Package, Plus, ImageIcon, Type, Link as LinkIcon, Eye, CheckCircle2, AlertCircle, FolderTree, LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/utils/cn';
 
@@ -116,6 +116,12 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
               <Eye className="w-4 h-4" />
             </Button>
           </Link>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
+            <Edit className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+            <Trash2 className="w-4 h-4" />
+          </Button>
         </div>
       )
     }

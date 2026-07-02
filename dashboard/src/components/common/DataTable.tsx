@@ -51,7 +51,7 @@ export function DataTable({ data, columns, searchPlaceholder, headerContent, cla
     <div className={cn("flex flex-col w-full bg-surface-container-lowest border border-outline-variant/20 rounded-2xl overflow-hidden shadow-sm", className)}>
       {(searchPlaceholder || headerContent) && (
         <div className="p-4 border-b border-outline-variant/10 flex flex-col sm:flex-row items-center justify-between gap-4 bg-surface/50">
-          <div className="flex-1 w-full flex overflow-x-auto custom-scrollbar">
+          <div className="flex-1 w-full flex overflow-x-auto">
             {headerContent}
           </div>
           {searchPlaceholder && (
@@ -69,7 +69,7 @@ export function DataTable({ data, columns, searchPlaceholder, headerContent, cla
         </div>
       )}
       
-      <div className="w-full overflow-x-auto custom-scrollbar">
+      <div className="w-full overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead className="sticky top-0 bg-surface-container border-b border-outline-variant/10 z-10">
             <tr>

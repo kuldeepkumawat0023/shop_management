@@ -1,6 +1,6 @@
 import React from 'react';
-import ProductionLogView from '@/components/dashboard/manufacturing/ProductionLogView';
+import ProductionsView from '@/components/dashboard/manufacturing/ProductionsView';
 
 export default function Page() {
-  return <ProductionLogView />;
+  return <ProductionsView />;
 }
