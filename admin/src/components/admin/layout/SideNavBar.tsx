@@ -24,7 +24,8 @@ import {
   CreditCard,
   BellRing,
   FileText,
-  Webhook
+  Webhook,
+  TrendingUp
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { Button } from '@/components/common/Button';
@@ -64,6 +65,16 @@ const adminNavLinks: NavLink[] = [
     icon: Headphones,
   },
   {
+    name: 'Revenue',
+    href: '/revenue',
+    icon: TrendingUp,
+  },
+  {
+    name: 'Payments',
+    href: '/payments',
+    icon: CreditCard,
+  },
+  {
     name: 'Team Management',
     href: '/team',
     icon: Users,
@@ -84,11 +95,10 @@ const adminNavLinks: NavLink[] = [
     href: '/settings',
     icon: Settings,
     children: [
-      { name: 'Platform Config', href: '/settings/platform', icon: Sliders },
-      { name: 'Payment Gateways', href: '/settings/payments', icon: CreditCard },
+      { name: 'User Profile', href: '/settings/profile', icon: Sliders },
+      { name: 'Security', href: '/settings/security', icon: Shield },
+      { name: 'Roles & Permissions', href: '/settings/roles', icon: Key },
       { name: 'Notifications', href: '/settings/notifications', icon: BellRing },
-      { name: 'Tax & Compliance', href: '/settings/compliance', icon: FileText },
-      { name: 'API Integrations', href: '/settings/api', icon: Webhook },
     ]
   },
 ];

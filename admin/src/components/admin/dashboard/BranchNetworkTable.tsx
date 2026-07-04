@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { DataTable } from '@/components/common/DataTable';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { Button } from '@/components/common/Button';
@@ -121,20 +122,6 @@ export default function BranchNetworkTable() {
         <StatusBadge status={row.status} />
       ),
     },
-    {
-      header: 'Action',
-      accessorKey: 'action',
-      cell: () => (
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs font-semibold px-3 bg-surface border-outline-variant/50 hover:bg-surface-container-high hover:text-primary">
-            Manage
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary rounded-lg">
-            <MoreHorizontal className="w-4 h-4" />
-          </Button>
-        </div>
-      ),
-    },
   ];
 
   return (
@@ -144,9 +131,11 @@ export default function BranchNetworkTable() {
           <h3 className="text-lg font-bold text-on-surface">Branch Network</h3>
           <p className="text-sm text-on-surface-variant mt-0.5">Monitor and manage all connected stores across the platform.</p>
         </div>
-        <Button variant="outline" size="sm" className="hidden sm:flex items-center gap-2 border-outline-variant/50">
-          View All Branches <ChevronRight className="w-4 h-4" />
-        </Button>
+        <Link href="/branches">
+          <Button variant="outline" size="sm" className="hidden sm:flex items-center gap-2 border-outline-variant/50">
+            View All Branches <ChevronRight className="w-4 h-4" />
+          </Button>
+        </Link>
       </div>
       
       <DataTable 
