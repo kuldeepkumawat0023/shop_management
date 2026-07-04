@@ -32,20 +32,20 @@ export function ConfirmModal({
         return {
           icon: <AlertCircle className="w-6 h-6 text-error" />,
           bgClass: 'bg-error/10',
-          confirmBtnVariant: 'danger' as const
+          confirmBtnVariant: 'default' as const
         };
       case 'info':
         return {
           icon: <Info className="w-6 h-6 text-primary" />,
           bgClass: 'bg-primary/10',
-          confirmBtnVariant: 'primary' as const
+          confirmBtnVariant: 'default' as const
         };
       case 'warning':
       default:
         return {
           icon: <AlertTriangle className="w-6 h-6 text-secondary" />,
           bgClass: 'bg-secondary/10',
-          confirmBtnVariant: 'primary' as const
+          confirmBtnVariant: 'default' as const
         };
     }
   };

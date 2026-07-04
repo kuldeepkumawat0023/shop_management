@@ -17,9 +17,10 @@ interface DataTableProps {
   headerContent?: React.ReactNode;
   className?: string;
   itemsPerPage?: number;
+  onRowClick?: (row: any) => void;
 }
 
-export function DataTable({ data, columns, searchPlaceholder, headerContent, className, itemsPerPage }: DataTableProps) {
+export function DataTable({ data, columns, searchPlaceholder, headerContent, className, itemsPerPage, onRowClick }: DataTableProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -88,7 +89,8 @@ export function DataTable({ data, columns, searchPlaceholder, headerContent, cla
               paginatedData.map((row, rowIdx) => (
                 <tr 
                   key={row.id || rowIdx} 
-                  className="hover:bg-surface/40 transition-colors group"
+                  className={cn("hover:bg-surface/40 transition-colors group", onRowClick && "cursor-pointer")}
+                  onClick={() => onRowClick && onRowClick(row)}
                 >
                   {columns.map((col, colIdx) => (
                     <td 

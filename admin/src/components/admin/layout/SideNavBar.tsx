@@ -9,7 +9,7 @@ import {
   Key,
   BarChart3,
   Megaphone,
-  LifeBuoy,
+  Headphones,
   Users,
   Server,
   ShieldAlert,
@@ -44,8 +44,8 @@ const adminNavLinks: NavLink[] = [
     icon: Store,
   },
   {
-    name: 'Licensing',
-    href: '/licensing',
+    name: 'Subscriptions',
+    href: '/subscriptions',
     icon: Key,
   },
   {
@@ -59,9 +59,9 @@ const adminNavLinks: NavLink[] = [
     icon: Megaphone,
   },
   {
-    name: 'Help Desk',
-    href: '/help-desk',
-    icon: LifeBuoy,
+    name: 'Contact',
+    href: '/contact',
+    icon: Headphones,
   },
   {
     name: 'Admins',

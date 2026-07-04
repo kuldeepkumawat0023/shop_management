@@ -5,11 +5,10 @@ import { DataTable } from '@/components/common/DataTable';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { Button } from '@/components/common/Button';
 import { StatsCard } from '@/components/common/StatsCard';
-import { Store, MapPin, CreditCard, Plus, CheckCircle2, AlertCircle, LayoutGrid, Eye, Edit, Trash2 } from 'lucide-react';
+import { DeleteModal } from '@/components/common/DeleteModal';
+import { Store, MapPin, CreditCard, Plus, CheckCircle2, AlertCircle, LayoutGrid, Eye, Edit, Trash2, IndianRupee } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatters';
 import { cn } from '@/utils/cn';
-import BranchDetailView from './BranchDetailView';
-import BranchStatusModal from './BranchStatusModal';
 import Link from 'next/link';
 
 // Mock Data for Branches
@@ -25,23 +24,8 @@ const mockBranches = [
 
 export default function BranchesView() {
   const [activeTab, setActiveTab] = useState('All Branches');
+  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; branch: any }>({ isOpen: false, branch: null });
   const tabs = ['All Branches', 'Live', 'Suspended'];
-
-  const [selectedBranch, setSelectedBranch] = useState<any>(null);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [statusModal, setStatusModal] = useState<{isOpen: boolean, action: 'suspend' | 'activate' | 'terminate' | null}>({
-    isOpen: false,
-    action: null
-  });
-
-  const handleViewDetails = (branch: any) => {
-    setSelectedBranch(branch);
-    setIsDetailOpen(true);
-  };
-
-  const handleStatusAction = (action: 'suspend' | 'activate' | 'terminate') => {
-    setStatusModal({ isOpen: true, action });
-  };
 
   // Filter Data based on Tab
   const filteredData = mockBranches.filter(item => {
@@ -107,10 +91,10 @@ export default function BranchesView() {
       header: 'Status',
       accessorKey: 'status',
       cell: (row: any) => (
-        <StatusBadge 
-          status={row.status} 
-          variant="dot" 
-          animate={row.status === 'Live'} 
+        <StatusBadge
+          status={row.status}
+          variant="dot"
+          animate={row.status === 'Live'}
         />
       ),
     },
@@ -119,27 +103,29 @@ export default function BranchesView() {
       accessorKey: 'actions',
       cell: (row: any) => (
         <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => handleViewDetails(row)}
-            className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors"
-          >
-            <Eye className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors"
-          >
-            <Edit className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Link href={`/branches/${row.id}`}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Eye className="w-4 h-4" />
+            </Button>
+          </Link>
+          <Link href={`/branches/${row.id}/edit`}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Edit className="w-4 h-4" />
+            </Button>
+          </Link>
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => {
-              setSelectedBranch(row);
-              handleStatusAction('suspend');
+              setDeleteModal({ isOpen: true, branch: row });
             }}
             className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors"
           >
@@ -153,6 +139,7 @@ export default function BranchesView() {
   const totalBranches = mockBranches.length;
   const activeBranches = mockBranches.filter(c => c.status === 'Live').length;
   const suspendedBranches = mockBranches.filter(c => c.status === 'Suspended').length;
+  const totalRevenue = mockBranches.reduce((acc, curr) => acc + curr.revenue, 0);
 
   const TabsComponent = (
     <div className="flex items-center gap-1 bg-surface-container-low p-1 rounded-lg border border-outline-variant/20 self-start lg:self-auto overflow-x-auto max-w-[calc(100vw-2rem)] lg:max-w-none no-scrollbar">
@@ -181,39 +168,58 @@ export default function BranchesView() {
           <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">Manage Branches</h1>
           <p className="text-sm text-on-surface-variant mt-1 font-medium">View and manage all connected stores across the platform.</p>
         </div>
-        <Button className="gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 shrink-0">
-          <Plus className="w-4 h-4" />
-          <span className="font-bold tracking-wide">Add Branch</span>
-        </Button>
+        <Link href="/branches/new">
+          <Button className="gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 shrink-0">
+            <Plus className="w-4 h-4" />
+            <span className="font-bold tracking-wide">Add Branch</span>
+          </Button>
+        </Link>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
           title="Total Branches"
           value={totalBranches}
           icon={Store}
           colorTheme="primary"
+          trend="142"
+          trendDirection="up"
+          trendLabel="LIFETIME REGISTRATIONS"
         />
         <StatsCard
           title="Live Branches"
           value={activeBranches}
           icon={CheckCircle2}
           colorTheme="success"
+          trend="8"
+          trendDirection="up"
+          trendLabel="NEW THIS WEEK"
         />
         <StatsCard
           title="Suspended Branches"
           value={suspendedBranches}
           icon={AlertCircle}
           colorTheme="warning"
+          trend="2"
+          trendDirection="down"
+          trendLabel="DOWN FROM LAST MONTH"
+        />
+        <StatsCard
+          title="Total MRR"
+          value={formatCurrency(totalRevenue)}
+          icon={IndianRupee}
+          colorTheme="secondary"
+          trend="12%"
+          trendDirection="up"
+          trendLabel="REVENUE GROWTH"
         />
       </div>
 
       {/* Main Table Area */}
       <div className="w-full bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 flex flex-col">
-        <DataTable 
-          data={filteredData} 
-          columns={columns} 
+        <DataTable
+          data={filteredData}
+          columns={columns}
           headerContent={
             <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-6 w-full">
               <div className="flex items-center gap-2 shrink-0">
@@ -229,20 +235,16 @@ export default function BranchesView() {
         />
       </div>
 
-      {/* Slide-out Drawer for Details */}
-      <BranchDetailView 
-        isOpen={isDetailOpen}
-        onClose={() => setIsDetailOpen(false)}
-        branch={selectedBranch}
-        onStatusChangeAction={handleStatusAction}
-      />
-
-      {/* Action Confirmation Modal */}
-      <BranchStatusModal 
-        isOpen={statusModal.isOpen}
-        onClose={() => setStatusModal({ isOpen: false, action: null })}
-        branch={selectedBranch}
-        action={statusModal.action}
+      <DeleteModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, branch: null })}
+        onDelete={() => {
+          // Handle delete logic here
+          setDeleteModal({ isOpen: false, branch: null });
+        }}
+        itemName={deleteModal.branch?.name || ''}
+        itemType="branch"
+        title="Delete Branch?"
       />
     </div>
   );
