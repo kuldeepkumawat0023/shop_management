@@ -1,7 +1,5 @@
+import AuditLogsView from '@/components/admin/system/AuditLogsView';
+
 export default function AuditLogsPage() {
-  return (
-    <div>
-      <h1>Audit Logs</h1>
-    </div>
-  );
+  return <AuditLogsView />;
 }

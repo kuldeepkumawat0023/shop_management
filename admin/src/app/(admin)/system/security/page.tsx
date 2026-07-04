@@ -1,7 +1,5 @@
+import SecurityView from '@/components/admin/system/SecurityView';
+
 export default function SecurityPage() {
-  return (
-    <div>
-      <h1>Security</h1>
-    </div>
-  );
+  return <SecurityView />;
 }

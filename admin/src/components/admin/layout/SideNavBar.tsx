@@ -64,8 +64,8 @@ const adminNavLinks: NavLink[] = [
     icon: Headphones,
   },
   {
-    name: 'Admins',
-    href: '/admins',
+    name: 'Team Management',
+    href: '/team',
     icon: Users,
   },
   {

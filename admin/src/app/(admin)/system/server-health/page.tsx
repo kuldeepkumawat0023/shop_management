@@ -1,7 +1,5 @@
+import ServerHealthView from '@/components/admin/system/ServerHealthView';
+
 export default function ServerHealthPage() {
-  return (
-    <div>
-      <h1>Server Health</h1>
-    </div>
-  );
+  return <ServerHealthView />;
 }
