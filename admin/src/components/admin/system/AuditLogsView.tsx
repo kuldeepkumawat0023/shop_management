@@ -76,12 +76,19 @@ export default function AuditLogsView() {
     {
       header: 'Risk',
       accessorKey: 'risk',
-      cell: (row: any) => (
-        <StatusBadge 
-          status={row.risk} 
-          variant={row.risk === 'Low' ? 'success' : row.risk === 'Medium' ? 'warning' : 'error'} 
-        />
-      )
+      cell: (row: any) => {
+        const colors = {
+          Low: 'bg-success/10 text-success border-success/20',
+          Medium: 'bg-warning/10 text-warning border-warning/20',
+          High: 'bg-error/10 text-error border-error/20'
+        };
+        const colorClass = colors[row.risk as keyof typeof colors] || colors.Low;
+        return (
+          <span className={`inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${colorClass}`}>
+            {row.risk}
+          </span>
+        );
+      }
     },
   ];
 
