@@ -29,7 +29,7 @@ export default function NotFound() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-error/10 rounded-full blur-[120px] pointer-events-none animate-[ping_8s_ease-in-out_infinite]" />
 
       <GlassCard className="relative z-10 p-12 max-w-lg w-full text-center shadow-2xl border-outline-variant/50 backdrop-blur-xl animate-[fade-in-up_0.6s_ease-out]">
-        
+
         {/* Animated Floating Ghost / Icon */}
         <div className="mb-8 flex justify-center">
           <div className="relative w-32 h-32 flex items-center justify-center animate-[bounce_3s_ease-in-out_infinite]">
@@ -45,7 +45,7 @@ export default function NotFound() {
         </h1>
         <h2 className="text-2xl font-bold text-on-surface mb-3">Page Not Found</h2>
         <p className="text-on-surface-variant mb-8 leading-relaxed">
-          Oops! It looks like you've wandered into the unknown. 
+          Oops! It looks like you've wandered into the unknown.
           The page you are looking for does not exist or has been moved.
         </p>
 
@@ -57,8 +57,8 @@ export default function NotFound() {
               Return to Dashboard
             </Button>
           </Link>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={handleGoBack}
             disabled={isGoingBack}
             className="w-full sm:w-auto flex items-center gap-2 border-primary text-primary hover:bg-primary/10 transition-all duration-300"
@@ -70,7 +70,8 @@ export default function NotFound() {
       </GlassCard>
 
       {/* Inline styles for custom animations that Tailwind might not have by default */}
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes fade-in-up {
           0% {
             opacity: 0;

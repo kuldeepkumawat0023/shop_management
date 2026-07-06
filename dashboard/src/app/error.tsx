@@ -20,10 +20,11 @@ export default function GlobalError({
 
   const handleRetry = () => {
     setIsRetrying(true);
+    // Add a small delay so the user can see the spin animation
     setTimeout(() => {
       reset();
       setIsRetrying(false);
-    }, 1000);
+    }, 1000); // spins for 1 second
   };
 
   return (
