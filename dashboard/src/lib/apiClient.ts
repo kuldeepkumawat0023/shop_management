@@ -51,7 +51,7 @@ export interface ApiResponse<T = any> {
 
 // ─── Base URL Configuration ──────────────────────────────────────────────────
 export const getBackendBaseUrl = () => {
-  const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+  const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
   return url.replace(/([^:]\/)\/+/g, "$1").replace(/\/$/, "");
 };
 
@@ -60,12 +60,46 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true // Required for CSRF cookies to be sent and received
 });
+
+let csrfToken: string | null = null;
+let isFetchingCsrf = false;
+let csrfPromise: Promise<string> | null = null;
+
+// Function to fetch CSRF token from backend
+const fetchCsrfToken = async (): Promise<string> => {
+  if (csrfToken) return csrfToken;
+  if (isFetchingCsrf && csrfPromise) return csrfPromise;
+
+  isFetchingCsrf = true;
+  csrfPromise = axios.get(`${getBackendBaseUrl()}/csrf-token`, { withCredentials: true })
+    .then(res => {
+      csrfToken = res.data.csrfToken;
+      isFetchingCsrf = false;
+      return csrfToken as string;
+    })
+    .catch(err => {
+      console.error('Failed to fetch CSRF token', err);
+      isFetchingCsrf = false;
+      return '';
+    });
+
+  return csrfPromise;
+};
 
 // ─── Request Interceptor (Security & Files) ──────────────────────────────────
 apiClient.interceptors.request.use(
-  (config) => {
+  async (config) => {
     if (typeof window !== 'undefined') {
+      // 0. Inject CSRF Token for state-changing requests
+      if (config.method && ['post', 'put', 'patch', 'delete'].includes(config.method.toLowerCase())) {
+        const token = await fetchCsrfToken();
+        if (token) {
+          config.headers['x-csrf-token'] = token;
+        }
+      }
+
       // 1. Dual-Storage Token Recovery
       const token = Cookies.get(TOKEN_KEY);
 

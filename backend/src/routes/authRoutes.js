@@ -2,16 +2,18 @@ const express = require('express');
 const router = express.Router();
 
 const { 
+  register,
   login, 
   googleLogin, 
   forgotPassword, 
   verifyOtp, 
   resetPassword, 
   reactivateAccount,
-  logout 
+  logout
 } = require('../controllers/authController');
 const { protect } = require('../middlewares/authMiddleware');
 
+router.post('/register', register);
 router.post('/login', login);
 router.post('/google-login', googleLogin);
 router.post('/forgot-password', forgotPassword);

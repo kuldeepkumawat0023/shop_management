@@ -29,7 +29,6 @@ const seedSuperAdmin = async () => {
         password: adminPassword,
         role: 'super_admin',
         isOtpVerified: true,
-        isHiringOtpVerified: true,
         isActive: true,
       });
       await admin.save();
@@ -77,7 +76,7 @@ if (process.env.VERCEL) {
   module.exports = app;
 } else {
   // ─── Local / Production Server Mode ─────────────────────
-  const PORT = process.env.PORT || 5000;
+  const PORT = process.env.PORT || 4000;
   const numCPUs = os.cpus().length;
 
   if (cluster.isPrimary && process.env.NODE_ENV === 'production') {

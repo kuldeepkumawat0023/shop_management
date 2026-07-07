@@ -49,6 +49,11 @@ const protect = async (req, res, next) => {
  */
 const authorizeRoles = (...roles) => {
   return (req, res, next) => {
+    // Super admin bypass
+    if (req.user && req.user.role === 'super_admin') {
+      return next();
+    }
+
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({ 
         success: false, 
@@ -60,4 +65,31 @@ const authorizeRoles = (...roles) => {
   };
 };
 
-module.exports = { protect, authorizeRoles };
+/**
+ * Grant access to specific permissions
+ * @param  {...String} permissions - Array of permissions allowed to access the route
+ */
+const authorizePermissions = (...permissions) => {
+  return async (req, res, next) => {
+    // Super admin bypass
+    if (req.user && req.user.role === 'super_admin') {
+      return next();
+    }
+
+    const { getPermissionsForUser } = require('../controllers/authController');
+    const userPermissions = await getPermissionsForUser(req.user);
+
+    const hasPermission = permissions.some(permission => userPermissions.includes(permission));
+
+    if (!hasPermission) {
+      return res.status(403).json({
+        success: false,
+        statusCode: 403,
+        message: 'You do not have permission to perform this action'
+      });
+    }
+    next();
+  };
+};
+
+module.exports = { protect, authorizeRoles, authorizePermissions };

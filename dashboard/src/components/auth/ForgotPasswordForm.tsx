@@ -22,7 +22,7 @@ export default function ForgotPasswordForm() {
     setError('');
 
     try {
-      const response = await authService.forgotPassword({ email });
+      const response = await authService.forgotPassword(email);
 
       if (response.success) {
         setSuccess(true);

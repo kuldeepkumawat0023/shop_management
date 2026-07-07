@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Shop = require('../models/Shop');
 const jwt = require('jsonwebtoken');
 const otpGenerator = require('otp-generator');
 const sendEmail = require('../config/email');
@@ -40,7 +41,7 @@ const getPermissionsForUser = async (user) => {
   let permissions = [];
   
   if (user.role === 'super_admin') {
-    permissions = PERMISSION_LIST;
+    permissions = ['all'];
   } else if (user.role === 'shop_owner') {
     permissions = PERMISSION_LIST; // Can refine if shop owners have slightly less
   } else if (user.customRoleId) {
@@ -58,6 +59,140 @@ const getPermissionsForUser = async (user) => {
   return permissions;
 };
 
+// @desc    Register user
+// @route   POST /api/v1/auth/register
+// @access  Public
+exports.register = async (req, res, next) => {
+  try {
+    const { fullname, email, countryCode, phoneNumber, password, confirmPassword, captchaToken, shopName } = req.body;
+
+    // Validate input
+    if (!fullname || !email || !phoneNumber || !password || !confirmPassword) {
+      return res.status(400).json({ success: false, statusCode: 400, message: 'Please provide all required fields', data: null });
+    }
+
+    /* // Ponytail: Hidden for Phase 2
+    if (process.env.RECAPTCHA_SECRET_KEY && !captchaToken) {
+        return res.status(400).json({ success: false, statusCode: 400, message: 'reCAPTCHA token missing', data: null });
+    }
+    const isCaptchaValid = await verifyRecaptcha(captchaToken);
+    if (!isCaptchaValid) {
+      return res.status(400).json({ success: false, statusCode: 400, message: 'reCAPTCHA verification failed', data: null });
+    }
+    */
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ success: false, statusCode: 400, message: 'Passwords do not match', data: null });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Check if user exists
+    const userExists = await User.findOne({ email: normalizedEmail });
+
+    if (userExists) {
+      if (userExists.isActive) {
+        return res.status(409).json({ success: false, statusCode: 409, message: 'User already exists', data: null });
+      } else {
+        // --- REACTIVATION FLOW ---
+        // Generate 6 digit OTP
+        const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false });
+
+        // Set OTP and expiry (10 mins)
+        userExists.otp = otp;
+        userExists.otpExpiry = Date.now() + 10 * 60 * 1000;
+        userExists.isOtpVerified = false;
+        await userExists.save({ validateBeforeSave: false });
+
+        try {
+          await sendEmail({
+            email: userExists.email,
+            subject: 'Account Reactivation OTP - Shop Management',
+            html: getReactivationEmail(userExists.fullname, otp)
+          });
+
+          return res.status(200).json({
+            success: true,
+            statusCode: 200,
+            message: 'Account is deactivated. Reactivation OTP sent to email.',
+            data: { isReactivation: true }
+          });
+        } catch (err) {
+          userExists.otp = undefined;
+          userExists.otpExpiry = undefined;
+          await userExists.save({ validateBeforeSave: false });
+          // If email fails, don't crash the server, just let the user know
+          return res.status(400).json({ success: false, statusCode: 400, message: 'Email could not be sent. Please check your mail settings.', data: null });
+        }
+      }
+    }
+
+    // Create new user as shop_owner
+    const user = await User.create({
+      fullname,
+      email: normalizedEmail,
+      countryCode: countryCode || '+91',
+      phoneNumber,
+      password,
+      role: 'shop_owner'
+    });
+
+    let shop = null;
+
+    // Create the shop for the user if shopName is provided
+    if (shopName) {
+      shop = await Shop.create({
+        name: shopName,
+        ownerId: user._id,
+        email: normalizedEmail,
+        contactNumber: phoneNumber
+      });
+
+      // Link shop to user
+      user.shopId = shop._id;
+      user.assignedShops = [shop._id];
+      await user.save({ validateBeforeSave: false });
+    }
+
+    // Create token
+    const token = signToken(user._id);
+
+    // Send Welcome Email (Fire and forget, handle error gracefully)
+    sendEmail({
+      email: user.email,
+      subject: 'Welcome to Thori Technical Shop',
+      html: getWelcomeEmail(user.fullname)
+    }).catch(err => console.log('Failed to send welcome email:', err.message));
+
+    // Send response
+    res.status(201).json({
+      success: true,
+      statusCode: 201,
+      message: 'User registered successfully',
+      data: {
+        user: {
+          _id: user._id,
+          fullname: user.fullname,
+          email: user.email,
+          role: user.role,
+          shopId: user.shopId
+        },
+        ...(shop && {
+          shop: {
+            _id: shop._id,
+            name: shop.name
+          }
+        }),
+        token,
+        expiresAt: getExpiresAt()
+      }
+    });
+
+  } catch (error) {
+    next(error); // Passes to global error handler
+  }
+};
+
 
 // @desc    Login user
 // @route   POST /api/v1/auth/login
@@ -70,6 +205,7 @@ exports.login = async (req, res, next) => {
       return res.status(400).json({ success: false, statusCode: 400, message: 'Please provide email and password', data: null });
     }
 
+    /* // Ponytail: Disabled reCAPTCHA for Phase 2
     if (process.env.RECAPTCHA_SECRET_KEY && !captchaToken) {
         return res.status(400).json({ success: false, statusCode: 400, message: 'reCAPTCHA token missing', data: null });
     }
@@ -78,6 +214,7 @@ exports.login = async (req, res, next) => {
     if (!isCaptchaValid) {
       return res.status(400).json({ success: false, statusCode: 400, message: 'reCAPTCHA verification failed', data: null });
     }
+    */
 
     const user = await User.findOne({ email: email.trim().toLowerCase() }).select('+password');
     if (!user || !(await user.matchPassword(password))) {
@@ -248,7 +385,18 @@ exports.reactivateAccount = async (req, res, next) => {
 // @access  Private
 exports.logout = async (req, res, next) => {
   try {
-    res.cookie('token', 'none', { expires: new Date(Date.now() + 10 * 1000), httpOnly: true });
-    res.status(200).json({ success: true, message: 'User logged out successfully' });
-  } catch (error) { next(error); }
+    res.cookie('token', 'none', {
+      expires: new Date(Date.now() + 10 * 1000),
+      httpOnly: true
+    });
+
+    res.status(200).json({
+      success: true,
+      statusCode: 200,
+      message: 'Logged out successfully',
+      data: {}
+    });
+  } catch (error) {
+    next(error);
+  }
 };

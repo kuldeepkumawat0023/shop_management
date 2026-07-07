@@ -4,6 +4,7 @@ const router = express.Router();
 // Import Routes
 const authRoutes = require('./authRoutes');
 const userRoutes = require('./userRoutes');
+/* // Ponytail: Disabled remaining routes for testing
 const shopRoutes = require('./shopRoutes');
 const roleRoutes = require('./roleRoutes');
 const categoryRoutes = require('./categoryRoutes');
@@ -27,10 +28,13 @@ const reportRoutes = require('./reportRoutes');
 // const expenseRoutes = require('./expenseRoutes');
 // const dashboardRoutes = require('./dashboardRoutes');
 // const notificationRoutes = require('./notificationRoutes');
+*/
 
 // Mount Routes
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
+
+/*
 router.use('/shops', shopRoutes);
 router.use('/roles', roleRoutes);
 router.use('/categories', categoryRoutes);
@@ -46,5 +50,6 @@ router.use('/adjustments', adjustmentRoutes);
 router.use('/manufacturing', manufacturingRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/reports', reportRoutes);
+*/
 
 module.exports = router;
