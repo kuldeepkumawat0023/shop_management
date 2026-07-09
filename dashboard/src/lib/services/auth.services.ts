@@ -6,75 +6,95 @@ export interface LoginPayload {
   captchaToken?: string | null;
 }
 
+export interface RegisterPayload {
+  fullname: string;
+  email: string;
+  phoneNumber?: string;
+  countryCode?: string;
+  password?: string;
+  confirmPassword?: string;
+  captchaToken?: string | null;
+}
+
 export interface OtpPayload {
   email: string;
   otp: string;
 }
 
 /**
- * 🔒 Authentication Service
- * Synced exactly with backend/src/routes/authRoutes.js
+ * 🔐 Advanced Auth Service
+ * Perfectly matched to the Node.js backend controllers.
  */
 export const authService = {
   /**
-   * Login User (Email + Password)
-   * POST /api/auth/login
+   * Login user
    */
-  login: async (data: LoginPayload): Promise<ApiResponse<{ user: AuthUser; token: string }>> => {
+  login: async (data: LoginPayload): Promise<ApiResponse<{ user: AuthUser; token: string; expiresAt?: number }>> => {
     const response = await apiClient.post('/auth/login', data);
     return response.data;
   },
 
   /**
-   * Register User
-   * POST /api/auth/register
+   * Google Login (Social)
    */
-  register: async (data: any): Promise<ApiResponse<{ user: AuthUser; token: string; expiresAt?: number; isReactivation?: boolean }>> => {
+  googleLogin: async (token: string, type: 'idToken' | 'accessToken' = 'idToken'): Promise<ApiResponse<{ user: AuthUser; token: string; expiresAt?: number }>> => {
+    const payload = type === 'accessToken' ? { accessToken: token } : { idToken: token };
+    const response = await apiClient.post('/auth/google-login', payload);
+    return response.data;
+  },
+
+  /**
+   * Register user
+   */
+  register: async (data: RegisterPayload): Promise<ApiResponse<{ user: AuthUser; token?: string; isReactivation?: boolean; expiresAt?: number }>> => {
     const response = await apiClient.post('/auth/register', data);
     return response.data;
   },
 
   /**
-   * Google Login
-   * POST /api/auth/google-login
+   * Forgot Password - Trigger OTP
    */
-  googleLogin: async (data: { token: string }): Promise<ApiResponse<{ user: AuthUser; token: string }>> => {
-    const response = await apiClient.post('/auth/google-login', data);
+  forgotPassword: async (email: string, captchaToken?: string | null): Promise<ApiResponse<void>> => {
+    const response = await apiClient.post('/auth/forgot-password', { email, captchaToken });
     return response.data;
   },
 
   /**
-   * Forgot Password
-   * POST /api/auth/forgot-password
+   * Verify OTP (Step 2 of Password Reset or Reactivation)
    */
-  forgotPassword: async (email: string): Promise<ApiResponse<void>> => {
-    const response = await apiClient.post('/auth/forgot-password', { email });
-    return response.data;
-  },
-
-  /**
-   * Verify OTP
-   * POST /api/auth/verify-otp
-   */
-  verifyOtp: async (data: OtpPayload): Promise<ApiResponse<{ user: AuthUser; token: string }>> => {
+  verifyOtp: async (data: OtpPayload): Promise<ApiResponse> => {
     const response = await apiClient.post('/auth/verify-otp', data);
     return response.data;
   },
 
   /**
-   * Reset Password
-   * POST /api/auth/reset-password
+   * Reset Password (Step 3)
    */
-  resetPassword: async (data: any): Promise<ApiResponse<void>> => {
+  resetPassword: async (data: any): Promise<ApiResponse> => {
     const response = await apiClient.post('/auth/reset-password', data);
     return response.data;
   },
 
   /**
-   * Logout User
-   * POST /api/auth/logout
+   * Reactivate Account (After soft-delete)
    */
-  logout: async (): Promise<ApiResponse<void>> => {
+  reactivateAccount: async (data: any): Promise<ApiResponse> => {
+    const response = await apiClient.post('/auth/reactivate-account', data);
+    return response.data;
+  },
+
+  /**
+   * Get Current User Profile
+   */
+  getProfile: async (): Promise<ApiResponse<{ user: AuthUser }>> => {
+    const response = await apiClient.get('/auth/profile');
+    return response.data;
+  },
+
+  /**
+   * Logout user
+   */
+  logout: async (): Promise<ApiResponse> => {
     const response = await apiClient.post('/auth/logout');
     return response.data;
   },
