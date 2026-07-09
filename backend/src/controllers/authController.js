@@ -3,11 +3,11 @@ const Shop = require('../models/Shop');
 const jwt = require('jsonwebtoken');
 const otpGenerator = require('otp-generator');
 const sendEmail = require('../config/email');
-const { 
-  getWelcomeEmail, 
-  getReactivationEmail, 
-  getLoginNotificationEmail, 
-  getPasswordResetEmail 
+const {
+  getWelcomeEmail,
+  getReactivationEmail,
+  getLoginNotificationEmail,
+  getPasswordResetEmail
 } = require('../utils/emailTemplates');
 const { ADMIN_DEFAULT_ROLES, PERMISSION_LIST } = require('../config/permissions');
 const { OAuth2Client } = require('google-auth-library');
@@ -17,8 +17,8 @@ const axios = require('axios');
 const verifyRecaptcha = async (captchaToken) => {
   if (!captchaToken) return false;
   // Bypassed if secret key not found in env
-  if (!process.env.RECAPTCHA_SECRET_KEY) return true; 
-  
+  if (!process.env.RECAPTCHA_SECRET_KEY) return true;
+
   try {
     const response = await axios.post(`https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaToken}`);
     return response.data.success;
@@ -39,7 +39,7 @@ const getExpiresAt = () => Date.now() + TOKEN_TTL_DAYS * 24 * 60 * 60 * 1000;
 // Helper to get Permissions based on Role
 const getPermissionsForUser = async (user) => {
   let permissions = [];
-  
+
   if (user.role === 'super_admin') {
     permissions = ['all'];
   } else if (user.role === 'shop_owner') {
@@ -55,7 +55,7 @@ const getPermissionsForUser = async (user) => {
   } else if (user.role === 'staff') {
     permissions = ADMIN_DEFAULT_ROLES.STAFF.permissions;
   }
-  
+
   return permissions;
 };
 
@@ -64,22 +64,20 @@ const getPermissionsForUser = async (user) => {
 // @access  Public
 exports.register = async (req, res, next) => {
   try {
-    const { fullname, email, countryCode, phoneNumber, password, confirmPassword, captchaToken, shopName } = req.body;
+    const { fullname, email, countryCode, phoneNumber, password, confirmPassword, captchaToken } = req.body;
 
     // Validate input
     if (!fullname || !email || !phoneNumber || !password || !confirmPassword) {
       return res.status(400).json({ success: false, statusCode: 400, message: 'Please provide all required fields', data: null });
     }
 
-    /* // Ponytail: Hidden for Phase 2
     if (process.env.RECAPTCHA_SECRET_KEY && !captchaToken) {
-        return res.status(400).json({ success: false, statusCode: 400, message: 'reCAPTCHA token missing', data: null });
+      return res.status(400).json({ success: false, statusCode: 400, message: 'reCAPTCHA token missing', data: null });
     }
     const isCaptchaValid = await verifyRecaptcha(captchaToken);
     if (!isCaptchaValid) {
       return res.status(400).json({ success: false, statusCode: 400, message: 'reCAPTCHA verification failed', data: null });
     }
-    */
 
     if (password !== confirmPassword) {
       return res.status(400).json({ success: false, statusCode: 400, message: 'Passwords do not match', data: null });
@@ -137,22 +135,7 @@ exports.register = async (req, res, next) => {
       role: 'shop_owner'
     });
 
-    let shop = null;
-
-    // Create the shop for the user if shopName is provided
-    if (shopName) {
-      shop = await Shop.create({
-        name: shopName,
-        ownerId: user._id,
-        email: normalizedEmail,
-        contactNumber: phoneNumber
-      });
-
-      // Link shop to user
-      user.shopId = shop._id;
-      user.assignedShops = [shop._id];
-      await user.save({ validateBeforeSave: false });
-    }
+    // ponytail: Removed shop creation from register. Shop will be created via a separate API/Popup in the dashboard.
 
     // Create token
     const token = signToken(user._id);
@@ -177,12 +160,6 @@ exports.register = async (req, res, next) => {
           role: user.role,
           shopId: user.shopId
         },
-        ...(shop && {
-          shop: {
-            _id: shop._id,
-            name: shop.name
-          }
-        }),
         token,
         expiresAt: getExpiresAt()
       }
@@ -205,7 +182,6 @@ exports.login = async (req, res, next) => {
       return res.status(400).json({ success: false, statusCode: 400, message: 'Please provide email and password', data: null });
     }
 
-    /* // Ponytail: Disabled reCAPTCHA for Phase 2
     if (process.env.RECAPTCHA_SECRET_KEY && !captchaToken) {
         return res.status(400).json({ success: false, statusCode: 400, message: 'reCAPTCHA token missing', data: null });
     }
@@ -214,7 +190,6 @@ exports.login = async (req, res, next) => {
     if (!isCaptchaValid) {
       return res.status(400).json({ success: false, statusCode: 400, message: 'reCAPTCHA verification failed', data: null });
     }
-    */
 
     const user = await User.findOne({ email: email.trim().toLowerCase() }).select('+password');
     if (!user || !(await user.matchPassword(password))) {
@@ -224,7 +199,7 @@ exports.login = async (req, res, next) => {
     if (user.isActive === false) {
       return res.status(403).json({ success: false, statusCode: 403, message: 'Account deactivated. Contact support.', data: null });
     }
-    
+
     // Clear isPending if this is a first time login from invite
     if (user.isPending) {
       user.isPending = false;

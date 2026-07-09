@@ -4,6 +4,60 @@ const AdminRole = require('../models/AdminRole');
 const { uploadToCloudinary, deleteFromCloudinary } = require('../config/cloudinary');
 const { ADMIN_DEFAULT_ROLES } = require('../config/permissions');
 
+// @desc    Check if a shop name already exists
+// @route   POST /api/v1/shops/check-name
+// @access  Private
+exports.checkShopName = async (req, res, next) => {
+  try {
+    const { name } = req.body;
+    if (!name) {
+      return res.status(400).json({ success: false, statusCode: 400, message: 'Shop name is required', data: null });
+    }
+
+    // Use a case-insensitive regex for exact match
+    const shop = await Shop.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } });
+
+    return res.status(200).json({
+      success: true,
+      statusCode: 200,
+      exists: !!shop,
+      message: !!shop ? 'Shop name already exists' : 'Shop name is available',
+      data: { exists: !!shop }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Check if user can create a new shop (Workspace Limit)
+// @route   GET /api/v1/shops/check-limit
+// @access  Private
+exports.checkShopLimit = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, statusCode: 404, message: 'User not found', data: null });
+    }
+
+    // ponytail: Hardcoded limit of 3 shops for simplicity (YAGNI)
+    const maxShopsAllowed = 3;
+    const currentShops = user.assignedShops ? user.assignedShops.length : 0;
+    const canCreate = currentShops < maxShopsAllowed;
+
+    return res.status(200).json({
+      success: true,
+      statusCode: 200,
+      data: {
+        canCreate,
+        currentShops,
+        maxShopsAllowed
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc    Create a new Shop (Super Admin)
 // @route   POST /api/v1/shops
 // @access  Private (Super Admin)
@@ -19,6 +73,23 @@ exports.createShop = async (req, res, next) => {
     const owner = await User.findById(ownerId);
     if (!owner) {
       return res.status(404).json({ success: false, statusCode: 404, message: 'Owner user not found', data: null });
+    }
+
+    // Check if shop name already exists
+    const existingShop = await Shop.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } });
+    if (existingShop) {
+      return res.status(400).json({ success: false, statusCode: 400, message: 'Shop name already exists', data: null });
+    }
+
+    // ponytail: Check shop limit before creating (YAGNI hardcoded limit of 3)
+    const maxShopsAllowed = 3;
+    if (owner.assignedShops && owner.assignedShops.length >= maxShopsAllowed) {
+      return res.status(403).json({
+        success: false,
+        statusCode: 403,
+        message: `Workspace limit reached. You can only create up to ${maxShopsAllowed} shops.`,
+        data: null
+      });
     }
 
     const shop = await Shop.create({

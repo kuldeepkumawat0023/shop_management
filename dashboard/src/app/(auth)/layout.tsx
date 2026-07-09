@@ -1,38 +1,48 @@
-import React from 'react';
-import Link from 'next/link';
-import { ShoppingBag } from 'lucide-react';
+'use client';
 
-export default function AuthLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+import React, { useEffect, useState } from 'react';
+import { useTheme } from 'next-themes';
+import { Sun, Moon } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { usePathname } from 'next/navigation';
+
+export default function AuthLayout({ children }: { children: React.ReactNode }) {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
+
+  // Avoid hydration mismatch by waiting until component is mounted on the client
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center hero-gradient p-4 relative overflow-hidden">
-      {/* Decorative Blur Background elements */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-[100px] pointer-events-none" />
-      
-      {/* Branding */}
-      <div className="z-10 mb-8 flex flex-col items-center text-center">
-        <Link href="/" className="flex items-center gap-2 mb-2 group">
-          <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-on-primary shadow-lg group-hover:scale-105 transition-transform">
-            <ShoppingBag className="w-6 h-6" />
-          </div>
-          <h1 className="text-3xl font-bold text-on-surface">SmartShop</h1>
-        </Link>
-        <p className="text-on-surface-variant font-medium">Next Generation ERP & POS System</p>
-      </div>
-
-      {/* Main Content Area (Auth Cards) */}
-      <div className="z-10 w-full max-w-md">
-        {children}
+    <div className="relative min-h-screen w-full">
+      {/* Theme Toggle Button */}
+      <div className="absolute top-4 right-4 z-50">
+        {mounted && (
+          <button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="p-2.5 rounded-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all shadow-md active:scale-95 cursor-pointer"
+            aria-label="Toggle Theme"
+          >
+            {theme === 'dark' ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-indigo-600" />}
+          </button>
+        )}
       </div>
       
-      {/* Footer */}
-      <div className="z-10 mt-12 text-sm text-muted-foreground text-center">
-        <p>&copy; {new Date().getFullYear()} SmartShop Management System. All rights reserved.</p>
-      </div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={pathname}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="min-h-screen w-full flex flex-col"
+        >
+          {children}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }

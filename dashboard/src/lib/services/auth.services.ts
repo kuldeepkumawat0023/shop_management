@@ -3,6 +3,7 @@ import apiClient, { ApiResponse, AuthUser } from '../apiClient';
 export interface LoginPayload {
   email: string;
   password?: string;
+  captchaToken?: string | null;
 }
 
 export interface OtpPayload {
@@ -21,6 +22,15 @@ export const authService = {
    */
   login: async (data: LoginPayload): Promise<ApiResponse<{ user: AuthUser; token: string }>> => {
     const response = await apiClient.post('/auth/login', data);
+    return response.data;
+  },
+
+  /**
+   * Register User
+   * POST /api/auth/register
+   */
+  register: async (data: any): Promise<ApiResponse<{ user: AuthUser; token: string; expiresAt?: number; isReactivation?: boolean }>> => {
+    const response = await apiClient.post('/auth/register', data);
     return response.data;
   },
 

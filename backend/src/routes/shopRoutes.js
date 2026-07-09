@@ -7,7 +7,9 @@ const {
   getMyShop, 
   updateShop,
   switchShop, 
-  deleteShop 
+  deleteShop,
+  checkShopName,
+  checkShopLimit
 } = require('../controllers/shopController');
 
 const { protect, authorizeRoles } = require('../middlewares/authMiddleware');
@@ -23,8 +25,12 @@ router.get('/my-shop', shopScope, getMyShop);
 // Switch Active Shop Context
 router.put('/switch/:id', switchShop);
 
-// Global routes restricted to Super Admin
-router.post('/create', authorizeRoles('super_admin'), createShop);
+// Ponytail: New APIs for Workspace Limit & Shop Verification
+router.post('/check-name', checkShopName);
+router.get('/check-limit', checkShopLimit);
+
+// Create route (Allow super_admin and shop_owner)
+router.post('/create', authorizeRoles('super_admin', 'shop_owner'), createShop);
 router.get('/all', authorizeRoles('super_admin'), getShops);
 router.delete('/delete/:id', authorizeRoles('super_admin'), deleteShop);
 

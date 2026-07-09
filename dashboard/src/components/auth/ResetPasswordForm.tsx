@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { authService } from '@/lib/services/auth.services';
-import { GlassCard } from '@/components/common/Card';
+import AuthSplitLayout from './AuthSplitLayout';
 import { Button } from '@/components/common/Button';
 import { KeyRound, Key, Mail, Hash, Loader2, Lock, LockKeyhole, ArrowLeft } from 'lucide-react';
 
@@ -84,7 +84,8 @@ export default function ResetPasswordForm() {
   };
 
   return (
-    <GlassCard className="p-8 w-full shadow-lg">
+    <AuthSplitLayout>
+      <div className="w-full">
       <div className="mb-6 text-center">
         <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
           {step === 'verify' ? <KeyRound className="w-8 h-8" /> : <Key className="w-8 h-8" />}
@@ -223,6 +224,7 @@ export default function ResetPasswordForm() {
           Back to Login
         </Link>
       </div>
-    </GlassCard>
+      </div>
+    </AuthSplitLayout>
   );
 }
