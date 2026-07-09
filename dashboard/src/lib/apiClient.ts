@@ -55,6 +55,16 @@ export const getBackendBaseUrl = () => {
   return url.replace(/([^:]\/)\/+/g, "$1").replace(/\/$/, "");
 };
 
+export const getBackendHostUrl = () => {
+  const baseUrl = getBackendBaseUrl();
+  try {
+    const url = new URL(baseUrl);
+    return `${url.protocol}//${url.host}`;
+  } catch (error) {
+    return baseUrl.replace('/api/v1', '');
+  }
+};
+
 const apiClient = axios.create({
   baseURL: getBackendBaseUrl(),
   headers: {

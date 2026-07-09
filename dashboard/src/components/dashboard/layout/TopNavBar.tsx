@@ -11,14 +11,16 @@ import {
   User,
   LogOut,
   Settings,
-  Download,
   ShoppingCart,
-  Bell,
-  Store
+  Bell
 } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import { cn } from '@/utils/cn';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/useAuth';
+import { authService } from '@/lib/services/auth.services';
+import { useRouter } from 'next/navigation';
+import { getBackendBaseUrl, getBackendHostUrl } from '@/lib/apiClient';
 
 function getInitials(name?: string): string {
   if (!name) return 'U';
@@ -36,43 +38,12 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [isStandalone, setIsStandalone] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Static user data for UI development without backend
-  const user = {
-    fullname: 'Raj Store Owner',
-    email: 'raj@greenmart.com',
-    role: 'Admin',
-    profilePhoto: null
-  };
+  const { user, logout } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
-
-    const checkStandalone = () => {
-      if (window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone) {
-        setIsStandalone(true);
-      }
-    };
-    checkStandalone();
-    window.addEventListener('appinstalled', () => setIsStandalone(true));
-
-    const checkInstallable = () => {
-      if ((window as any).deferredPrompt) {
-        setDeferredPrompt(true);
-      }
-    };
-    checkInstallable();
-
-    window.addEventListener('pwa-ready', checkInstallable);
-
-    const handleBeforeInstallPrompt = (e: any) => {
-      e.preventDefault();
-      setDeferredPrompt(true);
-    };
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -82,21 +53,29 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, []);
 
-  const handleInstallClick = () => {
-    window.dispatchEvent(new Event('showInstallModal'));
-    setIsDropdownOpen(false);
-  };
-
   const handleLogout = async () => {
-    // Static placeholder for logout
-    console.log('Logout clicked - static mode');
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error('Logout API failed:', error);
+    } finally {
+      logout();
+      router.push('/login');
+    }
   };
 
-  const profilePhoto = user?.profilePhoto;
+  const getProfilePhoto = () => {
+    if (!user?.profilePhoto) return null;
+    if (user.profilePhoto.startsWith('http')) return user.profilePhoto;
+    const cleanPath = user.profilePhoto.replace(/\\/g, '/');
+    const prefix = cleanPath.startsWith('/') ? '' : '/';
+    return `${getBackendHostUrl()}${prefix}${cleanPath}`;
+  };
+
+  const profilePhoto = getProfilePhoto();
 
   return (
     <header className="sticky top-0 right-0 w-full h-16 md:h-20 glass-navbar border-b border-outline-variant/30 flex items-center justify-between px-4 md:px-6 lg:px-10 z-40 bg-surface/80">
@@ -204,7 +183,6 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
                   }}
                 />
 
-                {/* Text and Icon with explicit relative layering to stay on top */}
                 <span className="relative z-10 flex items-center gap-2">
                   <ShoppingCart className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
                   New Sale
@@ -234,10 +212,10 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
             </div>
             <div className="hidden sm:block text-left">
               <div className="text-xs font-bold text-on-surface leading-tight truncate max-w-[100px]">
-                {user?.fullname || 'Admin User'}
+                {user?.fullname || 'Guest'}
               </div>
               <div className="text-[9px] text-on-surface-variant font-medium uppercase tracking-tighter">
-                {user?.role || 'Admin'}
+                {user?.role || 'User'}
               </div>
             </div>
             <ChevronDown className={cn(
@@ -257,7 +235,7 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
               >
                 <div className="px-4 py-3 border-b border-outline-variant/10 mb-1">
                   <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Signed in as</p>
-                  <p className="text-sm font-bold text-on-surface truncate">{user?.email || 'admin@smartshop.com'}</p>
+                  <p className="text-sm font-bold text-on-surface truncate">{user?.email || 'N/A'}</p>
                 </div>
 
                 <div className="px-2 space-y-0.5">
@@ -282,22 +260,9 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
                     </div>
                     Settings
                   </Link>
-
-
-                  {!isStandalone && (
-                    <button
-                      onClick={handleInstallClick}
-                      className="w-full flex items-center gap-3 px-3 py-2 text-left text-sm font-semibold text-primary hover:bg-primary/10 rounded-xl transition-colors group/item cursor-pointer"
-                    >
-                      <div className="p-1.5 rounded-lg bg-primary/10 text-primary group-hover/item:bg-primary/20 transition-colors">
-                        <Download size={16} />
-                      </div>
-                      Install App
-                    </button>
-                  )}
                 </div>
 
-                <div className="mt-2 pt-2 border-t border-outline-variant/10 px-2">
+                <div className="mt-2 pt-2 border-t border-outline-variant/10 px-2 mb-2">
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3 px-3 py-2 text-sm font-bold text-error hover:bg-error/10 rounded-xl transition-colors"

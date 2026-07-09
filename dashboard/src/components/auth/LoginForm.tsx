@@ -34,9 +34,9 @@ const LoginForm = () => {
       if (tokenResponse.access_token) {
         const toastId = toast.loading('Verifying Google account...');
         try {
-          const response = await authService.googleLogin({ token: tokenResponse.access_token });
+          const response = await authService.googleLogin(tokenResponse.access_token, 'accessToken');
           if (response.success) {
-            login(response.data.user, response.data.token);
+            login(response.data.user, response.data.token, response.data.expiresAt);
             toast.success('Welcome back!', { id: toastId });
             router.push('/');
           }

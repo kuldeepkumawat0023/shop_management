@@ -275,7 +275,10 @@ exports.googleLogin = async (req, res, next) => {
         token, expiresAt: getExpiresAt()
       }
     });
-  } catch (error) { return res.status(401).json({ success: false, message: 'Invalid Google token' }); }
+  } catch (error) { 
+    console.error("Google Login Error:", error);
+    return res.status(401).json({ success: false, message: 'Invalid Google token or internal error', error: error.message }); 
+  }
 };
 
 // @desc    Forgot Password (Send OTP)

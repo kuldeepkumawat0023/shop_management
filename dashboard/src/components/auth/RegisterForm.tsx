@@ -37,9 +37,9 @@ const RegisterForm = () => {
       if (tokenResponse.access_token) {
         const toastId = toast.loading('Creating your account...');
         try {
-          const response = await authService.googleLogin({ token: tokenResponse.access_token });
+          const response = await authService.googleLogin(tokenResponse.access_token, 'accessToken');
           if (response.success) {
-            login(response.data.user, response.data.token);
+            login(response.data.user, response.data.token, response.data.expiresAt);
             toast.success('Account created successfully!', { id: toastId });
             router.push('/');
           }
