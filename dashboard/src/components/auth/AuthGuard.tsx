@@ -18,16 +18,13 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const router = useRouter();
 
   useEffect(() => {
-    // Temporarily disabled for dev without backend
-    // if (isInitialized && !isAuthenticated) {
-    //   router.push('/login');
-    // }
+    if (isInitialized && !isAuthenticated) {
+      router.push('/login');
+    }
   }, [isAuthenticated, isInitialized, router]);
 
   // Loading State
-  // Temporarily disabled for dev without backend
-  // if (!isInitialized || !isAuthenticated) {
-  if (false) {
+  if (!isInitialized || !isAuthenticated) {
     return (
       <section
         className="h-screen w-full flex items-center justify-center bg-background"

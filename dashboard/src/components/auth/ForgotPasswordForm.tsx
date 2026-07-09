@@ -10,8 +10,7 @@ import {
   Sparkles,
   Mail,
   ArrowRight,
-  ArrowLeft,
-  BrainCircuit
+  ArrowLeft
 } from 'lucide-react';
 import AuthSplitLayout from './AuthSplitLayout';
 
@@ -140,12 +139,7 @@ const ForgotPasswordForm = () => {
               )}
             </button>
 
-            <div className="mt-3 flex items-center justify-center gap-2 px-4 py-1.5 bg-primary/5 backdrop-blur-sm rounded-lg border border-primary/10">
-              <BrainCircuit className="text-primary w-4 h-4" aria-hidden="true" />
-              <p className="text-[11px] leading-tight text-on-surface-variant italic">
-                <span className="font-semibold text-primary">Smart Insight:</span> Ensure to check your spam folder.
-              </p>
-            </div>
+
             
             <footer className="mt-6 text-center">
               <Link href="/login" className="inline-flex items-center gap-1 text-sm font-semibold text-muted-foreground hover:text-primary transition-colors">

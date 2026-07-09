@@ -8,20 +8,18 @@ export function middleware(request: NextRequest) {
 
   // The dashboard is at '/'
   // Login is at '/login'
-  const isAuthRoute = pathname === '/login' || pathname === '/register' || pathname === '/forgot-password' || pathname.startsWith('/reset-password');
+  const isAuthRoute = pathname === '/login' || pathname === '/register' || pathname === '/forgot-password' || pathname.startsWith('/reset-password') || pathname.startsWith('/verify-otp');
   // Exclude static paths and auth paths to determine if it's a protected route
   const isProtectedRoute = !isAuthRoute && !pathname.startsWith('/api') && !pathname.startsWith('/_next');
 
   if (isProtectedRoute && !token) {
     // Redirect to login if accessing protected route without a token
-    // Temporarily bypassed for dev
-    // return NextResponse.redirect(new URL('/login', request.url));
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
   if (isAuthRoute && token) {
     // Redirect to root (dashboard) if trying to access login while already authenticated
-    // Temporarily bypassed for dev
-    // return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   return NextResponse.next();

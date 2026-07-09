@@ -71,6 +71,7 @@ exports.register = async (req, res, next) => {
       return res.status(400).json({ success: false, statusCode: 400, message: 'Please provide all required fields', data: null });
     }
 
+    /*
     if (process.env.RECAPTCHA_SECRET_KEY && !captchaToken) {
       return res.status(400).json({ success: false, statusCode: 400, message: 'reCAPTCHA token missing', data: null });
     }
@@ -78,6 +79,7 @@ exports.register = async (req, res, next) => {
     if (!isCaptchaValid) {
       return res.status(400).json({ success: false, statusCode: 400, message: 'reCAPTCHA verification failed', data: null });
     }
+    */
 
     if (password !== confirmPassword) {
       return res.status(400).json({ success: false, statusCode: 400, message: 'Passwords do not match', data: null });

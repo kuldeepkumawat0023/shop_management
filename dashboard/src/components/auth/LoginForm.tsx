@@ -14,8 +14,7 @@ import {
   Mail,
   Lock,
   Eye,
-  EyeOff,
-  BrainCircuit
+  EyeOff
 } from 'lucide-react';
 import AuthSplitLayout from './AuthSplitLayout';
 
@@ -270,12 +269,7 @@ const LoginForm = () => {
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
 
-          <div className="mt-3 flex items-center justify-center gap-2 px-4 py-1.5 bg-primary/5 backdrop-blur-sm rounded-lg border border-primary/10">
-            <BrainCircuit className="text-primary w-4 h-4" aria-hidden="true" />
-            <p className="text-[11px] leading-tight text-on-surface-variant italic">
-              <span className="font-semibold text-primary">Smart Insight:</span> Connect your store seamlessly with cloud POS.
-            </p>
-          </div>
+
         </form>
 
         <footer className="mt-6 text-center">

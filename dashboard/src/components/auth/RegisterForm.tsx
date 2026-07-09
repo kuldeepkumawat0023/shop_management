@@ -7,7 +7,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { authService } from '@/lib/services/auth.services';
 import toast from 'react-hot-toast';
 import { useGoogleLogin } from '@react-oauth/google';
-import ReCAPTCHA from 'react-google-recaptcha';
 import {
   User,
   Mail,
@@ -29,7 +28,6 @@ const RegisterForm = () => {
   const { login } = useAuth();
 
   const [loading, setLoading] = useState(false);
-  const recaptchaRef = useRef<ReCAPTCHA>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -166,24 +164,6 @@ const RegisterForm = () => {
 
     setLoading(true);
 
-    let token = null;
-    if (process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
-      const toastId = toast.loading('Verifying reCAPTCHA...');
-      try {
-        token = await recaptchaRef.current?.executeAsync();
-      } catch (err) {
-        toast.error('reCAPTCHA failed', { id: toastId });
-        setLoading(false);
-        return;
-      }
-      if (!token) {
-        toast.error('Please complete the reCAPTCHA', { id: toastId });
-        setLoading(false);
-        return;
-      }
-      toast.dismiss(toastId);
-    }
-
     const toastId = toast.loading('Creating account...');
 
     try {
@@ -191,7 +171,6 @@ const RegisterForm = () => {
       const response = await authService.register({
         ...formData,
         email: normalizedEmail,
-        captchaToken: token,
       });
 
       if (response.success) {
@@ -212,7 +191,6 @@ const RegisterForm = () => {
     } catch (error: any) {
       const message = error.response?.data?.message || error.message || 'Registration failed. Please try again.';
       toast.error(message, { id: toastId });
-      recaptchaRef.current?.reset();
     } finally {
       setLoading(false);
     }
@@ -365,10 +343,6 @@ const RegisterForm = () => {
               I agree to the Terms of Service and Privacy Policy.
             </label>
           </div>
-
-          {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && (
-            <ReCAPTCHA ref={recaptchaRef} size="invisible" sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} badge="bottomleft" />
-          )}
 
           <Button type="submit" variant="gradient" className="w-full mt-6" disabled={loading}>
             {loading ? (

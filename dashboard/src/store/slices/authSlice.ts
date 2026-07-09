@@ -15,6 +15,7 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   isInitialized: boolean; // Prevents Next.js Hydration Mismatch
+  globalEnv: Record<string, string>;
 }
 
 const initialState: AuthState = {
@@ -22,6 +23,7 @@ const initialState: AuthState = {
   token: null,
   isAuthenticated: false,
   isInitialized: false,
+  globalEnv: {},
 };
 
 const authSlice = createSlice({
@@ -58,8 +60,12 @@ const authSlice = createSlice({
           state.isAuthenticated = true;
 
           // Re-sync cookie with remaining validity (30d from backend)
-          Cookies.set(TOKEN_KEY, token, { expires: 30, path: '/' });
-          Cookies.set('user_role', user.role, { expires: 30, path: '/' });
+          Cookies.set(TOKEN_KEY, token, {
+            expires: 30, path: '/', sameSite: 'strict', secure: process.env.NEXT_PUBLIC_SECURE_COOKIES === 'true'
+          });
+          Cookies.set('user_role', user.role, {
+            expires: 30, path: '/', sameSite: 'strict', secure: process.env.NEXT_PUBLIC_SECURE_COOKIES === 'true'
+          });
         }
       } catch (error) {
         console.error('Auth sync failed:', error);
@@ -83,7 +89,20 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
 
       if (typeof window !== 'undefined') {
-        localStorage.setItem(USER_KEY, JSON.stringify(user));
+        // Strip sensitive PII before saving to localStorage
+        const normalizedCompanyId = typeof user.shopId === 'object' && user.shopId !== null
+          ? (user.shopId as any)._id
+          : user.shopId; // ponytail: adapted companyId to shopId for SmartShop
+
+        const minifiedUser = {
+          _id: user._id,
+          role: user.role,
+          email: user.email,
+          fullname: user.fullname,
+          profilePhoto: user.profilePhoto,
+          shopId: normalizedCompanyId
+        };
+        localStorage.setItem(USER_KEY, JSON.stringify(minifiedUser));
 
 
         // ✅ Store exact expiry from backend (or default 30 days)
@@ -92,8 +111,12 @@ const authSlice = createSlice({
 
         // ✅ Cookie expiry synced with backend JWT (30 days, not 365)
         const cookieExpireDays = Math.max(1, Math.round((expiry - Date.now()) / (1000 * 60 * 60 * 24)));
-        Cookies.set(TOKEN_KEY, token, { expires: cookieExpireDays, path: '/' });
-        Cookies.set('user_role', user.role, { expires: cookieExpireDays, path: '/' });
+        Cookies.set(TOKEN_KEY, token, {
+          expires: cookieExpireDays, path: '/', sameSite: 'strict', secure: process.env.NEXT_PUBLIC_SECURE_COOKIES === 'true'
+        });
+        Cookies.set('user_role', user.role, {
+          expires: cookieExpireDays, path: '/', sameSite: 'strict', secure: process.env.NEXT_PUBLIC_SECURE_COOKIES === 'true'
+        });
       }
     },
 
@@ -102,13 +125,37 @@ const authSlice = createSlice({
      */
     updateUser: (state, action: PayloadAction<Partial<AuthUser>>) => {
       if (state.user) {
-        state.user = { ...state.user, ...action.payload };
+        let payloadShopId = action.payload.shopId; // ponytail: adapted companyId to shopId
+        if (typeof payloadShopId === 'object' && payloadShopId !== null) {
+          payloadShopId = (payloadShopId as any)._id;
+        }
+
+        state.user = {
+          ...state.user,
+          ...action.payload,
+          ...(payloadShopId !== undefined ? { shopId: payloadShopId } : {})
+        };
+
         if (typeof window !== 'undefined') {
-          localStorage.setItem(USER_KEY, JSON.stringify(state.user));
+          const normalizedShopId = typeof state.user.shopId === 'object' && state.user.shopId !== null
+            ? (state.user.shopId as any)._id
+            : state.user.shopId;
+
+          const minifiedUser = {
+            _id: state.user._id,
+            role: state.user.role,
+            email: state.user.email,
+            fullname: state.user.fullname,
+            profilePhoto: state.user.profilePhoto,
+            shopId: normalizedShopId
+          };
+          localStorage.setItem(USER_KEY, JSON.stringify(minifiedUser));
 
           // Sync role to cookie if updated
           if (action.payload.role) {
-            Cookies.set('user_role', action.payload.role, { expires: 30, path: '/' });
+            Cookies.set('user_role', action.payload.role, {
+              expires: 30, path: '/', sameSite: 'strict', secure: process.env.NEXT_PUBLIC_SECURE_COOKIES === 'true'
+            });
           }
         }
       }
@@ -125,12 +172,27 @@ const authSlice = createSlice({
       if (typeof window !== 'undefined') {
         localStorage.removeItem(USER_KEY);
         localStorage.removeItem(TOKEN_EXPIRY_KEY); // ✅ Also clear expiry
-        Cookies.remove(TOKEN_KEY, { path: '/' });
-        Cookies.remove('user_role', { path: '/' });
+        Cookies.remove(TOKEN_KEY, {
+          path: '/',
+          sameSite: 'strict',
+          secure: process.env.NEXT_PUBLIC_SECURE_COOKIES === 'true'
+        });
+        Cookies.remove('user_role', {
+          path: '/',
+          sameSite: 'strict',
+          secure: process.env.NEXT_PUBLIC_SECURE_COOKIES === 'true'
+        });
       }
     },
+
+    setGlobalEnv: (state, action: PayloadAction<Record<string, string>>) => {
+      state.globalEnv = action.payload;
+      if (typeof window !== 'undefined' && action.payload.NEXT_PUBLIC_SECURE_COOKIES) {
+        localStorage.setItem('globalEnv_secure_cookies', action.payload.NEXT_PUBLIC_SECURE_COOKIES);
+      }
+    }
   },
 });
 
-export const { initializeAuth, setCredentials, updateUser, logout } = authSlice.actions;
+export const { initializeAuth, setCredentials, updateUser, logout, setGlobalEnv } = authSlice.actions;
 export default authSlice.reducer;

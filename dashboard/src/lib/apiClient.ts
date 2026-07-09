@@ -149,8 +149,13 @@ apiClient.interceptors.response.use(
 
     if ((isGenuineAuthFailure || isDeactivated)) {
       if (typeof window !== 'undefined') {
-        Cookies.remove(TOKEN_KEY, { path: '/' });
-        Cookies.remove('user_role', { path: '/' });
+        const cookieOptions: Cookies.CookieAttributes = {
+          path: '/',
+          sameSite: 'strict',
+          secure: process.env.NEXT_PUBLIC_SECURE_COOKIES === 'true'
+        };
+        Cookies.remove(TOKEN_KEY, cookieOptions);
+        Cookies.remove('user_role', cookieOptions);
         localStorage.removeItem(USER_KEY);
         localStorage.removeItem('portal_token_expiry');
 

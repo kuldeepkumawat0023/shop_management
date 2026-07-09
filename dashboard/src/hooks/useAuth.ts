@@ -8,7 +8,7 @@ import { AuthUser } from '../lib/apiClient';
  */
 export const useAuth = () => {
   const dispatch = useAppDispatch();
-  const { user, token, isAuthenticated, isInitialized } = useAppSelector((state) => state.auth);
+  const { user, token, isAuthenticated, isInitialized, globalEnv } = useAppSelector((state) => state.auth);
 
   const login = (user: AuthUser, token: string, expiresAt?: number) => {
     dispatch(setCredentials({ user, token, expiresAt }));
@@ -30,6 +30,7 @@ export const useAuth = () => {
     token,
     isAuthenticated,
     isInitialized,
+    globalEnv,
     login,
     logout,
     role: user?.role || 'staff',
