@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   // We check for auth token in cookies
-  const token = request.cookies.get('token')?.value;
+  const token = request.cookies.get('shop_token')?.value;
   const { pathname } = request.nextUrl;
 
   // The dashboard is at '/'

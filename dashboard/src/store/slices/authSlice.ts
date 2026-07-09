@@ -8,7 +8,7 @@ import { AuthUser, TOKEN_KEY, USER_KEY } from '@/lib/apiClient';
  * Token expiry is now synced with backend JWT_EXPIRES_IN (30d)
  */
 
-const TOKEN_EXPIRY_KEY = 'portal_token_expiry';
+const TOKEN_EXPIRY_KEY = 'shop_token_expiry';
 
 interface AuthState {
   user: AuthUser | null;
@@ -48,7 +48,7 @@ const authSlice = createSlice({
           localStorage.removeItem(USER_KEY);
           localStorage.removeItem(TOKEN_EXPIRY_KEY);
           Cookies.remove(TOKEN_KEY, { path: '/' });
-          Cookies.remove('user_role', { path: '/' });
+          Cookies.remove('shop_user_role', { path: '/' });
           state.isInitialized = true;
           return;
         }
@@ -63,7 +63,7 @@ const authSlice = createSlice({
           Cookies.set(TOKEN_KEY, token, {
             expires: 30, path: '/', sameSite: 'strict', secure: process.env.NEXT_PUBLIC_SECURE_COOKIES === 'true'
           });
-          Cookies.set('user_role', user.role, {
+          Cookies.set('shop_user_role', user.role, {
             expires: 30, path: '/', sameSite: 'strict', secure: process.env.NEXT_PUBLIC_SECURE_COOKIES === 'true'
           });
         }
@@ -72,7 +72,7 @@ const authSlice = createSlice({
         localStorage.removeItem(USER_KEY);
         localStorage.removeItem(TOKEN_EXPIRY_KEY);
         Cookies.remove(TOKEN_KEY);
-        Cookies.remove('user_role');
+        Cookies.remove('shop_user_role');
       } finally {
         state.isInitialized = true;
       }
@@ -114,7 +114,7 @@ const authSlice = createSlice({
         Cookies.set(TOKEN_KEY, token, {
           expires: cookieExpireDays, path: '/', sameSite: 'strict', secure: process.env.NEXT_PUBLIC_SECURE_COOKIES === 'true'
         });
-        Cookies.set('user_role', user.role, {
+        Cookies.set('shop_user_role', user.role, {
           expires: cookieExpireDays, path: '/', sameSite: 'strict', secure: process.env.NEXT_PUBLIC_SECURE_COOKIES === 'true'
         });
       }
@@ -153,7 +153,7 @@ const authSlice = createSlice({
 
           // Sync role to cookie if updated
           if (action.payload.role) {
-            Cookies.set('user_role', action.payload.role, {
+            Cookies.set('shop_user_role', action.payload.role, {
               expires: 30, path: '/', sameSite: 'strict', secure: process.env.NEXT_PUBLIC_SECURE_COOKIES === 'true'
             });
           }
@@ -177,7 +177,7 @@ const authSlice = createSlice({
           sameSite: 'strict',
           secure: process.env.NEXT_PUBLIC_SECURE_COOKIES === 'true'
         });
-        Cookies.remove('user_role', {
+        Cookies.remove('shop_user_role', {
           path: '/',
           sameSite: 'strict',
           secure: process.env.NEXT_PUBLIC_SECURE_COOKIES === 'true'
@@ -188,7 +188,7 @@ const authSlice = createSlice({
     setGlobalEnv: (state, action: PayloadAction<Record<string, string>>) => {
       state.globalEnv = action.payload;
       if (typeof window !== 'undefined' && action.payload.NEXT_PUBLIC_SECURE_COOKIES) {
-        localStorage.setItem('globalEnv_secure_cookies', action.payload.NEXT_PUBLIC_SECURE_COOKIES);
+        localStorage.setItem('shop_globalEnv_secure_cookies', action.payload.NEXT_PUBLIC_SECURE_COOKIES);
       }
     }
   },

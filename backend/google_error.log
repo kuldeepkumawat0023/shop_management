@@ -1,0 +1,8 @@
+TypeError: next is not a function
+    at model.<anonymous> (D:\DineshThori\shop_management\backend\src\models\User.js:93:5)
+    at Kareem.execPre (D:\DineshThori\shop_management\backend\node_modules\kareem\index.js:59:39)
+    at model._execDocumentPreHooks (D:\DineshThori\shop_management\backend\node_modules\mongoose\lib\document.js:3210:29)
+    at model.$__save (D:\DineshThori\shop_management\backend\node_modules\mongoose\lib\model.js:403:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async maybeTracedSave (D:\DineshThori\shop_management\backend\node_modules\mongoose\lib\model.js:675:7)
+    at async exports.googleLogin (D:\DineshThori\shop_management\backend\src\controllers\authController.js:257:41)

@@ -185,7 +185,7 @@ exports.login = async (req, res, next) => {
     }
 
     if (process.env.RECAPTCHA_SECRET_KEY && !captchaToken) {
-        return res.status(400).json({ success: false, statusCode: 400, message: 'reCAPTCHA token missing', data: null });
+      return res.status(400).json({ success: false, statusCode: 400, message: 'reCAPTCHA token missing', data: null });
     }
 
     const isCaptchaValid = await verifyRecaptcha(captchaToken);
@@ -277,6 +277,7 @@ exports.googleLogin = async (req, res, next) => {
     });
   } catch (error) { 
     console.error("Google Login Error:", error);
+    require('fs').writeFileSync('google_error.log', error.stack || error.message);
     return res.status(401).json({ success: false, message: 'Invalid Google token or internal error', error: error.message }); 
   }
 };

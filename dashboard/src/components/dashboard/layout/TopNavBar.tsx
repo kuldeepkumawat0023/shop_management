@@ -56,15 +56,8 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
     };
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await authService.logout();
-    } catch (error) {
-      console.error('Logout API failed:', error);
-    } finally {
-      logout();
-      router.push('/login');
-    }
+  const handleLogout = () => {
+    logout();
   };
 
   const getProfilePhoto = () => {
@@ -93,7 +86,7 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
 
       {/* Right: Actions & Profile */}
       <div className="flex items-center gap-2 md:gap-4 ml-4">
-        
+
         {/* Action Icons */}
         <button className="relative p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors cursor-pointer">
           <Bell className="w-5 h-5" />
@@ -167,26 +160,26 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
                   size="sm"
                   className="relative overflow-hidden rounded-xl text-white font-extrabold text-xs tracking-wider flex items-center gap-2 shadow-lg shadow-primary/30 cursor-pointer border border-white/10"
                 >
-                {/* Infinite looping glass highlight sweep from left to right */}
-                <motion.div
-                  className="absolute inset-0 w-[50%] h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12"
-                  style={{ zIndex: 0 }}
-                  animate={{
-                    x: ["-180%", "280%"]
-                  }}
-                  transition={{
-                    repeat: Infinity,
-                    repeatType: "loop",
-                    duration: 2,
-                    ease: "easeInOut",
-                    repeatDelay: 1.2
-                  }}
-                />
+                  {/* Infinite looping glass highlight sweep from left to right */}
+                  <motion.div
+                    className="absolute inset-0 w-[50%] h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12"
+                    style={{ zIndex: 0 }}
+                    animate={{
+                      x: ["-180%", "280%"]
+                    }}
+                    transition={{
+                      repeat: Infinity,
+                      repeatType: "loop",
+                      duration: 2,
+                      ease: "easeInOut",
+                      repeatDelay: 1.2
+                    }}
+                  />
 
-                <span className="relative z-10 flex items-center gap-2">
-                  <ShoppingCart className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
-                  New Sale
-                </span>
+                  <span className="relative z-10 flex items-center gap-2">
+                    <ShoppingCart className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
+                    New Sale
+                  </span>
                 </Button>
               </Link>
             </motion.div>

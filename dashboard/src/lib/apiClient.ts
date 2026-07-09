@@ -8,7 +8,7 @@ import Cookies from 'js-cookie';
 
 // ─── Storage Keys ────────────────────────────────────────────────────────────
 export const TOKEN_KEY = 'shop_token';
-export const USER_KEY = 'user_data';
+export const USER_KEY = 'shop_user_data';
 
 // ─── Synchronized Types (Shop Management Backend Model: User.js) ─────────────
 export interface PersonalDetail {
