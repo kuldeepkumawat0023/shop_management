@@ -160,7 +160,8 @@ exports.register = async (req, res, next) => {
           fullname: user.fullname,
           email: user.email,
           role: user.role,
-          shopId: user.shopId
+          shopId: user.shopId,
+          assignedShops: user.assignedShops
         },
         token,
         expiresAt: getExpiresAt()
@@ -218,7 +219,7 @@ exports.login = async (req, res, next) => {
     res.status(200).json({
       success: true, statusCode: 200, message: 'Login successful',
       data: {
-        user: { _id: user._id, fullname: user.fullname, email: user.email, role: user.role, shopId: user.shopId, permissions },
+        user: { _id: user._id, fullname: user.fullname, email: user.email, role: user.role, shopId: user.shopId, assignedShops: user.assignedShops, permissions },
         token, expiresAt: getExpiresAt()
       }
     });
@@ -271,7 +272,7 @@ exports.googleLogin = async (req, res, next) => {
     res.status(200).json({
       success: true, statusCode: 200, message: 'Google login successful',
       data: {
-        user: { _id: user._id, fullname: user.fullname, email: user.email, profilePhoto: user.profilePhoto, role: user.role, shopId: user.shopId, permissions },
+        user: { _id: user._id, fullname: user.fullname, email: user.email, profilePhoto: user.profilePhoto, role: user.role, shopId: user.shopId, assignedShops: user.assignedShops, permissions },
         token, expiresAt: getExpiresAt()
       }
     });
