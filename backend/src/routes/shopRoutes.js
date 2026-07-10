@@ -2,9 +2,11 @@ const express = require('express');
 const router = express.Router();
 
 const { 
+  initCreateShop,
   createShop, 
   getShops, 
-  getMyShop, 
+  getMyShop,
+  getMyShops, 
   updateShop,
   switchShop, 
   deleteShop,
@@ -21,6 +23,7 @@ router.use(protect);
 
 // My Shop route for staff/managers/owners (Must come before /:id)
 router.get('/my-shop', shopScope, getMyShop);
+router.get('/my-shops', getMyShops);
 
 // Switch Active Shop Context
 router.put('/switch/:id', switchShop);
@@ -29,8 +32,9 @@ router.put('/switch/:id', switchShop);
 router.post('/check-name', checkShopName);
 router.get('/check-limit', checkShopLimit);
 
-// Create route (Allow super_admin and shop_owner)
-router.post('/create', authorizeRoles('super_admin', 'shop_owner'), createShop);
+// Basic Shop Operations
+router.post('/init-create', authorizeRoles('super_admin', 'shop_owner', 'manager', 'staff'), initCreateShop);
+router.post('/create', authorizeRoles('super_admin', 'shop_owner', 'manager', 'staff'), createShop);
 router.get('/all', authorizeRoles('super_admin'), getShops);
 router.delete('/delete/:id', authorizeRoles('super_admin'), deleteShop);
 

@@ -15,12 +15,20 @@ export interface ShopData {
 }
 
 export const shopService = {
-  createShop: async (data: ShopData): Promise<ApiResponse<ShopData>> => {
+  initCreateShop: async (data: Partial<ShopData>): Promise<ApiResponse<any>> => {
+    const response = await apiClient.post('/shops/init-create', data);
+    return response.data;
+  },
+  createShop: async (data: Partial<ShopData> & { otp?: string }): Promise<ApiResponse<ShopData>> => {
     const response = await apiClient.post('/shops/create', data);
     return response.data;
   },
   getShops: async (): Promise<ApiResponse<ShopData[]>> => {
     const response = await apiClient.get('/shops/all');
+    return response.data;
+  },
+  getMyShops: async (): Promise<ApiResponse<ShopData[]>> => {
+    const response = await apiClient.get('/shops/my-shops');
     return response.data;
   },
   getMyShop: async (): Promise<ApiResponse<ShopData>> => {

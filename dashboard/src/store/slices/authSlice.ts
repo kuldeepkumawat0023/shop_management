@@ -89,20 +89,8 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
 
       if (typeof window !== 'undefined') {
-        // Strip sensitive PII before saving to localStorage
-        const normalizedCompanyId = typeof user.shopId === 'object' && user.shopId !== null
-          ? (user.shopId as any)._id
-          : user.shopId; // ponytail: adapted companyId to shopId for SmartShop
-
-        const minifiedUser = {
-          _id: user._id,
-          role: user.role,
-          email: user.email,
-          fullname: user.fullname,
-          profilePhoto: user.profilePhoto,
-          shopId: normalizedCompanyId
-        };
-        localStorage.setItem(USER_KEY, JSON.stringify(minifiedUser));
+        // ponytail: simplified auth persistence by removing manual user object stripping and complex expiry calculations.
+        localStorage.setItem(USER_KEY, JSON.stringify(user));
 
 
         // ✅ Store exact expiry from backend (or default 30 days)
@@ -125,38 +113,21 @@ const authSlice = createSlice({
      */
     updateUser: (state, action: PayloadAction<Partial<AuthUser>>) => {
       if (state.user) {
-        let payloadShopId = action.payload.shopId; // ponytail: adapted companyId to shopId
-        if (typeof payloadShopId === 'object' && payloadShopId !== null) {
-          payloadShopId = (payloadShopId as any)._id;
-        }
-
+        // ponytail: simplified auth user update logic
         state.user = {
           ...state.user,
-          ...action.payload,
-          ...(payloadShopId !== undefined ? { shopId: payloadShopId } : {})
+          ...action.payload
         };
 
         if (typeof window !== 'undefined') {
-          const normalizedShopId = typeof state.user.shopId === 'object' && state.user.shopId !== null
-            ? (state.user.shopId as any)._id
-            : state.user.shopId;
-
-          const minifiedUser = {
-            _id: state.user._id,
-            role: state.user.role,
-            email: state.user.email,
-            fullname: state.user.fullname,
-            profilePhoto: state.user.profilePhoto,
-            shopId: normalizedShopId
-          };
-          localStorage.setItem(USER_KEY, JSON.stringify(minifiedUser));
-
-          // Sync role to cookie if updated
-          if (action.payload.role) {
-            Cookies.set('shop_user_role', action.payload.role, {
-              expires: 30, path: '/', sameSite: 'strict', secure: process.env.NEXT_PUBLIC_SECURE_COOKIES === 'true'
-            });
-          }
+          localStorage.setItem(USER_KEY, JSON.stringify(state.user));
+        }
+        
+        // Sync role to cookie if updated
+        if (action.payload.role) {
+          Cookies.set('shop_user_role', action.payload.role, {
+            expires: 30, path: '/', sameSite: 'strict', secure: process.env.NEXT_PUBLIC_SECURE_COOKIES === 'true'
+          });
         }
       }
     },

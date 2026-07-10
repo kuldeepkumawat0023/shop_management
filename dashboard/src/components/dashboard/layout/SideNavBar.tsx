@@ -206,7 +206,7 @@ export default function SideNavBar({ isOpen, onClose }: SideNavBarProps) {
           </Button>
         </div>
 
-        {/* Company Switcher */}
+        {/* Shop Switcher */}
         <ShopSwitcher />
 
         {/* Navigation Links */}

@@ -7,8 +7,7 @@ import { useAppSelector } from '../store/hooks/redux';
 export const useShop = () => {
   const { user } = useAppSelector((state) => state.auth);
   
-  // In a full implementation, you might have a dedicated shopSlice.
-  // For now, we derive the primary shop from the auth user profile.
+  // We derive the primary shop from the auth user profile.
   const activeShopId = user?.shopId || null;
   const assignedShops = user?.assignedShops || [];
 

@@ -4,8 +4,9 @@ const router = express.Router();
 // Import Routes
 const authRoutes = require('./authRoutes');
 const userRoutes = require('./userRoutes');
-/* // Ponytail: Disabled remaining routes for testing
+// Ponytail: Disabled remaining routes for testing
 const shopRoutes = require('./shopRoutes');
+/* 
 const roleRoutes = require('./roleRoutes');
 const categoryRoutes = require('./categoryRoutes');
 const brandRoutes = require('./brandRoutes');
@@ -34,8 +35,9 @@ const reportRoutes = require('./reportRoutes');
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 
-/*
 router.use('/shops', shopRoutes);
+
+/*
 router.use('/roles', roleRoutes);
 router.use('/categories', categoryRoutes);
 router.use('/brands', brandRoutes);

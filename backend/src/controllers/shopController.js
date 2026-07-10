@@ -1,6 +1,6 @@
 const Shop = require('../models/Shop');
 const User = require('../models/User');
-const AdminRole = require('../models/AdminRole');
+const CustomRole = require('../models/CustomRole');
 const { uploadToCloudinary, deleteFromCloudinary } = require('../config/cloudinary');
 const { ADMIN_DEFAULT_ROLES } = require('../config/permissions');
 
@@ -58,6 +58,70 @@ exports.checkShopLimit = async (req, res, next) => {
   }
 };
 
+// @desc    Initialize Shop Creation (Send OTP)
+// @route   POST /api/v1/shops/init-create
+// @access  Private (Super Admin / Shop Owner / Staff)
+exports.initCreateShop = async (req, res, next) => {
+  try {
+    const { name, ownerId, email } = req.body;
+    
+    if (!name || !ownerId) {
+      return res.status(400).json({ success: false, statusCode: 400, message: 'Shop name and Owner ID are required', data: null });
+    }
+
+    const owner = await User.findById(ownerId);
+    if (!owner) {
+      return res.status(404).json({ success: false, statusCode: 404, message: 'Owner user not found', data: null });
+    }
+
+    const existingShop = await Shop.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } });
+    if (existingShop) {
+      return res.status(400).json({ success: false, statusCode: 400, message: 'Shop name already exists', data: null });
+    }
+
+    // Prevent invited staff/managers from creating shops
+    if ((owner.role === 'staff' || owner.role === 'manager') && owner.assignedShops && owner.assignedShops.length > 0) {
+      return res.status(403).json({ success: false, statusCode: 403, message: 'Invited staff members cannot create new workspaces.', data: null });
+    }
+
+    const maxShopsAllowed = 3;
+    if (owner.assignedShops && owner.assignedShops.length >= maxShopsAllowed) {
+      return res.status(403).json({ success: false, statusCode: 403, message: `Workspace limit reached.`, data: null });
+    }
+
+    const otpGenerator = require('otp-generator');
+    const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false });
+    owner.otp = otp;
+    owner.otpExpiry = Date.now() + 10 * 60 * 1000;
+    await owner.save({ validateBeforeSave: false });
+
+    const sendEmail = require('../config/email');
+    const { getOtpEmail } = require('../utils/emailTemplates');
+    const targetEmail = email || owner.email; 
+    
+    console.log(`[DEV] OTP for Shop Creation (${targetEmail}): ${otp}`);
+
+    try {
+      await sendEmail({
+        email: targetEmail,
+        subject: 'Verify Workspace Creation',
+        html: getOtpEmail(otp)
+      });
+    } catch (emailErr) {
+      console.log('Failed to send OTP email:', emailErr.message);
+      // Fallback for local testing without SMTP: return success anyway so they can use the console OTP
+      if (!process.env.EMAIL_USER) {
+        return res.status(200).json({ success: true, statusCode: 200, message: 'OTP logged to console (SMTP not configured)', data: null });
+      }
+      return res.status(500).json({ success: false, statusCode: 500, message: 'Failed to send OTP email. Please try again later.', data: null });
+    }
+
+    res.status(200).json({ success: true, statusCode: 200, message: 'OTP sent to email', data: null });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc    Create a new Shop (Super Admin)
 // @route   POST /api/v1/shops
 // @access  Private (Super Admin)
@@ -81,6 +145,11 @@ exports.createShop = async (req, res, next) => {
       return res.status(400).json({ success: false, statusCode: 400, message: 'Shop name already exists', data: null });
     }
 
+    // Prevent invited staff/managers from creating shops
+    if ((owner.role === 'staff' || owner.role === 'manager') && owner.assignedShops && owner.assignedShops.length > 0) {
+      return res.status(403).json({ success: false, statusCode: 403, message: 'Invited staff members cannot create new workspaces.', data: null });
+    }
+
     // ponytail: Check shop limit before creating (YAGNI hardcoded limit of 3)
     const maxShopsAllowed = 3;
     if (owner.assignedShops && owner.assignedShops.length >= maxShopsAllowed) {
@@ -91,6 +160,20 @@ exports.createShop = async (req, res, next) => {
         data: null
       });
     }
+
+    const { otp } = req.body;
+    if (!otp) {
+      return res.status(400).json({ success: false, statusCode: 400, message: 'OTP is required to create a shop', data: null });
+    }
+    
+    if (owner.otp !== otp || (owner.otpExpiry && owner.otpExpiry < Date.now())) {
+      return res.status(400).json({ success: false, statusCode: 400, message: 'Invalid or expired OTP', data: null });
+    }
+
+    // Clear OTP
+    owner.otp = undefined;
+    owner.otpExpiry = undefined;
+    await owner.save({ validateBeforeSave: false });
 
     const shop = await Shop.create({
       name, ownerId, gstNumber, contactNumber, email, address
@@ -164,6 +247,32 @@ exports.getShops = async (req, res, next) => {
       success: true,
       statusCode: 200,
       message: 'Shops fetched successfully',
+      data: shops
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get all shops assigned to me
+// @route   GET /api/v1/shops/my-shops
+// @access  Private
+exports.getMyShops = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, statusCode: 404, message: 'User not found', data: null });
+    }
+
+    const shops = await Shop.find({ 
+      _id: { $in: user.assignedShops || [] },
+      isActive: true 
+    });
+
+    res.status(200).json({
+      success: true,
+      statusCode: 200,
+      message: 'Assigned shops fetched successfully',
       data: shops
     });
   } catch (error) {
