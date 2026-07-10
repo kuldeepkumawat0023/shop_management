@@ -14,11 +14,9 @@ export default function ResetPasswordForm() {
   const emailParam = searchParams.get('email');
   
   const [email, setEmail] = useState(emailParam || '');
-  const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   
-  const [step, setStep] = useState<'verify' | 'reset'>('verify');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -29,26 +27,6 @@ export default function ResetPasswordForm() {
     }
   }, [emailParam]);
 
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
-
-    try {
-      const response = await authService.verifyOtp({ email, otp });
-      if (response.success) {
-        setSuccess('OTP verified successfully. Please enter your new password.');
-        setStep('reset');
-        setTimeout(() => setSuccess(''), 3000);
-      } else {
-        setError(response.message || 'Invalid OTP');
-      }
-    } catch (err: any) {
-      setError(err?.response?.data?.message || err.message || 'Failed to verify OTP');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,16 +66,13 @@ export default function ResetPasswordForm() {
       <div className="w-full">
       <div className="mb-6 text-center">
         <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
-          {step === 'verify' ? <KeyRound className="w-8 h-8" /> : <Key className="w-8 h-8" />}
+          <Key className="w-8 h-8" />
         </div>
         <h2 className="text-2xl font-bold text-on-surface mb-2">
-          {step === 'verify' ? 'Verify OTP' : 'Set New Password'}
+          Set New Password
         </h2>
         <p className="text-on-surface-variant text-sm px-4">
-          {step === 'verify' 
-            ? `We've sent a 6-digit code to ${email || 'your email'}` 
-            : 'Create a strong, new password for your account'
-          }
+          Create a strong, new password for your account
         </p>
       </div>
 
@@ -113,60 +88,6 @@ export default function ResetPasswordForm() {
         </div>
       )}
 
-      {step === 'verify' ? (
-        <form onSubmit={handleVerifyOtp} className="space-y-4">
-          {!emailParam && (
-            <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-on-surface" htmlFor="email">Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-primary/80 w-5 h-5 z-10 pointer-events-none" />
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="glass-input w-full pl-10 pr-4 py-2.5 text-on-surface"
-                  placeholder="admin@smartshop.com"
-                />
-              </div>
-            </div>
-          )}
-
-          <div className="space-y-1.5">
-            <label className="text-sm font-semibold text-on-surface" htmlFor="otp">6-Digit OTP</label>
-            <div className="relative">
-              <Hash className="absolute left-3 top-1/2 -translate-y-1/2 text-primary/80 w-5 h-5 z-10 pointer-events-none" />
-              <input
-                id="otp"
-                type="text"
-                required
-                maxLength={6}
-                value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
-                className="glass-input w-full pl-10 pr-4 py-2.5 text-on-surface tracking-[0.5em] font-mono text-center"
-                placeholder="000000"
-              />
-            </div>
-          </div>
-
-          <Button 
-            type="submit" 
-            variant="gradient" 
-            className="w-full mt-4"
-            disabled={isLoading || !otp || !email}
-          >
-            {isLoading ? (
-              <span className="flex items-center gap-2">
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Verifying...
-              </span>
-            ) : (
-              'Verify Code'
-            )}
-          </Button>
-        </form>
-      ) : (
         <form onSubmit={handleResetPassword} className="space-y-4">
           <div className="space-y-1.5">
             <label className="text-sm font-semibold text-on-surface" htmlFor="newPassword">New Password</label>
@@ -216,7 +137,6 @@ export default function ResetPasswordForm() {
             )}
           </Button>
         </form>
-      )}
 
       <div className="mt-6 text-center text-sm">
         <Link href="/login" className="font-semibold text-muted-foreground hover:text-primary transition-colors flex items-center justify-center gap-1">

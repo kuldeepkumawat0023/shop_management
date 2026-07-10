@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { authService } from '@/lib/services/auth.services';
 import toast from 'react-hot-toast';
 import { MailOpen, ArrowRight } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import AuthSplitLayout from './AuthSplitLayout';
 
 /**
@@ -17,6 +18,7 @@ const VerifyOtpForm = () => {
   const searchParams = useSearchParams();
   const email = searchParams.get('email');
   const type = searchParams.get('type');
+  const [mounted, setMounted] = useState(false);
 
   const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
@@ -26,6 +28,7 @@ const VerifyOtpForm = () => {
   const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   useEffect(() => {
+    setMounted(true);
     if (!email) {
       toast.error('Email missing. Redirecting...');
       router.push('/login');
@@ -34,7 +37,7 @@ const VerifyOtpForm = () => {
 
   const handleOtpChange = (index: number, value: string) => {
     if (value && !/^\d+$/.test(value)) return;
-    
+
     if (value.length > 1) {
       value = value[0];
     }
@@ -60,7 +63,7 @@ const VerifyOtpForm = () => {
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData('text').trim().slice(0, 6);
-    
+
     if (/^\d+$/.test(pastedData)) {
       const newOtp = [...otp];
       for (let i = 0; i < pastedData.length; i++) {
@@ -68,7 +71,7 @@ const VerifyOtpForm = () => {
       }
       setOtp(newOtp);
       setError('');
-      
+
       const nextIndex = Math.min(pastedData.length, 5);
       document.getElementById(`otp-${nextIndex}`)?.focus();
     }
@@ -113,7 +116,7 @@ const VerifyOtpForm = () => {
 
   const handleResendOtp = async () => {
     if (!email) return;
-    
+
     if (type === 'reactivate') {
       toast.error('For security, please try logging in again to get a new reactivation code.');
       return;
@@ -154,80 +157,81 @@ const VerifyOtpForm = () => {
   const isFormValid = otp.join('').length === 6 && !loading;
 
   return (
-    <AuthSplitLayout>
-      <section aria-labelledby="verify-otp-heading" className="w-full">
+    <main className="min-h-screen flex items-center justify-center p-4 sm:p-8 bg-background transition-colors duration-300">
+      <section aria-labelledby="verify-otp-heading" className="w-full max-w-lg p-6 sm:p-10 rounded-3xl shadow-xl border bg-surface border-outline-variant/30">
         <h1 className="sr-only">Verify OTP Code for SmartShop Account</h1>
 
         <div className="w-full mx-auto text-center">
-          <header className="mb-8">
-            <div className="bg-primary/10 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-primary/20">
-              <MailOpen className="text-primary w-10 h-10" aria-hidden="true" />
+        <header className="mb-8">
+          <div className="bg-primary/10 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-primary/20">
+            <MailOpen className="text-primary w-10 h-10" aria-hidden="true" />
+          </div>
+
+          <h2 id="verify-otp-heading" className="text-2xl font-bold text-on-surface mb-2">
+            Check Your Email
+          </h2>
+
+          <p className="text-sm text-on-surface-variant opacity-70">
+            We&apos;ve sent a 6-digit verification code to <br />
+            <span className="font-bold text-primary">{email}</span>
+          </p>
+        </header>
+
+        <form onSubmit={handleSubmit} className="space-y-8" aria-label="OTP verification form">
+          <div className="flex justify-center flex-col items-center">
+            <div className="flex justify-center gap-2 sm:gap-3" onPaste={handlePaste}>
+              {otp.map((digit, i) => (
+                <input
+                  key={i}
+                  id={`otp-${i}`}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={1}
+                  className={`w-12 h-14 sm:w-14 sm:h-16 text-2xl sm:text-3xl font-black text-center bg-surface-container border-2 rounded-2xl focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none ${error ? 'border-red-500 bg-red-500/5 focus:border-red-500 focus:ring-red-500/10' : 'border-outline-variant/30 dark:border-zinc-800'}`}
+                  value={digit}
+                  onChange={e => handleOtpChange(i, e.target.value)}
+                  onKeyDown={e => handleKeyDown(i, e)}
+                  aria-label={`Digit ${i + 1}`}
+                  aria-invalid={!!error}
+                />
+              ))}
             </div>
+            {error && <p id="otp-error" className="text-[12px] text-red-500 mt-4 font-bold tracking-tight">{error}</p>}
+          </div>
 
-            <h2 id="verify-otp-heading" className="text-2xl font-bold text-on-surface mb-2">
-              Check Your Email
-            </h2>
+          <button
+            disabled={!isFormValid}
+            type="submit"
+            aria-label="Verify OTP code"
+            className="w-full gradient-button text-white font-bold py-4 px-4 rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            {loading ? 'Verifying...' : 'Verify Code'}
+            {!loading && <ArrowRight className="w-5 h-5" aria-hidden="true" />}
+          </button>
+        </form>
 
-            <p className="text-sm text-on-surface-variant opacity-70">
-              We&apos;ve sent a 6-digit verification code to <br />
-              <span className="font-bold text-primary">{email}</span>
-            </p>
-          </header>
-
-          <form onSubmit={handleSubmit} className="space-y-8" aria-label="OTP verification form">
-            <div className="flex justify-center flex-col items-center">
-              <div className="flex justify-center gap-2 sm:gap-4" onPaste={handlePaste}>
-                {otp.map((digit, i) => (
-                  <input
-                    key={i}
-                    id={`otp-${i}`}
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={1}
-                    className={`w-12 h-14 sm:w-16 sm:h-20 text-2xl sm:text-3xl font-black text-center glass-input border-2 rounded-2xl focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none ${error ? '!border-red-500 bg-red-500/5 focus:!border-red-500 focus:!ring-red-500/10' : 'border-outline-variant/30'}`}
-                    value={digit}
-                    onChange={e => handleOtpChange(i, e.target.value)}
-                    onKeyDown={e => handleKeyDown(i, e)}
-                    aria-label={`Digit ${i + 1}`}
-                    aria-invalid={!!error}
-                  />
-                ))}
-              </div>
-              {error && <p id="otp-error" className="text-[12px] text-red-500 mt-4 font-bold tracking-tight">{error}</p>}
-            </div>
-
+        <footer className="mt-8 flex flex-col items-center justify-center space-y-4">
+          {siteKey && mounted && createPortal(
+            <div className="fixed bottom-0 left-0 z-[9999]">
+              <ReCAPTCHA ref={recaptchaRef} size="invisible" sitekey={siteKey} badge="bottomleft" />
+            </div>,
+            document.body
+          )}
+          <p className="text-xs text-on-surface-variant">
+            Didn&apos;t receive the code?
             <button
-              disabled={!isFormValid}
-              type="submit"
-              aria-label="Verify OTP code"
-              className="w-full gradient-button text-white font-bold py-3 px-4 rounded-xl shadow-md hover:shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              type="button"
+              onClick={handleResendOtp}
+              aria-label="Resend OTP code"
+              className="text-primary font-bold ml-1 hover:underline"
             >
-              {loading ? 'Verifying...' : 'Verify Code'}
-              {!loading && <ArrowRight className="w-5 h-5" aria-hidden="true" />}
+              Resend OTP
             </button>
-          </form>
-
-          <footer className="mt-8 flex flex-col items-center justify-center space-y-4">
-            {siteKey && (
-              <div className="flex justify-center transform scale-90">
-                <ReCAPTCHA ref={recaptchaRef} size="invisible" sitekey={siteKey} badge="bottomleft" />
-              </div>
-            )}
-            <p className="text-xs text-on-surface-variant">
-              Didn&apos;t receive the code?
-              <button
-                type="button"
-                onClick={handleResendOtp}
-                aria-label="Resend OTP code"
-                className="text-primary font-bold ml-1 hover:underline"
-              >
-                Resend OTP
-              </button>
-            </p>
-          </footer>
-        </div>
-      </section>
-    </AuthSplitLayout>
+          </p>
+        </footer>
+      </div>
+    </section>
+    </main>
   );
 };
 

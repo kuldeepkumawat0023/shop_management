@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { authService } from '@/lib/services/auth.services';
 import toast from 'react-hot-toast';
 import ReCAPTCHA from 'react-google-recaptcha';
@@ -12,14 +13,19 @@ import {
   ArrowRight,
   ArrowLeft
 } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import AuthSplitLayout from './AuthSplitLayout';
 
 const ForgotPasswordForm = () => {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const recaptchaRef = useRef<ReCAPTCHA>(null);
   const [error, setError] = useState('');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,10 +60,10 @@ const ForgotPasswordForm = () => {
       // In authController, forgotPassword doesn't strictly check captcha yet, but we send it if we add it later.
       const response = await authService.forgotPassword(email);
       if (response.success) {
-        setSuccess(true);
-        toast.success('Reset link sent to your email!', { id: toastId });
+        toast.success('OTP sent to your email!', { id: toastId });
+        router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
       } else {
-        toast.error(response.message || 'Failed to send reset link', { id: toastId });
+        toast.error(response.message || 'Failed to send OTP', { id: toastId });
       }
     } catch (err: any) {
       const message = err.response?.data?.message || err.message || 'An error occurred';
@@ -122,8 +128,11 @@ const ForgotPasswordForm = () => {
               {error && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{error}</p>}
             </div>
 
-            {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && (
-              <ReCAPTCHA ref={recaptchaRef} size="invisible" sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} badge="bottomleft" />
+            {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && mounted && createPortal(
+              <div className="fixed bottom-0 left-0 z-[9999]">
+                <ReCAPTCHA ref={recaptchaRef} size="invisible" sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} badge="bottomleft" />
+              </div>,
+              document.body
             )}
 
             <button

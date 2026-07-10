@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
@@ -28,6 +29,9 @@ const LoginForm = () => {
 
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   const loginWithGoogle = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -250,8 +254,11 @@ const LoginForm = () => {
             {errors.password && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.password}</p>}
           </div>
 
-          {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && (
-            <ReCAPTCHA ref={recaptchaRef} size="invisible" sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} badge="bottomleft" />
+          {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && mounted && createPortal(
+            <div className="fixed bottom-0 left-0 z-[9999]">
+              <ReCAPTCHA ref={recaptchaRef} size="invisible" sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} badge="bottomleft" />
+            </div>,
+            document.body
           )}
 
           <div className="flex items-start gap-2 pt-2 pb-1">
