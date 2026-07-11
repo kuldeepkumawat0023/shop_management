@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { X, CreditCard, Banknote, Smartphone, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import { cn } from '@/utils/cn';
+import { usePOS } from '@/contexts/POSContext';
+import { formatCurrency } from '@/utils/formatCurrency';
 
 interface PaymentModalProps {
   onClose: () => void;
@@ -18,12 +20,20 @@ const PAYMENT_METHODS = [
 const QUICK_CASH = [500, 1000, 2000];
 
 export default function PaymentModal({ onClose }: PaymentModalProps) {
+  const { netAmount, checkout } = usePOS();
   const [method, setMethod] = useState('cash');
-  const [amountReceived, setAmountReceived] = useState<string>('945');
+  const [amountReceived, setAmountReceived] = useState<string>(netAmount.toString());
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const totalAmount = 945;
   const received = parseFloat(amountReceived) || 0;
-  const changeDue = received > totalAmount ? received - totalAmount : 0;
+  const changeDue = received > netAmount ? received - netAmount : 0;
+
+  const handleCheckout = async () => {
+    setIsSubmitting(true);
+    const success = await checkout(method, received);
+    setIsSubmitting(false);
+    if (success) onClose();
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -46,10 +56,9 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
 
         <div className="p-5 space-y-6">
           
-          {/* Total Amount Banner */}
           <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex flex-col items-center justify-center text-center">
             <span className="text-sm font-semibold text-on-surface-variant mb-1">Total Payable</span>
-            <span className="text-3xl font-black text-primary">₹{totalAmount.toFixed(2)}</span>
+            <span className="text-3xl font-black text-primary">{formatCurrency(netAmount)}</span>
           </div>
 
           {/* Payment Methods */}
@@ -109,21 +118,21 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
               {/* Change Due */}
               <div className="flex items-center justify-between p-3 bg-surface border border-outline-variant/20 rounded-xl">
                 <span className="text-sm font-semibold text-on-surface-variant">Change Due</span>
-                <span className="text-lg font-black text-error">₹{changeDue.toFixed(2)}</span>
+                <span className="text-lg font-black text-error">{formatCurrency(changeDue)}</span>
               </div>
             </div>
           )}
 
         </div>
 
-        {/* Footer Actions */}
         <div className="p-4 border-t border-outline-variant/20 bg-surface-container-low/50">
           <Button 
-            className="w-full h-12 text-base font-bold bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20"
-            onClick={onClose}
+            className="w-full h-12 text-base font-bold bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 disabled:opacity-50"
+            onClick={handleCheckout}
+            disabled={isSubmitting || (method === 'cash' && received < netAmount)}
           >
             <CheckCircle2 className="w-5 h-5 mr-2" />
-            Complete Sale
+            {isSubmitting ? 'Processing...' : 'Complete Sale'}
           </Button>
         </div>
         

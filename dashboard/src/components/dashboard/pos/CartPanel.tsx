@@ -4,13 +4,8 @@ import React from 'react';
 import { Minus, Plus, Trash2, PauseCircle, CreditCard, Banknote, ShoppingCart, User, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import CustomerSelection from './CustomerSelection';
-
-const CART_ITEMS = [
-  { id: 1, name: 'Amul Taaza Milk 1L', price: 68, qty: 2 },
-  { id: 2, name: 'Tata Tea Premium 1kg', price: 420, qty: 1 },
-  { id: 4, name: 'Maggi 2-Minute Noodles', price: 14, qty: 5 },
-  { id: 8, name: 'Fortune Sunflower Oil 1L', price: 145, qty: 2 },
-];
+import { usePOS } from '@/contexts/POSContext';
+import { formatCurrency } from '@/utils/formatCurrency';
 
 interface CartPanelProps {
   onClose?: () => void;
@@ -19,6 +14,8 @@ interface CartPanelProps {
 }
 
 export default function CartPanel({ onClose, onPay, onHold }: CartPanelProps) {
+  const { cart, removeFromCart, updateQuantity, subtotal, discount, tax, netAmount } = usePOS();
+
   return (
     <div className="flex flex-col h-full w-full bg-surface">
       
@@ -63,58 +60,80 @@ export default function CartPanel({ onClose, onPay, onHold }: CartPanelProps) {
 
       {/* Cart Items */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-outline-variant/30">
-        {CART_ITEMS.map((item) => (
-          <div key={item.id} className="flex gap-3 p-3 bg-surface-container-low border border-outline-variant/20 rounded-xl group hover:border-primary/30 transition-colors">
-            
-            <div className="flex-1 flex flex-col justify-between">
-              <div className="flex justify-between items-start mb-2">
-                <h4 className="text-sm font-semibold text-on-surface line-clamp-2 leading-tight pr-2">
-                  {item.name}
-                </h4>
-                <button className="text-outline-variant hover:text-error transition-colors mt-0.5 shrink-0">
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
+        {cart.length === 0 ? (
+          <div className="h-full flex flex-col items-center justify-center text-on-surface-variant/50 gap-2">
+            <ShoppingCart size={48} strokeWidth={1} />
+            <p>Cart is empty</p>
+          </div>
+        ) : (
+          cart.map((item) => (
+            <div key={item.productId} className="flex gap-3 p-3 bg-surface-container-low border border-outline-variant/20 rounded-xl group hover:border-primary/30 transition-colors">
               
-              <div className="flex items-center justify-between mt-auto">
-                <span className="text-sm font-black text-primary">₹{item.price}</span>
+              <div className="flex-1 flex flex-col justify-between">
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="text-sm font-semibold text-on-surface line-clamp-2 leading-tight pr-2">
+                    {item.name}
+                  </h4>
+                  <button 
+                    onClick={() => removeFromCart(item.productId)}
+                    className="text-outline-variant hover:text-error transition-colors mt-0.5 shrink-0"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
                 
-                {/* Qty Controls */}
-                <div className="flex items-center gap-3 bg-surface border border-outline-variant/30 rounded-lg p-0.5">
-                  <button className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-surface-container-high text-on-surface-variant transition-colors">
-                    <Minus className="w-3.5 h-3.5" />
-                  </button>
-                  <span className="text-xs font-bold w-4 text-center">{item.qty}</span>
-                  <button className="w-7 h-7 flex items-center justify-center rounded-md bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors">
-                    <Plus className="w-3.5 h-3.5" />
-                  </button>
+                <div className="flex items-center justify-between mt-auto">
+                  <span className="text-sm font-black text-primary">{formatCurrency(item.sellingPrice * item.quantity)}</span>
+                  
+                  {/* Qty Controls */}
+                  <div className="flex items-center gap-3 bg-surface border border-outline-variant/30 rounded-lg p-0.5">
+                    <button 
+                      onClick={() => updateQuantity(item.productId, -1)}
+                      className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-surface-container-high text-on-surface-variant transition-colors"
+                    >
+                      <Minus className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="text-xs font-bold w-4 text-center">{item.quantity}</span>
+                    <button 
+                      onClick={() => updateQuantity(item.productId, 1)}
+                      className="w-7 h-7 flex items-center justify-center rounded-md bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {/* Totals & Actions */}
       <div className="p-4 bg-surface border-t border-outline-variant/30 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.05)]">
         <div className="space-y-2 mb-4">
-          <div className="flex justify-between text-xs text-on-surface-variant">
+          <div className="flex justify-between text-on-surface-variant text-sm font-medium">
             <span>Subtotal</span>
-            <span className="font-semibold text-on-surface">₹916.00</span>
+            <span>{formatCurrency(subtotal)}</span>
           </div>
-          <div className="flex justify-between text-xs text-on-surface-variant">
-            <span>Tax (GST 5%)</span>
-            <span className="font-semibold text-on-surface">₹45.80</span>
-          </div>
-          <div className="flex justify-between text-xs text-success">
-            <span>Discount</span>
-            <span className="font-semibold">-₹16.80</span>
-          </div>
-          
-          <div className="pt-2 mt-2 border-t border-outline-variant/30 flex justify-between items-center">
-            <span className="text-sm font-bold text-on-surface">Total Payable</span>
-            <span className="text-2xl font-black text-primary">₹945.00</span>
-          </div>
+          {discount > 0 && (
+            <div className="flex justify-between text-error text-sm font-medium">
+              <span>Discount</span>
+              <span>-{formatCurrency(discount)}</span>
+            </div>
+          )}
+          {tax > 0 && (
+            <div className="flex justify-between text-on-surface-variant text-sm font-medium">
+              <span>Tax</span>
+              <span>+{formatCurrency(tax)}</span>
+            </div>
+          )}
+        </div>
+        
+        <div className="flex items-end justify-between border-t border-dashed border-outline-variant/30 pt-3 mb-4">
+          <span className="text-sm font-bold text-on-surface-variant">Total Amount</span>
+          <span className="text-3xl font-black text-primary leading-none tracking-tight">
+            {formatCurrency(netAmount)}
+          </span>
         </div>
 
         {/* Action Buttons */}

@@ -7,6 +7,7 @@ import { shopService } from '@/lib/services/shop.services';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { createPortal } from 'react-dom';
+import { shopCreationSchema } from '@/utils/validations';
 
 interface ShopCreationModalProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ export default function ShopCreationModal({ isOpen, onClose, isForced = false, o
   const [step, setStep] = useState<1 | 2>(1);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   React.useEffect(() => {
     setMounted(true);
@@ -36,14 +38,34 @@ export default function ShopCreationModal({ isOpen, onClose, isForced = false, o
 
   if (!isOpen || !mounted) return null;
 
+  const validate = (name: string, value: string) => {
+    let err = '';
+    const result = shopCreationSchema.safeParse({ ...formData, [name]: value });
+    if (!result.success) {
+      const fieldError = result.error.issues.find(e => e.path[0] === name);
+      if (fieldError) err = fieldError.message;
+    }
+    setFieldErrors(prev => ({ ...prev, [name]: err }));
+    return err === '';
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    validate(name, value);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim()) {
-      toast.error('Shop name is required');
+    
+    const validationResult = shopCreationSchema.safeParse(formData);
+    if (!validationResult.success) {
+      const newErrors: Record<string, string> = {};
+      for (const err of validationResult.error.issues) {
+        if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
+      }
+      setFieldErrors(newErrors);
+      toast.error('Please correct the errors in the form');
       return;
     }
 
@@ -200,65 +222,74 @@ export default function ShopCreationModal({ isOpen, onClose, isForced = false, o
           {step === 1 ? (
             <form id="create-shop-form" onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-on-surface uppercase tracking-wider mb-1.5 block">Shop Name <span className="text-error">*</span></label>
+                <label className="text-xs font-bold text-on-surface uppercase tracking-wider mb-1.5 block">Shop Name / दुकान का नाम <span className="text-error">*</span></label>
                 <input
                   type="text"
                   name="name"
                   required
+                  maxLength={100}
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="e.g. Green Mart - Main Branch"
-                  className="w-full bg-surface-container border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all"
+                  placeholder="Shop Name / दुकान का नाम"
+                  className={`w-full bg-surface-container border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all ${fieldErrors.name ? '!border-error !ring-error/10' : ''}`}
                 />
+                {fieldErrors.name && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{fieldErrors.name}</p>}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold text-on-surface uppercase tracking-wider mb-1.5 block">Email</label>
+                  <label className="text-xs font-bold text-on-surface uppercase tracking-wider mb-1.5 block">Email / ईमेल <span className="text-error">*</span></label>
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    placeholder="shop@example.com"
-                    className="w-full bg-surface-container border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all"
+                    placeholder="shop@example.com / ईमेल"
+                    className={`w-full bg-surface-container border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all ${fieldErrors.email ? '!border-error !ring-error/10' : ''}`}
                   />
+                  {fieldErrors.email && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{fieldErrors.email}</p>}
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-on-surface uppercase tracking-wider mb-1.5 block">Contact Number</label>
+                  <label className="text-xs font-bold text-on-surface uppercase tracking-wider mb-1.5 block">Contact Number / संपर्क नंबर <span className="text-error">*</span></label>
                   <input
                     type="tel"
                     name="contactNumber"
+                    maxLength={10}
                     value={formData.contactNumber}
                     onChange={handleChange}
-                    placeholder="+1 234 567 8900"
-                    className="w-full bg-surface-container border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all"
+                    placeholder="+91 9876543210 / फोन नंबर"
+                    className={`w-full bg-surface-container border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all ${fieldErrors.contactNumber ? '!border-error !ring-error/10' : ''}`}
                   />
+                  {fieldErrors.contactNumber && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{fieldErrors.contactNumber}</p>}
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-on-surface uppercase tracking-wider mb-1.5 block">GST / Tax Number</label>
+                <label className="text-xs font-bold text-on-surface uppercase tracking-wider mb-1.5 block">GST / Tax Number / जीएसटी नंबर</label>
                 <input
                   type="text"
                   name="gstNumber"
+                  maxLength={15}
                   value={formData.gstNumber}
                   onChange={handleChange}
-                  placeholder="GSTIN..."
-                  className="w-full bg-surface-container border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all"
+                  placeholder="GSTIN... (Optional) / जीएसटी (वैकल्पिक)"
+                  className={`w-full bg-surface-container border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all ${fieldErrors.gstNumber ? '!border-error !ring-error/10' : ''}`}
                 />
+                {fieldErrors.gstNumber && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{fieldErrors.gstNumber}</p>}
               </div>
 
               <div>
-                <label className="text-xs font-bold text-on-surface uppercase tracking-wider mb-1.5 block">Address</label>
+                <label className="text-xs font-bold text-on-surface uppercase tracking-wider mb-1.5 block">Address / पता <span className="text-error">*</span></label>
                 <textarea
                   name="address"
                   rows={3}
+                  maxLength={500}
                   value={formData.address}
                   onChange={handleChange}
-                  placeholder="Full address of the shop..."
-                  className="w-full bg-surface-container border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all resize-none"
+                  placeholder="Full address of the shop... / दुकान का पूरा पता..."
+                  className={`w-full bg-surface-container border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all resize-none ${fieldErrors.address ? '!border-error !ring-error/10' : ''}`}
                 />
+                {fieldErrors.address && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{fieldErrors.address}</p>}
               </div>
             </form>
           ) : (

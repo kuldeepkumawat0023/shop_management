@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createSale, getSales, getSaleById } = require('../controllers/saleController');
+const { createSale, getSales, getSaleById, updateSale, deleteSale } = require('../controllers/saleController');
 const { processOfflineSync } = require('../services/syncService');
 const { protect } = require('../middlewares/authMiddleware');
 const shopScope = require('../middlewares/shopScope');
@@ -13,7 +13,8 @@ router.use(shopScope);
 router.post('/create', requirePermission(PERMISSIONS.POS_ACCESS), createSale);
 router.get('/all', requirePermission(PERMISSIONS.VIEW_SALES), getSales);
 router.get('/get/:id', requirePermission(PERMISSIONS.VIEW_SALES), getSaleById);
-
+router.put('/update/:id', requirePermission(PERMISSIONS.POS_ACCESS), updateSale);
+router.delete('/delete/:id', requirePermission(PERMISSIONS.POS_ACCESS), deleteSale);
 // Offline Bulk Sync Route
 router.post('/sync', requirePermission(PERMISSIONS.POS_ACCESS), async (req, res, next) => {
   try {

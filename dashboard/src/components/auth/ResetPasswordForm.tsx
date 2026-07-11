@@ -7,6 +7,7 @@ import { authService } from '@/lib/services/auth.services';
 import AuthSplitLayout from './AuthSplitLayout';
 import { Button } from '@/components/common/Button';
 import { KeyRound, Key, Mail, Hash, Loader2, Lock, LockKeyhole, ArrowLeft } from 'lucide-react';
+import { resetPasswordSchema } from '@/utils/validations';
 
 export default function ResetPasswordForm() {
   const router = useRouter();
@@ -31,8 +32,9 @@ export default function ResetPasswordForm() {
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (newPassword !== confirmPassword) {
-      setError('Passwords do not match');
+    const result = resetPasswordSchema.safeParse({ newPassword, confirmPassword });
+    if (!result.success) {
+      setError(result.error.issues[0].message);
       return;
     }
 
@@ -90,7 +92,7 @@ export default function ResetPasswordForm() {
 
         <form onSubmit={handleResetPassword} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-semibold text-on-surface" htmlFor="newPassword">New Password</label>
+            <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest" htmlFor="newPassword">NEW PASSWORD / नया पासवर्ड <span className="text-error">*</span></label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-primary/80 w-5 h-5 z-10 pointer-events-none" />
               <input
@@ -100,13 +102,15 @@ export default function ResetPasswordForm() {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 className="glass-input w-full pl-10 pr-4 py-2.5 text-on-surface"
-                placeholder="••••••••"
+                placeholder="•••••••• / नया पासवर्ड"
+                maxLength={50}
               />
             </div>
+            <p className="text-[10px] text-on-surface-variant/70 mt-1 px-1">Min 8 chars, 1 uppercase, 1 lowercase, 1 number</p>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-semibold text-on-surface" htmlFor="confirmPassword">Confirm Password</label>
+            <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest" htmlFor="confirmPassword">CONFIRM PASSWORD / पासवर्ड की पुष्टि करें <span className="text-error">*</span></label>
             <div className="relative">
               <LockKeyhole className="absolute left-3 top-1/2 -translate-y-1/2 text-primary/80 w-5 h-5 z-10 pointer-events-none" />
               <input
@@ -116,7 +120,8 @@ export default function ResetPasswordForm() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="glass-input w-full pl-10 pr-4 py-2.5 text-on-surface"
-                placeholder="••••••••"
+                placeholder="•••••••• / पासवर्ड की पुष्टि करें"
+                maxLength={50}
               />
             </div>
           </div>

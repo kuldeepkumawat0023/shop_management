@@ -6,18 +6,41 @@ import { ArrowLeft, Save, UploadCloud, Tag, FileText, Globe, User } from 'lucide
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/utils/cn';
+import { brandSchema } from '@/utils/validations';
+import toast from 'react-hot-toast';
 
 export default function BrandForm() {
   const router = useRouter();
   const [dragActive, setDragActive] = useState(false);
+  
   const [formData, setFormData] = useState({
     name: '',
     website: '',
     contactPerson: '',
     category: '',
     description: '',
-    status: 'Active'
+    status: 'Active' as 'Active' | 'Inactive'
   });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
+
+  const validate = (name: string, value: string) => {
+    let error = '';
+    const result = brandSchema.safeParse({ ...formData, [name]: value });
+    if (!result.success) {
+      const fieldError = result.error.issues.find(err => err.path[0] === name);
+      if (fieldError) error = fieldError.message;
+    }
+    setErrors(prev => ({ ...prev, [name]: error }));
+    return error === '';
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    validate(name, value);
+  };
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -36,19 +59,40 @@ export default function BrandForm() {
     // Add file handling logic here
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const validationResult = brandSchema.safeParse(formData);
+    if (!validationResult.success) {
+      const newErrors: Record<string, string> = {};
+      for (const err of validationResult.error.issues) {
+        if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
+      }
+      setErrors(newErrors);
+      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें');
+    }
+
+    setLoading(true);
+    const toastId = toast.loading('Saving brand...');
+
+    try {
+      // API call simulation
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      toast.success('Brand saved successfully! / ब्रांड सफलतापूर्वक सहेजा गया!', { id: toastId });
+      router.back();
+    } catch (error) {
+      toast.error('Failed to save brand', { id: toastId });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 w-full max-w-7xl mx-auto flex flex-col gap-6">
+    <form onSubmit={handleSubmit} className="p-4 md:p-6 lg:p-8 w-full max-w-7xl mx-auto flex flex-col gap-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Button onClick={() => router.back()} variant="ghost" size="icon" className="w-10 h-10 rounded-xl bg-surface-container-low border border-outline-variant/20 text-on-surface hover:text-primary hover:bg-primary/10 transition-colors">
+          <Button type="button" onClick={() => router.back()} variant="ghost" size="icon" className="w-10 h-10 rounded-xl bg-surface-container-low border border-outline-variant/20 text-on-surface hover:text-primary hover:bg-primary/10 transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
@@ -57,12 +101,12 @@ export default function BrandForm() {
           </div>
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <Button onClick={() => router.back()} variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
+          <Button type="button" onClick={() => router.back()} variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
             Cancel
           </Button>
-          <Button className="flex-1 sm:flex-none gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl">
+          <Button type="submit" disabled={loading} className="flex-1 sm:flex-none gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
             <Save className="w-4 h-4" />
-            <span className="font-bold tracking-wide">Save Brand</span>
+            <span className="font-bold tracking-wide">{loading ? 'Saving...' : 'Save Brand'}</span>
           </Button>
         </div>
       </div>
@@ -78,56 +122,75 @@ export default function BrandForm() {
             
             <div className="space-y-2">
               <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                <Tag className="w-3.5 h-3.5" /> Brand Name <span className="text-error">*</span>
+                <Tag className="w-3.5 h-3.5" /> Brand Name / ब्रांड का नाम <span className="text-error">*</span>
               </label>
               <input 
                 type="text" 
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
+                aria-invalid={!!errors.name}
                 placeholder="e.g. SonicAudio, FitLife Gear" 
-                className="w-full h-11 px-4 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
+                className={cn(
+                  "w-full h-11 px-4 bg-surface-container-low border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all",
+                  errors.name ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                )}
               />
+              {errors.name && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.name}</p>}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                  <Globe className="w-3.5 h-3.5" /> Website URL
+                  <Globe className="w-3.5 h-3.5" /> Website URL / वेबसाइट
                 </label>
                 <input 
                   type="text" 
                   name="website"
                   value={formData.website}
                   onChange={handleChange}
+                  aria-invalid={!!errors.website}
                   placeholder="https://example.com" 
-                  className="w-full h-11 px-4 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
+                  className={cn(
+                    "w-full h-11 px-4 bg-surface-container-low border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all",
+                    errors.website ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                  )}
                 />
+                {errors.website && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.website}</p>}
               </div>
+              
               <div className="space-y-2">
                 <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                  <User className="w-3.5 h-3.5" /> Primary Contact
+                  <User className="w-3.5 h-3.5" /> Primary Contact / संपर्क व्यक्ति
                 </label>
                 <input 
                   type="text" 
                   name="contactPerson"
                   value={formData.contactPerson}
                   onChange={handleChange}
+                  aria-invalid={!!errors.contactPerson}
                   placeholder="John Doe" 
-                  className="w-full h-11 px-4 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
+                  className={cn(
+                    "w-full h-11 px-4 bg-surface-container-low border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all",
+                    errors.contactPerson ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                  )}
                 />
+                {errors.contactPerson && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.contactPerson}</p>}
               </div>
             </div>
 
             <div className="space-y-2">
               <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                <Tag className="w-3.5 h-3.5" /> Category Focus
+                <Tag className="w-3.5 h-3.5" /> Category Focus / श्रेणी
               </label>
               <select 
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full h-11 px-4 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all appearance-none cursor-pointer"
+                className={cn(
+                  "w-full h-11 px-4 bg-surface-container-low border rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 transition-all appearance-none cursor-pointer",
+                  errors.category ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                )}
               >
                 <option value="">Select a category</option>
                 <option value="Electronics">Electronics</option>
@@ -135,19 +198,24 @@ export default function BrandForm() {
                 <option value="Groceries">Groceries</option>
                 <option value="Home Decor">Home Decor</option>
               </select>
+              {errors.category && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.category}</p>}
             </div>
 
             <div className="space-y-2">
               <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                <FileText className="w-3.5 h-3.5" /> Brand Notes / Description
+                <FileText className="w-3.5 h-3.5" /> Brand Notes / विवरण
               </label>
               <textarea 
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
                 placeholder="Enter brand description, partnership notes, etc..." 
-                className="w-full h-32 p-4 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all resize-none"
+                className={cn(
+                  "w-full h-32 p-4 bg-surface-container-low border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all resize-none",
+                  errors.description ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                )}
               ></textarea>
+              {errors.description && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.description}</p>}
             </div>
           </div>
         </div>
@@ -216,6 +284,6 @@ export default function BrandForm() {
           </div>
         </div>
       </div>
-    </div>
+    </form>
   );
 }

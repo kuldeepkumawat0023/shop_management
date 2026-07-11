@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import AuthSplitLayout from './AuthSplitLayout';
+import { registerSchema } from '@/utils/validations';
 
 const RegisterForm = () => {
   const router = useRouter();
@@ -71,44 +72,11 @@ const RegisterForm = () => {
 
   const validateField = (name: string, value: string) => {
     let error = '';
-
-    if (!value) {
-      error = 'Required field';
-    } else {
-      switch (name) {
-        case 'fullname':
-          if (!/^[a-zA-Z\s]+$/.test(value)) {
-            error = 'Name must contain only letters and spaces';
-          }
-          break;
-
-        case 'email':
-          const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
-          if (!emailRegex.test(value)) {
-            error = 'Invalid email address';
-          }
-          break;
-
-        case 'phoneNumber':
-          if (!/^\d{10}$/.test(value)) {
-            error = 'Must be exactly 10 digits';
-          }
-          break;
-
-        case 'password':
-          if (value.length < 6) {
-            error = 'Minimum 6 characters';
-          }
-          break;
-
-        case 'confirmPassword':
-          if (value !== formData.password) {
-            error = 'Passwords mismatch';
-          }
-          break;
-      }
+    const result = registerSchema.safeParse({ ...formData, [name]: value });
+    if (!result.success) {
+      const fieldError = result.error.issues.find(err => err.path[0] === name);
+      if (fieldError) error = fieldError.message;
     }
-
     setErrors(prev => ({ ...prev, [name]: error }));
     return error === '';
   };
@@ -131,40 +99,13 @@ const RegisterForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newErrors: Record<string, string> = {};
-    let isValid = true;
-    const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
-
-    Object.keys(formData).forEach(key => {
-      const val = formData[key as keyof typeof formData];
-      if (!val) {
-        newErrors[key] = 'Required';
-        isValid = false;
-      } else {
-        if (key === 'fullname' && !/^[a-zA-Z\s]+$/.test(val)) {
-          newErrors[key] = 'Name must contain only letters and spaces';
-          isValid = false;
-        }
-        if (key === 'email' && !emailRegex.test(val)) {
-          newErrors[key] = 'Invalid email';
-          isValid = false;
-        }
-        if (key === 'phoneNumber' && val.length !== 10) {
-          newErrors[key] = '10 digits required';
-          isValid = false;
-        }
-        if (key === 'password' && val.length < 6) {
-          newErrors[key] = 'Minimum 6 characters';
-          isValid = false;
-        }
-        if (key === 'confirmPassword' && val !== formData.password) {
-          newErrors[key] = 'Mismatch';
-          isValid = false;
-        }
+    const normalizedEmail = formData.email.trim().toLowerCase();
+    const validationResult = registerSchema.safeParse({ ...formData, email: normalizedEmail });
+    if (!validationResult.success) {
+      const newErrors: Record<string, string> = {};
+      for (const err of validationResult.error.issues) {
+        if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
       }
-    });
-
-    if (!isValid) {
       setErrors(newErrors);
       return toast.error('Please fix form errors');
     }
@@ -255,13 +196,14 @@ const RegisterForm = () => {
         <form onSubmit={handleSubmit} className="space-y-4" aria-label="Register form">
           <div>
             <label className="block text-[10px] font-bold text-on-surface-variant mb-1 uppercase tracking-widest" htmlFor="fullname">
-              FULL NAME <span className="text-error">*</span>
+              FULL NAME / पूरा नाम <span className="text-error">*</span>
             </label>
             <div className="relative">
               <User className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 z-10 transition-colors ${errors.fullname ? 'text-error' : 'text-primary/70'}`} aria-hidden="true" />
               <input
                 className={`w-full glass-input rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-0 transition-all ${errors.fullname ? '!border-error !ring-error/10' : ''}`}
-                id="fullname" name="fullname" type="text" autoComplete="name" placeholder="John Doe"
+                id="fullname" name="fullname" type="text" autoComplete="name" placeholder="John Doe / पूरा नाम"
+                maxLength={50}
                 aria-invalid={!!errors.fullname}
                 value={formData.fullname} onChange={handleChange} required
               />
@@ -271,13 +213,14 @@ const RegisterForm = () => {
 
           <div>
             <label className="block text-[10px] font-bold text-on-surface-variant mb-1 uppercase tracking-widest" htmlFor="email">
-              EMAIL ADDRESS <span className="text-error">*</span>
+              EMAIL ADDRESS / ईमेल पता <span className="text-error">*</span>
             </label>
             <div className="relative">
               <Mail className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 z-10 transition-colors ${errors.email ? 'text-error' : 'text-primary/70'}`} aria-hidden="true" />
               <input
                 className={`w-full glass-input rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-0 transition-all ${errors.email ? '!border-error !ring-error/10' : ''}`}
-                id="email" name="email" type="email" autoComplete="email" placeholder="admin@smartshop.com"
+                id="email" name="email" type="email" autoComplete="email" placeholder="admin@smartshop.com / ईमेल"
+                maxLength={100}
                 aria-invalid={!!errors.email}
                 value={formData.email} onChange={handleChange} required
               />
@@ -287,7 +230,7 @@ const RegisterForm = () => {
 
           <div>
             <label className="block text-[10px] font-bold text-on-surface-variant mb-1 uppercase tracking-widest" htmlFor="phoneNumber">
-              PHONE NUMBER <span className="text-error">*</span>
+              PHONE NUMBER / फोन नंबर <span className="text-error">*</span>
             </label>
             <div className="relative flex gap-2">
               <div className="relative w-24 shrink-0">
@@ -306,7 +249,8 @@ const RegisterForm = () => {
                 <Phone className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 z-10 transition-colors ${errors.phoneNumber ? 'text-error' : 'text-primary/70'}`} aria-hidden="true" />
                 <input
                   className={`w-full glass-input rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-0 transition-all ${errors.phoneNumber ? '!border-error !ring-error/10' : ''}`}
-                  id="phoneNumber" name="phoneNumber" type="tel" placeholder="9876543210"
+                  id="phoneNumber" name="phoneNumber" type="tel" autoComplete="tel" placeholder="9876543210 / फोन नंबर"
+                  maxLength={10}
                   aria-invalid={!!errors.phoneNumber}
                   value={formData.phoneNumber} onChange={handleChange} required
                 />
@@ -317,13 +261,14 @@ const RegisterForm = () => {
 
           <div>
             <label className="block text-[10px] font-bold text-on-surface-variant mb-1 uppercase tracking-widest" htmlFor="password">
-              PASSWORD <span className="text-error">*</span>
+              PASSWORD / पासवर्ड <span className="text-error">*</span>
             </label>
             <div className="relative">
               <Lock className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 z-10 transition-colors ${errors.password ? 'text-error' : 'text-primary/70'}`} aria-hidden="true" />
               <input
                 className={`w-full glass-input rounded-xl py-2.5 pl-10 pr-10 text-sm focus:ring-0 transition-all ${errors.password ? '!border-error !ring-error/10' : ''}`}
-                id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete="new-password" placeholder="••••••••"
+                id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete="new-password" placeholder="•••••••• / पासवर्ड"
+                maxLength={50}
                 aria-invalid={!!errors.password}
                 value={formData.password} onChange={handleChange} required
               />
@@ -336,18 +281,22 @@ const RegisterForm = () => {
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-            {errors.password && <p className="text-[10px] text-error mt-1 font-bold px-1">{errors.password}</p>}
+            {errors.password 
+              ? <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.password}</p>
+              : <p className="text-[10px] text-on-surface-variant/70 mt-1 px-1">Min 8 chars, 1 uppercase, 1 lowercase, 1 number</p>
+            }
           </div>
 
           <div>
             <label className="block text-[10px] font-bold text-on-surface-variant mb-1 uppercase tracking-widest" htmlFor="confirmPassword">
-              CONFIRM PASSWORD <span className="text-error">*</span>
+              CONFIRM PASSWORD / पासवर्ड की पुष्टि करें <span className="text-error">*</span>
             </label>
             <div className="relative">
               <ShieldCheck className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 z-10 transition-colors ${errors.confirmPassword ? 'text-error' : 'text-primary/70'}`} aria-hidden="true" />
               <input
                 className={`w-full glass-input rounded-xl py-2.5 pl-10 pr-10 text-sm focus:ring-0 transition-all ${errors.confirmPassword ? '!border-error !ring-error/10' : ''}`}
-                id="confirmPassword" name="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} autoComplete="new-password" placeholder="••••••••"
+                id="confirmPassword" name="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} autoComplete="new-password" placeholder="•••••••• / पासवर्ड की पुष्टि करें"
+                maxLength={50}
                 aria-invalid={!!errors.confirmPassword}
                 value={formData.confirmPassword} onChange={handleChange} required
               />

@@ -1,4 +1,4 @@
-import BrandForm from '@/components/dashboard/brands/BrandForm';
+import BrandForm from '@/components/dashboard/inventory-group/brands/BrandForm';
 
 export default function NewBrandPage() {
   return <BrandForm />;

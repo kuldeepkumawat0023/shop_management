@@ -18,6 +18,7 @@ import {
   EyeOff
 } from 'lucide-react';
 import AuthSplitLayout from './AuthSplitLayout';
+import { loginSchema } from '@/utils/validations';
 
 /**
  * 🔒 Premium Login Form
@@ -65,20 +66,11 @@ const LoginForm = () => {
 
   const validate = (name: string, value: string) => {
     let error = '';
-
-    if (!value) {
-      error = 'Required';
-    } else if (name === 'email') {
-      const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
-      if (!emailRegex.test(value)) {
-        error = 'Invalid email';
-      }
-    } else if (name === 'password') {
-      if (value.length < 6) {
-        error = 'Min 6 characters required';
-      }
+    const result = loginSchema.safeParse({ ...formData, [name]: value });
+    if (!result.success) {
+      const fieldError = result.error.issues.find(err => err.path[0] === name);
+      if (fieldError) error = fieldError.message;
     }
-
     setErrors(prev => ({ ...prev, [name]: error }));
     return error === '';
   };
@@ -94,26 +86,14 @@ const LoginForm = () => {
     e.preventDefault();
 
     const normalizedEmail = formData.email.trim().toLowerCase();
-    const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
-    const isEmailValid = normalizedEmail && emailRegex.test(normalizedEmail);
-    const isPasswordValid = formData.password && formData.password.length >= 6;
-
-    if (!isEmailValid || !isPasswordValid) {
-      let emailError = '';
-      if (!formData.email) {
-        emailError = 'Required';
-      } else if (!emailRegex.test(formData.email)) {
-        emailError = 'Invalid email';
+    
+    const validationResult = loginSchema.safeParse({ email: normalizedEmail, password: formData.password });
+    if (!validationResult.success) {
+      const newErrors: Record<string, string> = {};
+      for (const err of validationResult.error.issues) {
+        if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
       }
-
-      let passwordError = '';
-      if (!formData.password) {
-        passwordError = 'Required';
-      } else if (formData.password.length < 6) {
-        passwordError = 'Min 6 characters required';
-      }
-
-      setErrors({ email: emailError, password: passwordError });
+      setErrors(newErrors);
       return toast.error('Please correct the errors');
     }
 
@@ -212,13 +192,14 @@ const LoginForm = () => {
         <form onSubmit={handleSubmit} className="space-y-4" aria-label="Login form">
           <div>
             <label className="block text-[10px] font-bold text-on-surface-variant mb-1 uppercase tracking-widest" htmlFor="email">
-              EMAIL ADDRESS <span className="text-error">*</span>
+              EMAIL ADDRESS / ईमेल पता <span className="text-error">*</span>
             </label>
             <div className="relative">
               <Mail className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 z-10 transition-colors ${errors.email ? 'text-error' : 'text-primary/70'}`} aria-hidden="true" />
               <input
                 className={`w-full glass-input rounded-xl pl-10 pr-4 py-2.5 text-sm focus:ring-0 transition-all ${errors.email ? '!border-error !ring-error/10' : ''}`}
-                id="email" name="email" type="email" autoComplete="email" placeholder="admin@smartshop.com"
+                id="email" name="email" type="email" autoComplete="email" placeholder="admin@smartshop.com / ईमेल"
+                maxLength={100}
                 aria-invalid={!!errors.email}
                 value={formData.email} onChange={handleChange} required
               />
@@ -229,7 +210,7 @@ const LoginForm = () => {
           <div>
             <div className="flex justify-between items-center mb-1">
               <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-widest" htmlFor="password">
-                PASSWORD <span className="text-error">*</span>
+                PASSWORD / पासवर्ड <span className="text-error">*</span>
               </label>
               <Link className="text-[10px] font-bold text-primary hover:opacity-80 transition-opacity" href="/forgot-password" aria-label="Forgot password">
                 Forgot password?
@@ -239,7 +220,8 @@ const LoginForm = () => {
               <Lock className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 z-10 transition-colors ${errors.password ? 'text-error' : 'text-primary/70'}`} aria-hidden="true" />
               <input
                 className={`w-full glass-input rounded-xl pl-10 pr-10 py-2.5 text-sm focus:ring-0 transition-all ${errors.password ? '!border-error !ring-error/10' : ''}`}
-                id="password" name="password" placeholder="••••••••" type={showPassword ? 'text' : 'password'} autoComplete="current-password"
+                id="password" name="password" placeholder="•••••••• / पासवर्ड" type={showPassword ? 'text' : 'password'} autoComplete="current-password"
+                maxLength={50}
                 aria-invalid={!!errors.password}
                 value={formData.password} onChange={handleChange} required
               />
