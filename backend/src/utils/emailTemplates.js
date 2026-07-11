@@ -5,16 +5,16 @@ const getBaseTemplate = (title, content) => `
   <meta charset="utf-8">
   <style>
     .container { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 0; background-color: #f4f7f6; }
-    .header { background: #1e293b; padding: 30px 20px; text-align: center; color: white; border-radius: 8px 8px 0 0; border-bottom: 4px solid #3b82f6; }
+    .header { background: linear-gradient(90deg, #006591 0%, #0ea5e9 100%); padding: 30px 20px; text-align: center; color: white; border-radius: 8px 8px 0 0; }
     .header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; color: #ffffff; }
     .content { background-color: white; padding: 40px 30px; border-radius: 0 0 8px 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
     .content h2 { color: #1e293b; margin-top: 0; }
     .content p { color: #555; line-height: 1.6; font-size: 16px; }
-    .otp-box { background-color: #f8fafc; border: 2px dashed #3b82f6; text-align: center; padding: 20px; margin: 30px 0; border-radius: 8px; }
-    .otp-code { font-size: 36px; font-weight: bold; color: #1e293b; letter-spacing: 4px; }
-    .info-box { background-color: #f9f9f9; border-left: 4px solid #1e293b; padding: 15px 20px; margin: 20px 0; border-radius: 4px; }
+    .otp-box { background-color: #f0fdfa; border: 2px dashed #0ea5e9; text-align: center; padding: 20px; margin: 30px 0; border-radius: 8px; }
+    .otp-code { font-size: 36px; font-weight: bold; color: #0f172a; letter-spacing: 4px; }
+    .info-box { background-color: #f8fafc; border-left: 4px solid #006591; padding: 15px 20px; margin: 20px 0; border-radius: 4px; }
     .btn-container { text-align: center; margin-top: 30px; }
-    .btn { display: inline-block; background: #3b82f6; color: #ffffff !important; text-decoration: none; padding: 14px 35px; border-radius: 5px; font-weight: bold; font-size: 16px; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); border: 1px solid #2563eb; }
+    .btn { display: inline-block; background: linear-gradient(90deg, #006591 0%, #0ea5e9 100%); color: #ffffff !important; text-decoration: none; padding: 14px 35px; border-radius: 5px; font-weight: bold; font-size: 16px; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3); border: none; }
     .footer { text-align: center; margin-top: 20px; padding-bottom: 20px; color: #888; font-size: 12px; }
     .warning { color: #ef4444; font-weight: bold; }
   </style>
@@ -22,14 +22,14 @@ const getBaseTemplate = (title, content) => `
 <body>
   <div class="container">
     <div class="header">
-      <h1>Thori Technical Shop</h1>
+      <h1>Shop Management</h1>
     </div>
     <div class="content">
       <h2>${title}</h2>
       ${content}
     </div>
     <div class="footer">
-      <p>&copy; ${new Date().getFullYear()} Thori Technical Shop Management. All rights reserved.</p>
+      <p>&copy; ${new Date().getFullYear()} Shop Management System. All rights reserved.</p>
     </div>
   </div>
 </body>
@@ -39,7 +39,7 @@ const getBaseTemplate = (title, content) => `
 exports.getWelcomeEmail = (name) => {
   const content = `
     <p>Hello ${name},</p>
-    <p>Welcome to the <strong>Thori Technical Shop Management System</strong>!</p>
+    <p>Welcome to the <strong>Shop Management System</strong>!</p>
     <p>Your account has been successfully created. You can now log into your dashboard to access your modules (Inventory, Payroll, Recipes, etc.).</p>
     <div class="btn-container">
       <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}" class="btn">Go to Dashboard →</a>
@@ -101,7 +101,7 @@ exports.getPasswordResetEmail = (otp) => {
 exports.getStaffInviteEmail = (name, email, password, roleName) => {
   const content = `
     <p>Hello ${name},</p>
-    <p>You have been invited to join the <strong>Thori Technical Shop</strong> management system with the assigned role of <strong style="color: #1e293b;">${roleName}</strong>.</p>
+    <p>You have been invited to join the <strong>Shop Management System</strong> with the assigned role of <strong style="color: #0ea5e9;">${roleName}</strong>.</p>
     
     <div class="info-box">
       <p style="margin:0; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #888;">Your Credentials</p>
