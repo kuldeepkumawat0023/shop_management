@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Minus, Plus, Trash2, PauseCircle, CreditCard, Banknote, ShoppingCart, User, MoreVertical } from 'lucide-react';
+import { Minus, Plus, Trash2, PauseCircle, CreditCard, Banknote, ShoppingCart, User, MoreVertical, X } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import CustomerSelection from './CustomerSelection';
 import { usePOS } from '@/contexts/POSContext';
@@ -14,7 +14,7 @@ interface CartPanelProps {
 }
 
 export default function CartPanel({ onClose, onPay, onHold }: CartPanelProps) {
-  const { cart, removeFromCart, updateQuantity, subtotal, discount, tax, netAmount } = usePOS();
+  const { cart, removeFromCart, updateQuantity, subtotal, discount, tax, netAmount, selectedCustomer, setSelectedCustomer } = usePOS();
 
   return (
     <div className="flex flex-col h-full w-full bg-surface">
@@ -42,20 +42,27 @@ export default function CartPanel({ onClose, onPay, onHold }: CartPanelProps) {
         <CustomerSelection />
         
         {/* Selected Customer Preview */}
-        <div className="mt-3 flex items-center justify-between p-2.5 bg-primary/5 border border-primary/20 rounded-lg">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs">
-              RS
+        {selectedCustomer && (
+          <div className="mt-3 flex items-center justify-between p-2.5 bg-primary/5 border border-primary/20 rounded-lg">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs uppercase">
+                {selectedCustomer.name.substring(0, 2)}
+              </div>
+              <div>
+                <p className="text-xs font-bold text-on-surface">{selectedCustomer.name}</p>
+                <p className="text-[10px] text-primary font-medium">{selectedCustomer.phone}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs font-bold text-on-surface">Rahul Sharma</p>
-              <p className="text-[10px] text-primary font-medium">+91 98765 43210</p>
-            </div>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="w-6 h-6 text-on-surface-variant hover:text-error"
+              onClick={() => setSelectedCustomer(null)}
+            >
+              <X className="w-3.5 h-3.5" />
+            </Button>
           </div>
-          <Button variant="ghost" size="icon" className="w-6 h-6 text-on-surface-variant hover:text-error">
-            <X className="w-3.5 h-3.5" />
-          </Button>
-        </div>
+        )}
       </div>
 
       {/* Cart Items */}
@@ -157,14 +164,5 @@ export default function CartPanel({ onClose, onPay, onHold }: CartPanelProps) {
       </div>
       
     </div>
-  );
-}
-
-// Quick placeholder for missing X icon if not imported properly
-function X({ className }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
-    </svg>
   );
 }

@@ -5,35 +5,92 @@ import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
 import { ArrowLeft, Save, User, MapPin } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { customerSchema } from '@/utils/validations';
+import toast from 'react-hot-toast';
 
 export default function CustomerForm() {
   const router = useRouter();
+  
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     phone: '',
     company: '',
-    status: 'Active',
+    status: 'Active' as 'Active' | 'Inactive',
+    address: '' // We map the individual fields to the schema's 'address' if we want, but schema just has one address string.
+  });
+
+  const [addressData, setAddressData] = useState({
     street: '',
     city: '',
     state: '',
     zip: '',
     country: '',
-    notes: ''
   });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
+
+  const validate = (name: string, value: string) => {
+    let error = '';
+    const result = customerSchema.safeParse({ ...formData, [name]: value });
+    if (!result.success) {
+      const fieldError = result.error.issues.find(err => err.path[0] === name);
+      if (fieldError) error = fieldError.message;
+    }
+    setErrors(prev => ({ ...prev, [name]: error }));
+    return error === '';
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    validate(name, value);
+  };
+
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setAddressData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Compile address before validation if necessary, or just validate main fields
+    const fullAddress = `${addressData.street}, ${addressData.city}, ${addressData.state}, ${addressData.zip}, ${addressData.country}`.replace(/^[,\s]+|[,\s]+$/g, '');
+    const dataToValidate = { ...formData, address: fullAddress };
+
+    const validationResult = customerSchema.safeParse(dataToValidate);
+    if (!validationResult.success) {
+      const newErrors: Record<string, string> = {};
+      for (const err of validationResult.error.issues) {
+        if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
+      }
+      setErrors(newErrors);
+      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें');
+    }
+
+    setLoading(true);
+    const toastId = toast.loading('Saving customer...');
+
+    try {
+      // API call simulation
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      toast.success('Customer saved successfully! / ग्राहक सफलतापूर्वक सहेजा गया!', { id: toastId });
+      router.back();
+    } catch (error) {
+      toast.error('Failed to save customer', { id: toastId });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 w-full max-w-7xl mx-auto flex flex-col gap-6">
+    <form onSubmit={handleSubmit} className="p-4 md:p-6 lg:p-8 w-full max-w-7xl mx-auto flex flex-col gap-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Button onClick={() => router.back()} variant="ghost" size="icon" className="w-10 h-10 rounded-xl bg-surface-container-low border border-outline-variant/20 text-on-surface hover:text-primary hover:bg-primary/10 transition-colors">
+          <Button type="button" onClick={() => router.back()} variant="ghost" size="icon" className="w-10 h-10 rounded-xl bg-surface-container-low border border-outline-variant/20 text-on-surface hover:text-primary hover:bg-primary/10 transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
@@ -42,12 +99,12 @@ export default function CustomerForm() {
           </div>
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <Button onClick={() => router.back()} variant="outline" className="flex-1 sm:flex-none w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
+          <Button type="button" onClick={() => router.back()} variant="outline" className="flex-1 sm:flex-none w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
             Cancel
           </Button>
-          <Button className="flex-1 sm:flex-none gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl">
+          <Button type="submit" disabled={loading} className="flex-1 sm:flex-none gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
             <Save className="w-4 h-4" />
-            <span className="font-bold tracking-wide">Save Customer</span>
+            <span className="font-bold tracking-wide">{loading ? 'Saving...' : 'Save Customer'}</span>
           </Button>
         </div>
       </div>
@@ -61,42 +118,44 @@ export default function CustomerForm() {
               <h2 className="text-lg font-bold text-on-surface">Personal Information</h2>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <Input
-                label="First Name"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleInputChange}
-                placeholder="e.g. Rajesh"
-                required
-              />
-              <Input
-                label="Last Name"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleInputChange}
-                placeholder="e.g. Kumar"
-                required
-              />
+            <div className="grid grid-cols-1 gap-5">
+              <div>
+                <Input
+                  label="Full Name / पूरा नाम"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="e.g. Rajesh Kumar"
+                  error={!!errors.name}
+                />
+                {errors.name && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.name}</p>}
+              </div>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <Input
-                label="Email Address"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                placeholder="rajesh@example.com"
-              />
-              <Input
-                label="Phone Number"
-                name="phone"
-                value={formData.phone}
-                onChange={handleInputChange}
-                placeholder="+91 98765 43210"
-                required
-              />
+              <div>
+                <Input
+                  label="Email Address / ईमेल पता"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="rajesh@example.com"
+                  error={!!errors.email}
+                />
+                {errors.email && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.email}</p>}
+              </div>
+              <div>
+                <Input
+                  label="Phone Number / फ़ोन नंबर"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  placeholder="9876543210"
+                  error={!!errors.phone}
+                />
+                {errors.phone && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.phone}</p>}
+              </div>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -121,20 +180,6 @@ export default function CustomerForm() {
               </div>
             </div>
           </div>
-          
-          <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
-            <div className="flex flex-col gap-1.5 w-full">
-              <label className="text-sm font-bold text-on-surface">Customer Notes</label>
-              <textarea 
-                name="notes"
-                value={formData.notes}
-                onChange={handleInputChange}
-                rows={4}
-                className="w-full rounded-xl bg-surface border border-outline-variant/30 px-3 py-3 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all resize-none placeholder:text-on-surface-variant/50"
-                placeholder="Any special instructions or preferences..."
-              />
-            </div>
-          </div>
         </div>
 
         {/* Right Column - Address */}
@@ -149,8 +194,8 @@ export default function CustomerForm() {
               <Input
                 label="Street Address"
                 name="street"
-                value={formData.street}
-                onChange={handleInputChange}
+                value={addressData.street}
+                onChange={handleAddressChange}
                 placeholder="123 Main St, Apartment 4B"
               />
               
@@ -158,15 +203,15 @@ export default function CustomerForm() {
                 <Input
                   label="City"
                   name="city"
-                  value={formData.city}
-                  onChange={handleInputChange}
+                  value={addressData.city}
+                  onChange={handleAddressChange}
                   placeholder="Mumbai"
                 />
                 <Input
                   label="State/Province"
                   name="state"
-                  value={formData.state}
-                  onChange={handleInputChange}
+                  value={addressData.state}
+                  onChange={handleAddressChange}
                   placeholder="Maharashtra"
                 />
               </div>
@@ -175,15 +220,15 @@ export default function CustomerForm() {
                 <Input
                   label="ZIP / Postal Code"
                   name="zip"
-                  value={formData.zip}
-                  onChange={handleInputChange}
+                  value={addressData.zip}
+                  onChange={handleAddressChange}
                   placeholder="400001"
                 />
                 <Input
                   label="Country"
                   name="country"
-                  value={formData.country}
-                  onChange={handleInputChange}
+                  value={addressData.country}
+                  onChange={handleAddressChange}
                   placeholder="India"
                 />
               </div>
@@ -191,6 +236,6 @@ export default function CustomerForm() {
           </div>
         </div>
       </div>
-    </div>
+    </form>
   );
 }

@@ -10,7 +10,7 @@ import { StatusBadge } from '@/components/common/StatusBadge';
 import { saleService } from '@/lib/services/sale.services';
 import { formatCurrency } from '@/utils/formatCurrency';
 import toast from 'react-hot-toast';
-import InvoiceModal from '@/components/dashboard/pos/InvoiceModal';
+import InvoiceModal from '@/components/dashboard/pos/today-sales/InvoiceModal';
 import { useRouter } from 'next/navigation';
 import { usePOS } from '@/contexts/POSContext';
 

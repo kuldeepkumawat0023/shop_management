@@ -1,15 +1,24 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { X, PauseCircle } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
+import { usePOS } from '@/contexts/POSContext';
 
 interface HoldBillModalProps {
   onClose: () => void;
 }
 
 export default function HoldBillModal({ onClose }: HoldBillModalProps) {
+  const { holdBill, cart } = usePOS();
+  const [note, setNote] = useState('');
+
+  const handleHold = () => {
+    holdBill(note);
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       {/* Backdrop */}
@@ -38,6 +47,10 @@ export default function HoldBillModal({ onClose }: HoldBillModalProps) {
         <div className="p-5 space-y-4">
           <p className="text-sm font-medium text-on-surface-variant leading-relaxed">
             Are you sure you want to pause this order? You can resume it later from the Hold Bills page.
+            <br/>
+            <span className="text-xs text-on-surface-variant/70">
+              Cart items: {cart.length} / कार्ट आइटम: {cart.length}
+            </span>
           </p>
 
           <div className="space-y-1.5">
@@ -46,6 +59,8 @@ export default function HoldBillModal({ onClose }: HoldBillModalProps) {
             </label>
             <Input 
               placeholder="e.g. Customer went to get wallet" 
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
               autoFocus
             />
           </div>
@@ -58,7 +73,8 @@ export default function HoldBillModal({ onClose }: HoldBillModalProps) {
           </Button>
           <Button 
             className="flex-1 bg-warning hover:bg-warning/90 text-on-primary shadow-lg shadow-warning/20"
-            onClick={onClose}
+            onClick={handleHold}
+            disabled={cart.length === 0}
           >
             Confirm Hold
           </Button>

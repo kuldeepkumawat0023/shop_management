@@ -1,32 +1,47 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import { cn } from '@/utils/cn';
-import { LayoutGrid, Coffee, ShoppingBag, Carrot, Package, MonitorSmartphone } from 'lucide-react';
+import { LayoutGrid, Coffee, ShoppingBag, Carrot, Package, MonitorSmartphone, Tag } from 'lucide-react';
+import { usePOS } from '@/contexts/POSContext';
 
-const CATEGORIES = [
-  { id: 'all', name: 'All Items', icon: LayoutGrid },
-  { id: 'grocery', name: 'Grocery', icon: ShoppingBag },
-  { id: 'vegetables', name: 'Vegetables', icon: Carrot },
-  { id: 'beverages', name: 'Beverages', icon: Coffee },
-  { id: 'electronics', name: 'Electronics', icon: MonitorSmartphone },
-  { id: 'snacks', name: 'Snacks', icon: Package },
-];
+const ICON_MAP: Record<string, React.ElementType> = {
+  grocery: ShoppingBag,
+  vegetables: Carrot,
+  beverages: Coffee,
+  electronics: MonitorSmartphone,
+  snacks: Package,
+};
 
 export default function CategoryFilter() {
-  const [activeId, setActiveId] = useState('all');
+  const { products, selectedCategory, setSelectedCategory } = usePOS();
+
+  const categories = useMemo(() => {
+    const uniqueCats = Array.from(new Set(products.map(p => p.category?.toLowerCase() || 'other')));
+    
+    const cats = uniqueCats.map(cat => ({
+      id: cat,
+      name: cat === 'other' ? 'Other' : cat.charAt(0).toUpperCase() + cat.slice(1),
+      icon: ICON_MAP[cat] || Tag
+    }));
+
+    return [
+      { id: 'all', name: 'All Items', icon: LayoutGrid },
+      ...cats.sort((a, b) => a.name.localeCompare(b.name))
+    ];
+  }, [products]);
 
   return (
     <div className="w-full bg-surface border-b border-outline-variant/20 shadow-sm z-10 px-4 py-3 shrink-0">
       <div className="flex items-center gap-3 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        {CATEGORIES.map((cat) => {
+        {categories.map((cat) => {
           const Icon = cat.icon;
-          const isActive = activeId === cat.id;
+          const isActive = selectedCategory === cat.id;
           
           return (
             <button
               key={cat.id}
-              onClick={() => setActiveId(cat.id)}
+              onClick={() => setSelectedCategory(cat.id)}
               className={cn(
                 "flex items-center gap-2 px-4 py-2.5 rounded-full whitespace-nowrap transition-all duration-300 border shrink-0",
                 isActive 

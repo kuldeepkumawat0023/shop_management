@@ -8,13 +8,14 @@ import { cn } from '@/utils/cn';
 import { usePOS } from '@/contexts/POSContext';
 
 export default function ProductGrid() {
-  const { products, loadingProducts, addToCart, searchQuery } = usePOS();
+  const { products, loadingProducts, addToCart, searchQuery, selectedCategory } = usePOS();
 
-  // Simple client side filtering based on searchQuery
-  const filteredProducts = products.filter(p => 
-    p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    (p.sku && p.sku.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const filteredProducts = products.filter(p => {
+    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          (p.sku && p.sku.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesCategory = selectedCategory === 'all' || (p.category?.toLowerCase() || 'other') === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   if (loadingProducts) {
     return <div className="h-full flex items-center justify-center text-on-surface-variant font-medium">Loading products...</div>;

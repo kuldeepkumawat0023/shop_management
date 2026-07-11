@@ -20,7 +20,7 @@ const PAYMENT_METHODS = [
 const QUICK_CASH = [500, 1000, 2000];
 
 export default function PaymentModal({ onClose }: PaymentModalProps) {
-  const { netAmount, checkout } = usePOS();
+  const { netAmount, checkout, selectedCustomer } = usePOS();
   const [method, setMethod] = useState('cash');
   const [amountReceived, setAmountReceived] = useState<string>(netAmount.toString());
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,7 +30,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
 
   const handleCheckout = async () => {
     setIsSubmitting(true);
-    const success = await checkout(method, received);
+    const success = await checkout(method, received, selectedCustomer?._id);
     setIsSubmitting(false);
     if (success) onClose();
   };

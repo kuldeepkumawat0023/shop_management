@@ -24,11 +24,31 @@ interface CartItem {
   stock: number;
 }
 
+interface Customer {
+  _id: string;
+  name: string;
+  phone: string;
+}
+
+interface HeldBill {
+  id: string;
+  cart: CartItem[];
+  customer: Customer | null;
+  discount: number;
+  tax: number;
+  note: string;
+  heldAt: Date;
+}
+
 interface POSContextType {
   products: Product[];
   loadingProducts: boolean;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  selectedCategory: string | null;
+  setSelectedCategory: (category: string | null) => void;
+  selectedCustomer: Customer | null;
+  setSelectedCustomer: (customer: Customer | null) => void;
   cart: CartItem[];
   setCart: React.Dispatch<React.SetStateAction<CartItem[]>>;
   addToCart: (product: Product) => void;
@@ -44,6 +64,9 @@ interface POSContextType {
   editSaleId: string | null;
   setEditSaleId: (id: string | null) => void;
   checkout: (paymentMethod: string, paidAmount: number, customerId?: string) => Promise<boolean>;
+  heldBills: HeldBill[];
+  holdBill: (note: string) => void;
+  resumeBill: (billId: string) => void;
 }
 
 const POSContext = createContext<POSContextType | undefined>(undefined);
@@ -52,11 +75,14 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>('all');
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   
   const [cart, setCart] = useState<CartItem[]>([]);
   const [discount, setDiscount] = useState(0);
   const [tax, setTax] = useState(0);
   const [editSaleId, setEditSaleId] = useState<string | null>(null);
+  const [heldBills, setHeldBills] = useState<HeldBill[]>([]);
 
   useEffect(() => {
     fetchProducts();
@@ -123,6 +149,37 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
     setCart([]);
     setDiscount(0);
     setTax(0);
+    setSelectedCustomer(null);
+  };
+
+  const holdBill = (note: string) => {
+    if (cart.length === 0) {
+      toast.error('Cart is empty! / कार्ट खाली है!');
+      return;
+    }
+    const bill: HeldBill = {
+      id: `HB-${Date.now()}`,
+      cart: [...cart],
+      customer: selectedCustomer,
+      discount,
+      tax,
+      note,
+      heldAt: new Date()
+    };
+    setHeldBills(prev => [...prev, bill]);
+    clearCart();
+    toast.success('Bill held successfully! / बिल होल्ड किया गया!');
+  };
+
+  const resumeBill = (billId: string) => {
+    const bill = heldBills.find(b => b.id === billId);
+    if (!bill) return;
+    setCart(bill.cart);
+    setSelectedCustomer(bill.customer);
+    setDiscount(bill.discount);
+    setTax(bill.tax);
+    setHeldBills(prev => prev.filter(b => b.id !== billId));
+    toast.success('Bill resumed! / बिल फिर से शुरू!');
   };
 
   const subtotal = cart.reduce((sum, item) => sum + (item.sellingPrice * item.quantity), 0);
@@ -172,6 +229,10 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
     loadingProducts,
     searchQuery,
     setSearchQuery,
+    selectedCategory,
+    setSelectedCategory,
+    selectedCustomer,
+    setSelectedCustomer,
     cart,
     setCart,
     addToCart,
@@ -186,7 +247,10 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
     netAmount,
     editSaleId,
     setEditSaleId,
-    checkout
+    checkout,
+    heldBills,
+    holdBill,
+    resumeBill
   };
 
   return <POSContext.Provider value={value}>{children}</POSContext.Provider>;
