@@ -101,3 +101,16 @@ export const supplierSchema = z.object({
   address: z.string().max(500, 'Address is too long / पता बहुत लंबा है').optional(),
 });
 
+export const productSchema = z.object({
+  name: z.string().min(1, 'Product Name is required / उत्पाद का नाम आवश्यक है').max(100),
+  description: z.string().optional(),
+  sku: z.string().min(1, 'SKU is required / SKU आवश्यक है'),
+  sellingPrice: z.number().min(0, 'Price must be positive / मूल्य सकारात्मक होना चाहिए'),
+  costPrice: z.number().min(0).optional(),
+  taxRate: z.number().min(0).optional(),
+  currentStock: z.number().min(0).optional(),
+  minStockLevel: z.number().min(0).optional(),
+  category: z.string().optional(),
+  brand: z.string().optional(),
+  isActive: z.boolean().optional(),
+});

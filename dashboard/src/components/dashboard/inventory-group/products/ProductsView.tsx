@@ -6,27 +6,39 @@ import { Button } from '@/components/common/Button';
 import { Package, FolderTree, Trophy, FileEdit, Edit, Eye, Trash2, Plus } from 'lucide-react';
 import { StatsCard } from '@/components/common/StatsCard';
 import { StatusBadge } from '@/components/common/StatusBadge';
-import { cn } from '@/utils/cn';
 import Link from 'next/link';
-
-// Mock Data
-const productsData = [
-  { id: '1', name: 'Samsung Galaxy S24 Ultra', category: 'Electronics', brand: 'Samsung', sku: 'SKU-ELE-001', stock: 45, price: 129999.00, status: 'Published' },
-  { id: '2', name: 'Basmati Rice (5kg)', category: 'Groceries', brand: 'India Gate', sku: 'SKU-GRO-012', stock: 120, price: 450.00, status: 'Published' },
-  { id: '3', name: 'Sony WH-1000XM5 Headphones', category: 'Electronics', brand: 'Sony', sku: 'SKU-ELE-005', stock: 0, price: 29990.00, status: 'Draft' },
-  { id: '4', name: 'Nike Air Max 270', category: 'Footwear', brand: 'Nike', sku: 'SKU-FOT-022', stock: 15, price: 12995.00, status: 'Published' },
-  { id: '5', name: 'Nivea Soft Moisturizer', category: 'Personal Care', brand: 'Nivea', sku: 'SKU-PER-008', stock: 8, price: 299.00, status: 'Draft' },
-  { id: '6', name: 'Apple iPhone 15 Pro', category: 'Electronics', brand: 'Apple', sku: 'SKU-ELE-009', stock: 32, price: 134900.00, status: 'Published' },
-  { id: '7', name: 'Dell XPS 13 Laptop', category: 'Electronics', brand: 'Dell', sku: 'SKU-ELE-014', stock: 12, price: 145000.00, status: 'Published' },
-  { id: '8', name: 'Puma Running Shoes', category: 'Footwear', brand: 'Puma', sku: 'SKU-FOT-033', stock: 40, price: 4500.00, status: 'Published' },
-  { id: '9', name: 'Logitech MX Master 3S', category: 'Electronics', brand: 'Logitech', sku: 'SKU-ELE-042', stock: 25, price: 9999.00, status: 'Published' },
-  { id: '10', name: 'Lays Classic Salted (100g)', category: 'Groceries', brand: 'Lays', sku: 'SKU-GRO-099', stock: 200, price: 50.00, status: 'Published' },
-  { id: '11', name: 'Dettol Handwash (Refill)', category: 'Personal Care', brand: 'Dettol', sku: 'SKU-PER-112', stock: 65, price: 99.00, status: 'Published' },
-];
+import { cn } from '@/utils/cn';
+import { productService } from '@/lib/services/product.services';
 
 export default function ProductsView() {
   const [activeTab, setActiveTab] = useState('All Products');
+  const [productsData, setProductsData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const tabs = ['All Products', 'Published', 'Drafts'];
+
+  React.useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await productService.getProducts();
+        if (res.success) {
+          setProductsData(res.data.map((p: any) => ({
+            ...p,
+            id: p._id,
+            brand: p.brand?.name || 'General',
+            category: p.category?.name || 'Uncategorized',
+            stock: p.currentStock || 0,
+            price: p.sellingPrice || 0,
+            status: p.isActive !== false ? 'Published' : 'Draft'
+          })));
+        }
+      } catch (err) {
+        console.error('Error fetching products', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const filteredData = productsData.filter(item => {
     if (activeTab === 'All Products') return true;
@@ -36,8 +48,8 @@ export default function ProductsView() {
   });
 
   const columns = [
-    { 
-      header: 'Product Info', 
+    {
+      header: 'Product Info',
       accessorKey: 'name',
       cell: (row: any) => (
         <div className="flex items-center gap-3">
@@ -56,8 +68,8 @@ export default function ProductsView() {
         </div>
       )
     },
-    { 
-      header: 'SKU', 
+    {
+      header: 'SKU',
       accessorKey: 'sku',
       cell: (row: any) => (
         <span className="text-xs font-mono font-medium text-on-surface-variant bg-surface-container px-2 py-1 rounded-md border border-outline-variant/10">
@@ -65,21 +77,21 @@ export default function ProductsView() {
         </span>
       )
     },
-    { 
-      header: 'Price', 
+    {
+      header: 'Price',
       accessorKey: 'price',
       cell: (row: any) => (
         <span className="font-bold text-on-surface">₹{row.price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
       )
     },
-    { 
-      header: 'Stock', 
+    {
+      header: 'Stock',
       accessorKey: 'stock',
       cell: (row: any) => {
         let stockStatus = 'In Stock';
         if (row.stock === 0) stockStatus = 'Out of Stock';
         else if (row.stock < 20) stockStatus = 'Low Stock';
-        
+
         return (
           <div className="flex flex-col gap-1">
             <span className="font-bold text-on-surface">{row.stock} <span className="text-xs text-on-surface-variant font-medium">units</span></span>
@@ -97,10 +109,10 @@ export default function ProductsView() {
       header: 'Status',
       accessorKey: 'status',
       cell: (row: any) => (
-        <StatusBadge 
-          status={row.status} 
-          variant="dot" 
-          colorTheme={row.status === 'Published' ? 'success' : 'secondary'} 
+        <StatusBadge
+          status={row.status}
+          variant="dot"
+          colorTheme={row.status === 'Published' ? 'success' : 'secondary'}
         />
       )
     },
@@ -109,7 +121,7 @@ export default function ProductsView() {
       accessorKey: 'id',
       cell: (row: any) => (
         <div className="flex items-center gap-2">
-          <Link href="/products/detail">
+          <Link href={`/products/${row.id}`}>
             <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10">
               <Eye className="w-4 h-4" />
             </Button>
@@ -163,52 +175,53 @@ export default function ProductsView() {
 
       {/* Stats Cards Row */}
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 shrink-0">
-        <StatsCard 
+        <StatsCard
           title="Total Products"
-          value="2,450"
+          value={productsData.length}
           icon={Package}
           trendLabel="ACTIVE ITEMS"
           colorTheme="primary"
         />
-        <StatsCard 
+        <StatsCard
           title="Active Categories"
-          value="24"
+          value={new Set(productsData.map(p => p.category)).size}
           icon={FolderTree}
           trendLabel="MAPPED CATEGORIES"
           colorTheme="secondary"
         />
-        <StatsCard 
+        <StatsCard
           title="Top Selling"
           value="Galaxy S24"
           icon={Trophy}
           trendLabel="THIS WEEK"
           colorTheme="success"
         />
-        <StatsCard 
+        <StatsCard
           title="Drafts / Inactive"
-          value="12"
+          value={productsData.filter(p => p.status === 'Draft').length}
           icon={FileEdit}
           trendLabel="NOT PUBLISHED"
           colorTheme="warning"
         />
       </div>
 
-      <div className="w-full bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 flex flex-col">
-        <DataTable 
-          data={filteredData}
-          columns={columns}
-          headerContent={
-            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-6 w-full">
-              <div className="flex items-center gap-2 shrink-0">
-                <h2 className="text-lg font-bold text-on-surface">Catalog</h2>
+      <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl shadow-sm overflow-hidden min-h-[400px] flex flex-col">
+        {loading ? (
+          <div className="flex-1 flex items-center justify-center text-on-surface-variant font-medium">Loading Products...</div>
+        ) : (
+          <DataTable
+            data={filteredData}
+            columns={columns}
+            searchPlaceholder="Search products by name, sku, or brand..."
+            itemsPerPage={10}
+            headerContent={
+              <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 mb-2">
+                <h2 className="text-xl font-bold text-on-surface">Product Catalog</h2>
+                {TabsComponent}
               </div>
-              {TabsComponent}
-            </div>
-          }
-          searchPlaceholder="Search by product name, brand or SKU..."
-          className="border-none shadow-none bg-transparent"
-          itemsPerPage={10}
-        />
+            }
+          />
+        )}
       </div>
     </div>
   );

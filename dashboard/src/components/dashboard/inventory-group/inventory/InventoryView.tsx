@@ -7,19 +7,47 @@ import { Package, AlertTriangle, AlertCircle, Banknote, Edit, Eye, Trash2 } from
 import { StatsCard } from '@/components/common/StatsCard';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { cn } from '@/utils/cn';
-
-// Mock Data
-const inventoryData = [
-  { id: '1', name: 'Fortune Sunflower Oil (1L)', category: 'Groceries', sku: 'SKU-GRO-001', stock: 145, minStock: 20, price: 155.00, status: 'In Stock' },
-  { id: '2', name: 'Aashirvaad Atta (5kg)', category: 'Groceries', sku: 'SKU-GRO-002', stock: 12, minStock: 15, price: 210.00, status: 'Low Stock' },
-  { id: '3', name: 'Maggi Noodles (Pack of 4)', category: 'Snacks', sku: 'SKU-SNA-001', stock: 0, minStock: 30, price: 56.00, status: 'Out of Stock' },
-  { id: '4', name: 'Amul Butter (500g)', category: 'Dairy', sku: 'SKU-DAI-001', stock: 85, minStock: 10, price: 260.00, status: 'In Stock' },
-  { id: '5', name: 'Lays Classic Salted', category: 'Snacks', sku: 'SKU-SNA-002', stock: 5, minStock: 20, price: 20.00, status: 'Low Stock' },
-];
+import { productService } from '@/lib/services/product.services';
 
 export default function InventoryView() {
   const [activeTab, setActiveTab] = useState('All Items');
+  const [inventoryData, setInventoryData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const tabs = ['All Items', 'Low Stock', 'Out of Stock'];
+
+  React.useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await productService.getProducts();
+        if (res.success) {
+          setInventoryData(res.data.map((p: any) => {
+            const stock = p.currentStock || 0;
+            const minStock = p.minStockLevel || 10;
+            let status = 'In Stock';
+            if (stock === 0) status = 'Out of Stock';
+            else if (stock <= minStock) status = 'Low Stock';
+
+            return {
+              ...p,
+              id: p._id,
+              name: p.name,
+              category: p.category?.name || 'Uncategorized',
+              sku: p.sku || 'N/A',
+              stock: stock,
+              minStock: minStock,
+              price: p.sellingPrice || 0,
+              status: status
+            };
+          }));
+        }
+      } catch (err) {
+        console.error('Error fetching inventory products', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const filteredData = inventoryData.filter(item => {
     if (activeTab === 'All Items') return true;
@@ -135,51 +163,55 @@ export default function InventoryView() {
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 shrink-0">
         <StatsCard 
           title="Total Products"
-          value="1,240"
+          value={inventoryData.length}
           icon={Package}
           trendLabel="UNIQUE ITEMS"
           colorTheme="primary"
         />
         <StatsCard 
           title="Total Stock Value"
-          value="₹45,200"
+          value={`₹${inventoryData.reduce((acc, curr) => acc + (curr.price * curr.stock), 0).toLocaleString('en-IN')}`}
           icon={Banknote}
           trendLabel="CURRENT ESTIMATE"
           colorTheme="purple"
         />
         <StatsCard 
           title="Low Stock"
-          value="15"
+          value={inventoryData.filter(i => i.status === 'Low Stock').length}
           icon={AlertTriangle}
           trendLabel="NEEDS REORDER"
           colorTheme="warning"
         />
         <StatsCard 
           title="Out of Stock"
-          value="3"
+          value={inventoryData.filter(i => i.status === 'Out of Stock').length}
           icon={AlertCircle}
           trendLabel="UNAVAILABLE"
           colorTheme="error"
         />
       </div>
 
-      <div className="w-full bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 flex flex-col">
-        <DataTable 
-          data={filteredData}
-          columns={columns}
-          headerContent={
-            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-6 w-full">
-              <div className="flex items-center gap-2 shrink-0">
-                <h2 className="text-lg font-bold text-on-surface">Product List</h2>
-                <StatusBadge status="Live Sync" variant="dot" colorTheme="success" className="ml-2 bg-success/10 text-success border-success/20" />
+      <div className="w-full bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 flex flex-col min-h-[400px]">
+        {loading ? (
+          <div className="flex-1 flex items-center justify-center text-on-surface-variant font-medium">Loading Inventory...</div>
+        ) : (
+          <DataTable 
+            data={filteredData}
+            columns={columns}
+            headerContent={
+              <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-6 w-full">
+                <div className="flex items-center gap-2 shrink-0">
+                  <h2 className="text-lg font-bold text-on-surface">Product List</h2>
+                  <StatusBadge status="Live Sync" variant="dot" colorTheme="success" className="ml-2 bg-success/10 text-success border-success/20" />
+                </div>
+                {TabsComponent}
               </div>
-              {TabsComponent}
-            </div>
-          }
-          searchPlaceholder="Search by product name or SKU..."
-          className="border-none shadow-none bg-transparent"
-          itemsPerPage={10}
-        />
+            }
+            searchPlaceholder="Search by product name or SKU..."
+            className="border-none shadow-none bg-transparent"
+            itemsPerPage={10}
+          />
+        )}
       </div>
     </div>
   );

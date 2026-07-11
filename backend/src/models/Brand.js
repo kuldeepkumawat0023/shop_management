@@ -15,6 +15,22 @@ const brandSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+  website: {
+    type: String,
+    trim: true
+  },
+  contactPerson: {
+    type: String,
+    trim: true
+  },
+  categoryId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category'
+  },
+  description: {
+    type: String,
+    trim: true
+  },
   isActive: {
     type: Boolean,
     default: true

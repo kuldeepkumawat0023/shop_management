@@ -2,8 +2,18 @@ import apiClient, { ApiResponse } from '../apiClient';
 
 export const productService = {
   createProduct: async (data: any): Promise<ApiResponse<any>> => {
-    // Handling FormData automatically via apiClient interceptor if image is present
-    const response = await apiClient.post('/products/create', data);
+    // Map frontend specific fields to backend expected names
+    const payload = {
+      ...data,
+      barcode: data.sku || 'B-' + Date.now(), // Fallback if sku is empty
+      categoryId: data.category,
+      brandId: data.brand || null,
+      purchasePrice: data.costPrice || 0,
+      gstRate: data.taxRate || 0,
+      minStock: data.minStockLevel || 5,
+      openingStock: data.currentStock || 0
+    };
+    const response = await apiClient.post('/products/create', payload);
     return response.data;
   },
   getProducts: async (): Promise<ApiResponse<any>> => {

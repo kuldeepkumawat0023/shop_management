@@ -8,22 +8,34 @@ import { StatsCard } from '@/components/common/StatsCard';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { cn } from '@/utils/cn';
 import Link from 'next/link';
-
-// Mock Data
-const categoriesData = [
-  { id: '1', name: 'Electronics', slug: 'electronics', totalProducts: 145, description: 'Electronic devices, gadgets and accessories', status: 'Active' },
-  { id: '2', name: 'Groceries', slug: 'groceries', totalProducts: 320, description: 'Daily essentials, food items and beverages', status: 'Active' },
-  { id: '3', name: 'Footwear', slug: 'footwear', totalProducts: 56, description: 'Shoes, sneakers, sandals for men and women', status: 'Active' },
-  { id: '4', name: 'Personal Care', slug: 'personal-care', totalProducts: 89, description: 'Cosmetics, hygiene and wellness products', status: 'Active' },
-  { id: '5', name: 'Home Appliances', slug: 'home-appliances', totalProducts: 34, description: 'Large and small appliances for home', status: 'Active' },
-  { id: '6', name: 'Furniture', slug: 'furniture', totalProducts: 0, description: 'Tables, chairs, beds and decor', status: 'Inactive' },
-  { id: '7', name: 'Snacks', slug: 'snacks', totalProducts: 112, description: 'Chips, biscuits, chocolates', status: 'Active' },
-  { id: '8', name: 'Beverages', slug: 'beverages', totalProducts: 45, description: 'Cold drinks, juices, tea and coffee', status: 'Active' },
-];
+import { categoryService, CategoryData } from '@/lib/services/category.services';
 
 export default function CategoriesView() {
   const [activeTab, setActiveTab] = useState('All Categories');
+  const [categoriesData, setCategoriesData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const tabs = ['All Categories', 'Active', 'Inactive'];
+
+  React.useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await categoryService.getCategories();
+        if (res.success) {
+          setCategoriesData(res.data.map(c => ({
+            ...c,
+            id: c._id,
+            status: c.isActive !== false ? 'Active' : 'Inactive',
+            totalProducts: 0 // Fallback
+          })));
+        }
+      } catch (err) {
+        console.error('Error fetching categories', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const filteredData = categoriesData.filter(item => {
     if (activeTab === 'All Categories') return true;
@@ -163,23 +175,27 @@ export default function CategoriesView() {
       </div>
 
       {/* Data Table Area */}
-      <div className="w-full bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 flex flex-col">
-        <DataTable
-          data={filteredData}
-          columns={columns}
-          headerContent={
-            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-6 w-full">
-              <div className="flex items-center gap-2 shrink-0">
-                <LayoutGrid className="w-5 h-5 text-primary" />
-                <h2 className="text-lg font-bold text-on-surface">Category List</h2>
+      <div className="w-full bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 flex flex-col min-h-[400px]">
+        {loading ? (
+          <div className="flex-1 flex items-center justify-center text-on-surface-variant font-medium">Loading Categories...</div>
+        ) : (
+          <DataTable
+            data={filteredData}
+            columns={columns}
+            headerContent={
+              <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-6 w-full">
+                <div className="flex items-center gap-2 shrink-0">
+                  <LayoutGrid className="w-5 h-5 text-primary" />
+                  <h2 className="text-lg font-bold text-on-surface">Category List</h2>
+                </div>
+                {TabsComponent}
               </div>
-              {TabsComponent}
-            </div>
-          }
-          searchPlaceholder="Search by category name or slug..."
-          itemsPerPage={10}
-          className="border-none shadow-none bg-transparent"
-        />
+            }
+            searchPlaceholder="Search by category name or slug..."
+            itemsPerPage={10}
+            className="border-none shadow-none bg-transparent"
+          />
+        )}
       </div>
     </div>
   );

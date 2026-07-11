@@ -8,19 +8,52 @@ import { StatsCard } from '@/components/common/StatsCard';
 import { Download, Plus, Search, Filter, Tag, Handshake, Trophy, Edit, Trash2, Eye, TrendingUp, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/utils/cn';
-
-// Mock Data
-const brandsData = [
-  { id: '1', name: 'SonicAudio', category: 'Electronics', totalProducts: 124, status: 'Active', lastUpdated: 'Today, 09:41 AM' },
-  { id: '2', name: 'FitLife Gear', category: 'Sports & Fitness', totalProducts: 89, status: 'Active', lastUpdated: 'Yesterday, 04:20 PM' },
-  { id: '3', name: 'Lumina Home', category: 'Home Decor', totalProducts: 45, status: 'Active', lastUpdated: 'Jul 12, 11:30 AM' },
-  { id: '4', name: 'TechNova', category: 'Electronics', totalProducts: 210, status: 'Active', lastUpdated: 'Jul 10, 02:15 PM' },
-  { id: '5', name: 'PureEssence', category: 'Beauty & Health', totalProducts: 0, status: 'Inactive', lastUpdated: 'Jun 28, 09:00 AM' },
-  { id: '6', name: 'UrbanStep', category: 'Footwear', totalProducts: 56, status: 'Active', lastUpdated: 'Jun 25, 03:45 PM' },
-];
+import { brandService, BrandData } from '@/lib/services/brand.services';
+import toast from 'react-hot-toast';
 
 export default function BrandsView() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [brandsData, setBrandsData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  React.useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const res = await brandService.getBrands();
+        if (res.success) {
+          setBrandsData(res.data.map(b => ({
+            ...b,
+            id: b._id,
+            status: b.isActive !== false ? 'Active' : 'Inactive',
+            totalProducts: 0, // Fallback
+            category: 'General', // Fallback if no category association
+            lastUpdated: new Date(b.updatedAt || new Date()).toLocaleDateString()
+          })));
+        }
+      } catch (err) {
+        console.error('Error fetching brands', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBrands();
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this brand? / क्या आप वाकई इस ब्रांड को हटाना चाहते हैं?')) {
+      try {
+        const res = await brandService.deleteBrand(id);
+        if (res.success || (res as any).status === 200) {
+          toast.success('Brand deleted successfully');
+          setBrandsData(prev => prev.filter(b => b.id !== id));
+        } else {
+          toast.error((res as any).message || 'Failed to delete brand');
+        }
+      } catch (err) {
+        toast.error('Error deleting brand');
+      }
+    }
+  };
 
   const filteredData = brandsData.filter(brand => 
     brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -85,10 +118,12 @@ export default function BrandsView() {
           <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
             <Eye className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
-            <Edit className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+          <Link href={`/brands/${row.id}/edit`}>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
+              <Edit className="w-4 h-4" />
+            </Button>
+          </Link>
+          <Button onClick={() => handleDelete(row.id)} variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
             <Trash2 className="w-4 h-4" />
           </Button>
         </div>
@@ -122,7 +157,7 @@ export default function BrandsView() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
         <StatsCard 
           title="Total Brands"
-          value="48"
+          value={brandsData.length}
           icon={Tag}
           trend="+3"
           trendDirection="up"
@@ -131,7 +166,7 @@ export default function BrandsView() {
         />
         <StatsCard 
           title="Active Partnerships"
-          value="42"
+          value={brandsData.filter(b => b.status === 'Active').length}
           icon={Handshake}
           trendLabel="87.5% Active Rate"
           colorTheme="success"
@@ -145,7 +180,7 @@ export default function BrandsView() {
         />
         <StatsCard 
           title="Inactive Brands"
-          value="6"
+          value={brandsData.filter(b => b.status === 'Inactive').length}
           icon={AlertCircle}
           trendLabel="Needs Action"
           colorTheme="error"
@@ -153,33 +188,37 @@ export default function BrandsView() {
       </div>
 
       {/* Brands Ledger */}
-      <div className="w-full bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 flex flex-col">
-        <DataTable 
-          data={filteredData}
-          columns={columns}
-          headerContent={
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full gap-4">
-              <h3 className="text-xl font-black text-on-surface">Brand Directory</h3>
-              <div className="flex items-center gap-3 w-full sm:w-auto">
-                <div className="relative focus-within:ring-2 focus-within:ring-primary-container rounded-lg w-full sm:w-48">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant w-4 h-4" />
-                  <input 
-                    className="w-full bg-surface-container-low border border-outline-variant/20 rounded-xl pl-9 pr-4 py-2 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:ring-0 transition-colors placeholder:text-on-surface-variant/50" 
-                    placeholder="Filter brands..." 
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
+      <div className="w-full bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 flex flex-col min-h-[400px]">
+        {loading ? (
+          <div className="flex-1 flex items-center justify-center text-on-surface-variant font-medium">Loading Brands...</div>
+        ) : (
+          <DataTable 
+            data={filteredData}
+            columns={columns}
+            headerContent={
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full gap-4">
+                <h3 className="text-xl font-black text-on-surface">Brand Directory</h3>
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <div className="relative focus-within:ring-2 focus-within:ring-primary-container rounded-lg w-full sm:w-48">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant w-4 h-4" />
+                    <input 
+                      className="w-full bg-surface-container-low border border-outline-variant/20 rounded-xl pl-9 pr-4 py-2 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:ring-0 transition-colors placeholder:text-on-surface-variant/50" 
+                      placeholder="Filter brands..." 
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                  <button className="p-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-xl transition-colors border border-outline-variant/30 bg-surface-container-lowest shrink-0">
+                    <Filter className="w-4 h-4" />
+                  </button>
                 </div>
-                <button className="p-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-xl transition-colors border border-outline-variant/30 bg-surface-container-lowest shrink-0">
-                  <Filter className="w-4 h-4" />
-                </button>
               </div>
-            </div>
-          }
-          className="border-none shadow-none bg-transparent"
-          itemsPerPage={10}
-        />
+            }
+            className="border-none shadow-none bg-transparent"
+            itemsPerPage={10}
+          />
+        )}
       </div>
     </div>
   );

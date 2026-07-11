@@ -7,9 +7,9 @@ const userRoutes = require('./userRoutes');
 const shopRoutes = require('./shopRoutes');
 /* 
 const roleRoutes = require('./roleRoutes');
+*/
 const categoryRoutes = require('./categoryRoutes');
 const brandRoutes = require('./brandRoutes');
-*/
 const productRoutes = require('./productRoutes');
 const customerRoutes = require('./customerRoutes');
 /*
@@ -30,9 +30,9 @@ router.use('/users', userRoutes);
 router.use('/shops', shopRoutes);
 /*
 router.use('/roles', roleRoutes);
+*/
 router.use('/categories', categoryRoutes);
 router.use('/brands', brandRoutes);
-*/
 router.use('/products', productRoutes);
 router.use('/customers', customerRoutes);
 /*

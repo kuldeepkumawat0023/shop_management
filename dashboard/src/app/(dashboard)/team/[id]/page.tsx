@@ -1,5 +1,5 @@
 import React from 'react';
-import TeamMemberDetailView from '@/components/dashboard/team/TeamMemberDetailView';
+import TeamMemberDetailView from '@/components/dashboard/hr-group/team/TeamMemberDetailView';
 
 export default function TeamMemberDetailPage() {
   return <TeamMemberDetailView />;
