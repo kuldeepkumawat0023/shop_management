@@ -56,9 +56,9 @@ export default function ProductGrid() {
                 )}
                 
                 {/* Discount Badge on Image (Optional visual flair) */}
-                {hasDiscount && !isOutOfStock && (
+                {hasDiscount && product.mrp && !isOutOfStock && (
                   <div className="absolute top-2 right-2 bg-error text-white text-[9px] font-black px-1.5 py-0.5 rounded-sm shadow-sm">
-                    {Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF
+                    {Math.round(((product.mrp - product.sellingPrice) / product.mrp) * 100)}% OFF
                   </div>
                 )}
               </div>

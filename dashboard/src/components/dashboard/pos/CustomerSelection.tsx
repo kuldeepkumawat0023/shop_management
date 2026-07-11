@@ -5,6 +5,7 @@ import { Search, UserPlus, X, User } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import { usePOS } from '@/contexts/POSContext';
 import { customerService } from '@/lib/services/customer.services';
+import CustomerCreateModal from './CustomerCreateModal';
 import { cn } from '@/utils/cn';
 
 interface CustomerData {
@@ -21,6 +22,7 @@ export default function CustomerSelection() {
   const [searchTerm, setSearchTerm] = useState('');
   const [customers, setCustomers] = useState<CustomerData[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -88,7 +90,7 @@ export default function CustomerSelection() {
                     <li 
                       key={customer._id}
                       onClick={() => {
-                        setSelectedCustomer(customer);
+                        setSelectedCustomer({ ...customer, phone: customer.phone || '' });
                         setIsOpen(false);
                         setSearchTerm('');
                       }}
@@ -102,16 +104,38 @@ export default function CustomerSelection() {
               ) : (
                 <div className="p-4 text-sm text-center text-on-surface-variant">
                   No customers found. 
-                  <button className="text-primary font-bold ml-1 hover:underline">Add New</button>
+                  <button 
+                    onClick={() => { setIsOpen(false); setIsCreateOpen(true); }}
+                    className="text-primary font-bold ml-1 hover:underline"
+                  >
+                    Add New
+                  </button>
                 </div>
               )}
             </div>
           )}
         </div>
-        <Button variant="outline" size="icon" className="shrink-0 h-10 w-10 border-outline-variant/30 text-primary hover:bg-primary/5">
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="shrink-0 h-10 w-10 border-outline-variant/30 text-primary hover:bg-primary/5"
+          onClick={() => setIsCreateOpen(true)}
+        >
           <UserPlus className="w-5 h-5" />
         </Button>
       </div>
+
+      {isCreateOpen && (
+        <CustomerCreateModal 
+          onClose={() => setIsCreateOpen(false)}
+          onSuccess={(newCustomer) => {
+            setIsCreateOpen(false);
+            const formatted = { ...newCustomer, phone: newCustomer.mobile };
+            setCustomers(prev => [...prev, formatted]);
+            setSelectedCustomer(formatted);
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -6,7 +6,8 @@ import ProductGrid from '@/components/dashboard/pos/ProductGrid';
 import CartPanel from '@/components/dashboard/pos/CartPanel';
 import PaymentModal from '@/components/dashboard/pos/PaymentModal';
 import HoldBillModal from '@/components/dashboard/pos/HoldBillModal';
-import { ShoppingCart, Search, ScanBarcode, Plus } from 'lucide-react';
+import CustomItemModal from '@/components/dashboard/pos/CustomItemModal';
+import { ShoppingCart, Search, ScanBarcode, Plus, PackagePlus } from 'lucide-react';
 import { usePOS } from '@/contexts/POSContext';
 import { Button } from '@/components/common/Button';
 import toast from 'react-hot-toast';
@@ -15,10 +16,11 @@ export default function NewSaleView() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [isHoldBillOpen, setIsHoldBillOpen] = useState(false);
+  const [isCustomItemOpen, setIsCustomItemOpen] = useState(false);
   const [barcodeInput, setBarcodeInput] = useState('');
   const barcodeRef = useRef<HTMLInputElement>(null);
 
-  const { searchQuery, setSearchQuery, products, addToCart, cart } = usePOS();
+  const { searchQuery, setSearchQuery, cart, products, addToCart } = usePOS();
 
   const handleBarcodeScan = async () => {
     if (!barcodeInput.trim()) return;
@@ -106,6 +108,16 @@ export default function NewSaleView() {
               <Plus className="w-4 h-4" />
               <span className="text-sm font-bold hidden sm:inline">Add</span>
             </Button>
+            <div className="w-px h-6 bg-outline-variant/30 shrink-0 mx-1"></div>
+            <Button 
+              type="button"
+              variant="outline"
+              onClick={() => setIsCustomItemOpen(true)}
+              className="shrink-0 h-10 px-4 border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-primary/5 gap-1.5 rounded-xl"
+            >
+              <PackagePlus className="w-4 h-4" />
+              <span className="text-sm font-bold hidden md:inline">Custom Item</span>
+            </Button>
           </div>
         </div>
 
@@ -154,6 +166,10 @@ export default function NewSaleView() {
       
       {isHoldBillOpen && (
         <HoldBillModal onClose={() => setIsHoldBillOpen(false)} />
+      )}
+      
+      {isCustomItemOpen && (
+        <CustomItemModal onClose={() => setIsCustomItemOpen(false)} />
       )}
         
     </div>
