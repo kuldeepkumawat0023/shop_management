@@ -1,6 +1,6 @@
 import React from 'react';
-import NewProductView from '@/components/dashboard/inventory-group/products/NewProductView';
+import ProductForm from '@/components/dashboard/inventory-group/products/ProductForm';
 
-export default function Page() {
-  return <NewProductView />;
+export default function NewProductPage() {
+  return <ProductForm />;
 }

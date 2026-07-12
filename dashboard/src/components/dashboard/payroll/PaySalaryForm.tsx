@@ -255,7 +255,6 @@ export default function PaySalaryForm() {
                 />
               </div>
             </div>
-            </div>
           </div>
         </div>
       </div>

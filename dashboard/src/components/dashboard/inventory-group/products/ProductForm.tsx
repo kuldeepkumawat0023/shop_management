@@ -11,11 +11,11 @@ import { categoryService } from '@/lib/services/category.services';
 import { brandService } from '@/lib/services/brand.services';
 import toast from 'react-hot-toast';
 
-interface NewProductViewProps {
+interface ProductFormProps {
   editId?: string;
 }
 
-export default function NewProductView({ editId }: NewProductViewProps) {
+export default function ProductForm({ editId }: ProductFormProps) {
   const router = useRouter();
   const [dragActive, setDragActive] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);

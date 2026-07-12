@@ -244,7 +244,6 @@ export default function CustomerForm() {
                 />
               </div>
             </div>
-            </div>
           </div>
         </div>
       </div>

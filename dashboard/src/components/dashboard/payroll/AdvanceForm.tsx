@@ -250,7 +250,6 @@ export default function AdvanceForm() {
                 </div>
               )}
             </div>
-            </div>
           </div>
         </div>
       </div>
