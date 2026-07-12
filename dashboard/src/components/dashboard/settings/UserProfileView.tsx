@@ -7,7 +7,7 @@ import { User, Save } from 'lucide-react';
 
 export default function UserProfileView() {
   return (
-    <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full mx-auto max-w-5xl">
+    <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full ">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
         <div>
           <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">User Profile</h2>
@@ -27,7 +27,7 @@ export default function UserProfileView() {
           <div className="flex flex-col text-center sm:text-left">
             <h4 className="font-bold text-on-surface text-lg">Admin User</h4>
             <p className="text-sm text-on-surface-variant mt-1 mb-3">Administrator</p>
-            <Button variant="outline" size="sm" className="w-fit mx-auto sm:mx-0 rounded-lg font-bold text-xs">
+            <Button variant="outline" size="sm" className="w-fit sm:mx-0 rounded-lg font-bold text-xs">
               Change Photo
             </Button>
           </div>

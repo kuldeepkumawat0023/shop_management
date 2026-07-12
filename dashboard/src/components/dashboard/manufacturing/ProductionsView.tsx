@@ -53,7 +53,7 @@ export default function ProductionsView() {
   ];
 
   return (
-    <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full mx-auto">
+    <div className="flex flex-col bg-background p-4 md:p-6 lg:p-8 w-full ">
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
         <div>
@@ -75,7 +75,7 @@ export default function ProductionsView() {
       </div>
 
       {/* KPI Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
         <StatsCard 
           title="Total Runs"
           value="1,248"
@@ -109,7 +109,7 @@ export default function ProductionsView() {
       </div>
 
       {/* Productions Table */}
-      <div className="w-full bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 flex flex-col">
+      <div className="w-full bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 flex flex-col overflow-hidden">
         <DataTable 
           data={filteredData}
           columns={columns}

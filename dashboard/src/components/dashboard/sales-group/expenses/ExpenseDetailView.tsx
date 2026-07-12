@@ -10,7 +10,7 @@ export default function ExpenseDetailView() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col h-full bg-background overflow-y-auto custom-scrollbar w-full mx-auto">
+    <div className="flex flex-col h-full bg-background overflow-y-auto custom-scrollbar w-full ">
       {/* Header Sticky */}
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -43,7 +43,7 @@ export default function ExpenseDetailView() {
         </div>
       </div>
 
-      <div className="p-4 md:p-6 lg:p-8 max-w-5xl mx-auto w-full flex flex-col gap-8">
+      <div className="p-4 md:p-6 lg:p-8 w-full flex flex-col gap-8">
         
         {/* Main Details Card */}
         <div className="bg-surface-container-lowest rounded-3xl shadow-sm border border-outline-variant/20 p-6 md:p-8 flex flex-col gap-8 relative overflow-hidden">

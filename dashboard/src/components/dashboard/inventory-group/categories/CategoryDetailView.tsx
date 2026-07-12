@@ -175,7 +175,7 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
   }
 
   return (
-    <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 mx-auto w-full overflow-y-auto custom-scrollbar">
+    <div className="flex flex-col bg-background p-4 md:p-6 lg:p-8 w-full">
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-8">
@@ -344,9 +344,9 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
 
       {activeTab === 'Settings' && (
         <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl shadow-sm p-6 text-center py-20">
-          <AlertCircle className="w-12 h-12 text-on-surface-variant/50 mx-auto mb-4" />
+          <AlertCircle className="w-12 h-12 text-on-surface-variant/50 mb-4" />
           <h2 className="text-xl font-bold text-on-surface mb-2">Category Settings</h2>
-          <p className="text-on-surface-variant max-w-md mx-auto mb-6">
+          <p className="text-on-surface-variant max-w-md mb-6">
             Configure SEO settings, default product templates, and visibility rules for this category.
           </p>
           <Button variant="outline">Edit Configuration</Button>

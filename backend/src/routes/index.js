@@ -23,6 +23,8 @@ const expenseRoutes = require('./expenseRoutes');
 const dashboardRoutes = require('./dashboardRoutes');
 const reportRoutes = require('./reportRoutes');
 */
+const recipeRoutes = require('./recipeRoutes');
+const productionRoutes = require('./productionRoutes');
 
 // Mount Routes
 router.use('/auth', authRoutes);
@@ -46,5 +48,7 @@ router.use('/expenses', expenseRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/reports', reportRoutes);
 */
+router.use('/recipes', recipeRoutes);
+router.use('/production', productionRoutes);
 
 module.exports = router;

@@ -14,7 +14,7 @@ import { StatsCard } from '@/components/common/StatsCard';
 export default function DashboardView() {
     return (
         <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 w-full bg-surface">
-            <div className="w-full mx-auto space-y-6">
+            <div className="w-full space-y-6">
 
                 {/* Main Hero Header */}
                 <div className="gradient-button p-6 md:p-8 text-on-primary relative overflow-hidden shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 rounded-2xl mb-6">

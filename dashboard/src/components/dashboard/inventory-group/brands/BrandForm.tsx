@@ -125,10 +125,10 @@ export default function BrandForm({ editId }: BrandFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 md:p-6 lg:p-8 w-full mx-auto flex flex-col gap-6">
-      {/* Header */}
-      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl pb-4 pt-4 -mt-4 -mx-4 px-4 md:-mt-6 md:-mx-6 md:px-6 lg:-mt-8 lg:-mx-8 lg:px-8 border-b border-outline-variant/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-2 shadow-sm">
-        <div className="flex items-center gap-3">
+    <form onSubmit={handleSubmit} className="flex flex-col w-full ">
+      <div className="sticky top-16 md:top-20 z-20 bg-background border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex items-center gap-3">
           <Button type="button" onClick={() => router.back()} variant="ghost" size="icon" className="w-10 h-10 rounded-xl bg-surface-container-low border border-outline-variant/20 text-on-surface hover:text-primary hover:bg-primary/10 transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </Button>
@@ -141,18 +141,20 @@ export default function BrandForm({ editId }: BrandFormProps) {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <Button type="button" onClick={() => router.back()} variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
+        <div className="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">
+          <Button type="button" onClick={() => router.back()} variant="outline" className="flex-1 sm:flex-none rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
             Cancel
           </Button>
           <Button type="submit" disabled={loading} className="flex-1 sm:flex-none gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
-            <Save className="w-4 h-4" />
-            <span className="font-bold tracking-wide">{loading ? 'Saving...' : (editId ? 'Update Brand' : 'Save Brand')}</span>
+            <Save className="w-4 h-4 shrink-0" />
+            <span className="font-bold tracking-wide truncate">{loading ? 'Saving...' : (editId ? 'Update Brand' : 'Save Brand')}</span>
           </Button>
         </div>
       </div>
+      </div>
 
-      <div className="flex flex-col gap-6">
+      {/* Form Content */}
+      <div className="p-4 md:p-6 lg:p-8 flex-1 w-full flex flex-col gap-6">
         <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
           <div className="flex items-center gap-2 mb-2">
             <Tag className="w-5 h-5 text-primary" />

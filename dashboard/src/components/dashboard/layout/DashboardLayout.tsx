@@ -8,9 +8,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex overflow-hidden bg-background">
+    <div className="min-h-screen flex bg-background relative">
       <SideNavBar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-      <main className="flex-1 flex flex-col md:ml-72 h-screen overflow-hidden transition-all duration-300">
+      <main className="flex-1 flex flex-col md:ml-72 min-h-screen transition-all duration-300 w-full relative">
         <TopNavBar onMenuClick={() => setIsSidebarOpen(true)} />
         {children}
       </main>

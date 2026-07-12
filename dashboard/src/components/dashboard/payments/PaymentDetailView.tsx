@@ -10,7 +10,7 @@ export default function PaymentDetailView() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col h-full bg-background overflow-y-auto custom-scrollbar w-full mx-auto">
+    <div className="flex flex-col h-full bg-background overflow-y-auto custom-scrollbar w-full ">
       {/* Header Sticky */}
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -43,7 +43,7 @@ export default function PaymentDetailView() {
         </div>
       </div>
 
-      <div className="p-4 md:p-6 lg:p-8 max-w-3xl mx-auto w-full flex flex-col gap-6">
+      <div className="p-4 md:p-6 lg:p-8 w-full flex flex-col gap-6">
         
         {/* Receipt Box */}
         <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm overflow-hidden flex flex-col relative print:shadow-none print:border-none">

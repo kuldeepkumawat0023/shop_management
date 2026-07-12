@@ -15,7 +15,7 @@ const pnlKPIs = [
 
 export default function ProfitReportView() {
   return (
-    <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full mx-auto">
+    <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full ">
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
         <div>
@@ -51,7 +51,7 @@ export default function ProfitReportView() {
       </div>
 
       {/* P&L Statement Layout */}
-      <div className="max-w-4xl mx-auto w-full flex flex-col gap-6">
+      <div className=" w-full flex flex-col gap-6">
         <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm overflow-hidden flex flex-col">
           
           <div className="p-6 bg-surface-container-lowest/50 border-b border-outline-variant/20 flex flex-col items-center justify-center text-center">

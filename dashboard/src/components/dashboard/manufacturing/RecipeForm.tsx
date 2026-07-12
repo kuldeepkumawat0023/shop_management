@@ -21,9 +21,9 @@ export default function RecipeForm() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-background overflow-y-auto custom-scrollbar w-full mx-auto">
+    <div className="flex flex-col w-full ">
       {/* Header Sticky */}
-      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
+      <div className="sticky top-16 md:top-20 z-20 bg-background border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-3">
             <Button onClick={() => router.back()} variant="outline" className="w-10 h-10 p-0 rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary/50 transition-all">
@@ -34,18 +34,18 @@ export default function RecipeForm() {
               <p className="text-sm font-medium text-on-surface-variant">Define formula and raw materials</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <Button onClick={() => router.back()} variant="outline" className="w-full sm:w-auto font-bold border-outline-variant/30">Cancel</Button>
-            <Button className="flex-1 sm:w-auto gradient-button text-white font-bold shadow-md hover:shadow-lg gap-2">
-              <Save className="w-4 h-4" />
-              Save Recipe
+          <div className="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">
+            <Button onClick={() => router.back()} variant="outline" className="flex-1 sm:flex-none font-bold border-outline-variant/30">Cancel</Button>
+            <Button className="flex-1 sm:flex-none gradient-button text-white font-bold shadow-md hover:shadow-lg gap-2">
+              <Save className="w-4 h-4 shrink-0" />
+              <span className="truncate">Save Recipe</span>
             </Button>
           </div>
         </div>
       </div>
 
       {/* Form Content */}
-      <div className="p-4 md:p-6 lg:p-8 flex-1 max-w-4xl mx-auto w-full">
+      <div className="p-4 md:p-6 lg:p-8 flex-1 w-full">
         <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col gap-8">
           
           {/* General Information */}

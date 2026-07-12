@@ -6,7 +6,7 @@ import { Sliders, Save } from 'lucide-react';
 
 export default function PreferencesView() {
   return (
-    <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full mx-auto max-w-5xl">
+    <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full ">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
         <div>
           <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">Preferences</h2>

@@ -75,7 +75,7 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
   const currentStock = productData.currentStock || 0;
 
   return (
-    <div className="flex flex-col h-full bg-background overflow-y-auto custom-scrollbar p-4 md:p-6 lg:p-8 mx-auto w-full">
+    <div className="flex flex-col bg-background p-4 md:p-6 lg:p-8 w-full">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
@@ -126,7 +126,7 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
                 <span className="bg-surface-container-low px-2.5 py-1 rounded-md border border-outline-variant/10">{productData.brand?.name || 'No Brand'}</span>
               </div>
             </div>
-            <p className="text-sm text-on-surface-variant leading-relaxed max-w-3xl">
+            <p className="text-sm text-on-surface-variant leading-relaxed ">
               {productData.description || 'No description provided.'}
             </p>
           </div>

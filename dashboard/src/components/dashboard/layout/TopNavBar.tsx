@@ -71,7 +71,7 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
   const profilePhoto = getProfilePhoto();
 
   return (
-    <header className="sticky top-0 right-0 w-full h-16 md:h-20 glass-navbar border-b border-outline-variant/30 flex items-center justify-between px-4 md:px-6 lg:px-10 z-40 bg-surface/80">
+    <header className="sticky top-0 right-0 w-full h-16 md:h-20 bg-surface border-b border-outline-variant/30 flex items-center justify-between px-4 md:px-6 lg:px-10 z-40">
       {/* Left: Mobile Toggle */}
       <div className="flex items-center gap-3 flex-1">
         <Button
