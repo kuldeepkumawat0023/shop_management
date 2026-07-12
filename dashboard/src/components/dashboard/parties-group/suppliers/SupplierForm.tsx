@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
-import { ArrowLeft, Save, Building2, MapPin, ReceiptText } from 'lucide-react';
+import { ArrowLeft, Save, Building2, MapPin, ReceiptText, RefreshCcw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { supplierSchema } from '@/utils/validations';
 import toast from 'react-hot-toast';
@@ -56,6 +56,28 @@ export default function SupplierForm() {
     setAddressData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleClear = () => {
+    setFormData({
+      name: '',
+      contactPerson: '',
+      email: '',
+      phone: '',
+      gstNumber: '',
+      status: 'Active',
+      paymentTerms: '',
+      notes: '',
+      address: ''
+    });
+    setAddressData({
+      street: '',
+      city: '',
+      state: '',
+      zip: '',
+      country: '',
+    });
+    setErrors({});
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -88,9 +110,9 @@ export default function SupplierForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 md:p-6 lg:p-8 w-full flex flex-col gap-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <form onSubmit={handleSubmit} className="flex flex-col w-full ">
+      {/* Header Sticky */}
+      <div className="sticky top-16 md:top-20 z-20 bg-background border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
         <div className="flex items-center gap-3">
           <Button type="button" onClick={() => router.back()} variant="ghost" size="icon" className="w-10 h-10 rounded-xl bg-surface-container-low border border-outline-variant/20 text-on-surface hover:text-primary hover:bg-primary/10 transition-colors">
             <ArrowLeft className="w-5 h-5" />
@@ -100,18 +122,10 @@ export default function SupplierForm() {
             <p className="text-sm text-on-surface-variant mt-1 font-medium">Onboard a new vendor or B2B partner</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <Button type="button" onClick={() => router.back()} variant="outline" className="flex-1 sm:flex-none w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
-            Cancel
-          </Button>
-          <Button type="submit" disabled={loading} className="flex-1 sm:flex-none gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
-            <Save className="w-4 h-4" />
-            <span className="font-bold tracking-wide">{loading ? 'Saving...' : 'Save Supplier'}</span>
-          </Button>
-        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="p-4 md:p-6 lg:p-8 flex-1 w-full flex flex-col gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column - Company Info */}
         <div className="flex flex-col gap-6">
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
@@ -287,6 +301,22 @@ export default function SupplierForm() {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-4 pt-6 border-t border-outline-variant/20">
+          <Button type="button" onClick={handleClear} variant="ghost" className="w-full sm:w-auto text-on-surface-variant hover:text-error flex items-center justify-center gap-2">
+            <RefreshCcw className="w-4 h-4" />
+            Clear Form
+          </Button>
+          <Button type="button" onClick={() => router.back()} variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
+            Cancel
+          </Button>
+          <Button type="submit" disabled={loading} className="w-full sm:w-auto gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
+            <Save className="w-4 h-4" />
+            <span className="font-bold tracking-wide">{loading ? 'Saving...' : 'Save Supplier'}</span>
+          </Button>
         </div>
       </div>
     </form>

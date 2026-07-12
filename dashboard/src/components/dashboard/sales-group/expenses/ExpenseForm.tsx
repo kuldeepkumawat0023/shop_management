@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/common/Button';
-import { Input } from '@/components/common/Input';
-import { ArrowLeft, Save, UploadCloud, Info, IndianRupee, FileText } from 'lucide-react';
+import { ArrowLeft, Save, UploadCloud, Info, IndianRupee, FileText, RefreshCcw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { cn } from '@/utils/cn';
+import { expenseSchema } from '@/utils/validations';
+import toast from 'react-hot-toast';
 
 export default function ExpenseForm() {
   const router = useRouter();
@@ -18,10 +20,32 @@ export default function ExpenseForm() {
     status: 'Paid',
     description: ''
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+  };
+
+  const handleClear = () => {
+    setFormData({
+      payee: '',
+      category: '',
+      amount: '',
+      date: '',
+      paymentMethod: 'Bank Transfer',
+      status: 'Paid',
+      description: ''
+    });
+    setErrors({});
   };
 
   const handleDrag = (e: React.DragEvent) => {
@@ -31,12 +55,45 @@ export default function ExpenseForm() {
     else if (e.type === "dragleave") setDragActive(false);
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const submissionData = {
+      ...formData,
+      amount: Number(formData.amount) || 0
+    };
+
+    const validationResult = expenseSchema.safeParse(submissionData);
+    if (!validationResult.success) {
+      const newErrors: Record<string, string> = {};
+      for (const err of validationResult.error.issues) {
+        if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
+      }
+      setErrors(newErrors);
+      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें');
+    }
+
+    setSubmitting(true);
+    const toastId = toast.loading('Saving expense...');
+    
+    try {
+      // API call would go here
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast.success('Expense saved successfully!', { id: toastId });
+      router.back();
+    } catch (err: any) {
+      toast.error('Failed to save expense', { id: toastId });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
-    <div className="p-4 md:p-6 lg:p-8 w-full flex flex-col gap-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <form onSubmit={handleSubmit} className="flex flex-col w-full ">
+      {/* Header Sticky */}
+      <div className="sticky top-16 md:top-20 z-20 bg-background border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
         <div className="flex items-center gap-3">
-          <Button onClick={() => router.back()} variant="ghost" size="icon" className="w-10 h-10 rounded-xl bg-surface-container-low border border-outline-variant/20 text-on-surface hover:text-primary hover:bg-primary/10 transition-colors">
+          <Button type="button" onClick={() => router.back()} variant="ghost" size="icon" className="w-10 h-10 rounded-xl bg-surface-container-low border border-outline-variant/20 text-on-surface hover:text-primary hover:bg-primary/10 transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
@@ -44,18 +101,10 @@ export default function ExpenseForm() {
             <p className="text-sm text-on-surface-variant mt-1 font-medium">Record a new outgoing payment or bill</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <Button onClick={() => router.back()} variant="outline" className="flex-1 sm:flex-none w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
-            Cancel
-          </Button>
-          <Button className="flex-1 sm:flex-none gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl">
-            <Save className="w-4 h-4" />
-            <span className="font-bold tracking-wide">Save Expense</span>
-          </Button>
-        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="p-4 md:p-6 lg:p-8 flex-1 w-full flex flex-col gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Main Details */}
         <div className="lg:col-span-2 flex flex-col gap-6">
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
@@ -65,22 +114,30 @@ export default function ExpenseForm() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <Input
-                label="Payee / Vendor"
-                name="payee"
-                value={formData.payee}
-                onChange={handleInputChange}
-                placeholder="e.g. Office Supplies Inc"
-                required
-              />
+              <div className="flex flex-col gap-1.5 w-full">
+                <label className="text-sm font-bold text-on-surface">Payee / Vendor <span className="text-error ml-1">*</span></label>
+                <input
+                  name="payee"
+                  value={formData.payee}
+                  onChange={handleInputChange}
+                  placeholder="e.g. Office Supplies Inc"
+                  className={cn(
+                    "w-full h-10 px-3 bg-surface border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all",
+                    errors.payee ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                  )}
+                />
+                {errors.payee && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.payee}</p>}
+              </div>
               <div className="flex flex-col gap-1.5 w-full">
                 <label className="text-sm font-bold text-on-surface">Expense Category <span className="text-error ml-1">*</span></label>
                 <select 
                   name="category"
                   value={formData.category}
                   onChange={handleInputChange}
-                  className="flex w-full h-10 rounded-xl bg-surface border border-outline-variant/30 px-3 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all appearance-none"
-                  required
+                  className={cn(
+                    "flex w-full h-10 rounded-xl bg-surface border px-3 text-sm text-on-surface focus:outline-none focus:ring-2 transition-all appearance-none",
+                    errors.category ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                  )}
                 >
                   <option value="">Select category...</option>
                   <option value="Utilities">Utilities (Electricity, Water)</option>
@@ -92,6 +149,7 @@ export default function ExpenseForm() {
                   <option value="Software">Software & IT</option>
                   <option value="Misc">Miscellaneous</option>
                 </select>
+                {errors.category && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.category}</p>}
               </div>
             </div>
 
@@ -115,24 +173,39 @@ export default function ExpenseForm() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <Input
-                label="Amount"
-                name="amount"
-                type="number"
-                value={formData.amount}
-                onChange={handleInputChange}
-                placeholder="₹0.00"
-                leftIcon={<span className="font-bold text-on-surface-variant">₹</span>}
-                required
-              />
-              <Input
-                label="Expense Date"
-                name="date"
-                type="date"
-                value={formData.date}
-                onChange={handleInputChange}
-                required
-              />
+              <div className="flex flex-col gap-1.5 w-full">
+                <label className="text-sm font-bold text-on-surface">Amount <span className="text-error ml-1">*</span></label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-on-surface-variant">₹</span>
+                  <input
+                    type="number"
+                    name="amount"
+                    value={formData.amount}
+                    onChange={handleInputChange}
+                    placeholder="0.00"
+                    className={cn(
+                      "w-full h-10 pl-8 pr-3 bg-surface border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all",
+                      errors.amount ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                    )}
+                  />
+                </div>
+                {errors.amount && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.amount}</p>}
+              </div>
+
+              <div className="flex flex-col gap-1.5 w-full">
+                <label className="text-sm font-bold text-on-surface">Expense Date <span className="text-error ml-1">*</span></label>
+                <input
+                  type="date"
+                  name="date"
+                  value={formData.date}
+                  onChange={handleInputChange}
+                  className={cn(
+                    "w-full h-10 px-3 bg-surface border rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 transition-all",
+                    errors.date ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                  )}
+                />
+                {errors.date && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.date}</p>}
+              </div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -197,7 +270,23 @@ export default function ExpenseForm() {
             </div>
           </div>
         </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-4 pt-6 border-t border-outline-variant/20">
+          <Button type="button" onClick={handleClear} variant="ghost" className="w-full sm:w-auto text-on-surface-variant hover:text-error flex items-center justify-center gap-2">
+            <RefreshCcw className="w-4 h-4" />
+            Clear Form
+          </Button>
+          <Button type="button" onClick={() => router.back()} variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
+            Cancel
+          </Button>
+          <Button type="submit" disabled={submitting} className="w-full sm:w-auto gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
+            <Save className="w-4 h-4" />
+            <span className="font-bold tracking-wide">{submitting ? 'Saving...' : 'Save Expense'}</span>
+          </Button>
+        </div>
       </div>
-    </div>
+    </form>
   );
 }

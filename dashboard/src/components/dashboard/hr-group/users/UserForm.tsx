@@ -2,20 +2,25 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/common/Button';
-import { Input } from '@/components/common/Input';
-import { ArrowLeft, Save, ShieldAlert, Key, UserCheck } from 'lucide-react';
+import { ArrowLeft, Save, ShieldAlert, Key, UserCheck, RefreshCcw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { cn } from '@/utils/cn';
+import { userSchema } from '@/utils/validations';
+import toast from 'react-hot-toast';
 
 export default function UserForm() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
+    phone: '',
     username: '',
     role: '',
     status: 'Pending',
     requirePasswordReset: true,
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -26,14 +31,63 @@ export default function UserForm() {
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
+
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+  };
+
+  const handleClear = () => {
+    setFormData({
+      fullName: '',
+      email: '',
+      phone: '',
+      username: '',
+      role: '',
+      status: 'Pending',
+      requirePasswordReset: true,
+    });
+    setErrors({});
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const validationResult = userSchema.safeParse(formData);
+    if (!validationResult.success) {
+      const newErrors: Record<string, string> = {};
+      for (const err of validationResult.error.issues) {
+        if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
+      }
+      setErrors(newErrors);
+      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें');
+    }
+
+    setSubmitting(true);
+    const toastId = toast.loading('Sending invitation...');
+    
+    try {
+      // API call would go here
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast.success('Invitation sent successfully!', { id: toastId });
+      router.back();
+    } catch (err: any) {
+      toast.error('Failed to send invitation', { id: toastId });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 w-full flex flex-col gap-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <form onSubmit={handleSubmit} className="flex flex-col w-full ">
+      {/* Header Sticky */}
+      <div className="sticky top-16 md:top-20 z-20 bg-background border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
         <div className="flex items-center gap-3">
-          <Button onClick={() => router.back()} variant="ghost" size="icon" className="w-10 h-10 rounded-xl bg-surface-container-low border border-outline-variant/20 text-on-surface hover:text-primary hover:bg-primary/10 transition-colors">
+          <Button type="button" onClick={() => router.back()} variant="ghost" size="icon" className="w-10 h-10 rounded-xl bg-surface-container-low border border-outline-variant/20 text-on-surface hover:text-primary hover:bg-primary/10 transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
@@ -41,18 +95,10 @@ export default function UserForm() {
             <p className="text-sm text-on-surface-variant mt-1 font-medium">Grant a new user access to the dashboard</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <Button onClick={() => router.back()} variant="outline" className="flex-1 sm:flex-none w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
-            Cancel
-          </Button>
-          <Button className="flex-1 sm:flex-none gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl">
-            <Save className="w-4 h-4" />
-            <span className="font-bold tracking-wide">Send Invite</span>
-          </Button>
-        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="p-4 md:p-6 lg:p-8 flex-1 w-full flex flex-col gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column - Account Info */}
         <div className="flex flex-col gap-6">
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
@@ -62,32 +108,63 @@ export default function UserForm() {
             </div>
             
             <div className="flex flex-col gap-5">
-              <Input
-                label="Full Name"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleInputChange}
-                placeholder="e.g. Rahul Sharma"
-                required
-              />
+              <div className="flex flex-col gap-1.5 w-full">
+                <label className="text-sm font-bold text-on-surface">Full Name <span className="text-error ml-1">*</span></label>
+                <input
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  placeholder="e.g. Rahul Sharma"
+                  className={cn(
+                    "w-full h-10 px-3 bg-surface border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all",
+                    errors.fullName ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                  )}
+                />
+                {errors.fullName && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.fullName}</p>}
+              </div>
               
-              <Input
-                label="Email Address"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                placeholder="rahul.s@example.com"
-                required
-              />
+              <div className="flex flex-col gap-1.5 w-full">
+                <label className="text-sm font-bold text-on-surface">Email Address <span className="text-error ml-1">*</span></label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="rahul.s@example.com"
+                  className={cn(
+                    "w-full h-10 px-3 bg-surface border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all",
+                    errors.email ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                  )}
+                />
+                {errors.email && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.email}</p>}
+              </div>
+
+              <div className="flex flex-col gap-1.5 w-full">
+                <label className="text-sm font-bold text-on-surface">Phone Number <span className="text-error ml-1">*</span></label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  placeholder="e.g. 9876543210"
+                  className={cn(
+                    "w-full h-10 px-3 bg-surface border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all",
+                    errors.phone ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                  )}
+                />
+                {errors.phone && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.phone}</p>}
+              </div>
               
-              <Input
-                label="Username (Optional)"
-                name="username"
-                value={formData.username}
-                onChange={handleInputChange}
-                placeholder="rahuls123"
-              />
+              <div className="flex flex-col gap-1.5 w-full">
+                <label className="text-sm font-bold text-on-surface">Username (Optional)</label>
+                <input
+                  name="username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  placeholder="rahuls123"
+                  className="w-full h-10 px-3 bg-surface border border-outline-variant/30 rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:border-primary/50 focus:ring-primary/20 transition-all"
+                />
+              </div>
             </div>
           </div>
           
@@ -136,13 +213,15 @@ export default function UserForm() {
             
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">System Role</label>
+                <label className="text-sm font-bold text-on-surface">System Role <span className="text-error ml-1">*</span></label>
                 <select 
                   name="role"
                   value={formData.role}
                   onChange={handleInputChange}
-                  className="flex w-full h-10 rounded-xl bg-surface border border-outline-variant/30 px-3 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all appearance-none"
-                  required
+                  className={cn(
+                    "flex w-full h-10 rounded-xl bg-surface border px-3 text-sm text-on-surface focus:outline-none focus:ring-2 transition-all appearance-none",
+                    errors.role ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                  )}
                 >
                   <option value="">Select a role...</option>
                   <option value="Super Admin">Super Admin (Full Access)</option>
@@ -150,6 +229,7 @@ export default function UserForm() {
                   <option value="Sales Exec">Sales Executive (POS & Sales only)</option>
                   <option value="Viewer">Viewer (Read Only)</option>
                 </select>
+                {errors.role && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.role}</p>}
               </div>
 
               <div className="flex flex-col gap-1.5 w-full">
@@ -193,11 +273,27 @@ export default function UserForm() {
                     Select a role to see its permissions preview.
                   </p>
                 )}
-              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-4 pt-6 border-t border-outline-variant/20">
+          <Button type="button" onClick={handleClear} variant="ghost" className="w-full sm:w-auto text-on-surface-variant hover:text-error flex items-center justify-center gap-2">
+            <RefreshCcw className="w-4 h-4" />
+            Clear Form
+          </Button>
+          <Button type="button" onClick={() => router.back()} variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
+            Cancel
+          </Button>
+          <Button type="submit" disabled={submitting} className="w-full sm:w-auto gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
+            <Save className="w-4 h-4" />
+            <span className="font-bold tracking-wide">{submitting ? 'Sending...' : 'Send Invite'}</span>
+          </Button>
+        </div>
+      </div>
+    </form>
   );
 }

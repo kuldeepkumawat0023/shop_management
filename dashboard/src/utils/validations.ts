@@ -114,3 +114,98 @@ export const productSchema = z.object({
   brand: z.string().optional(),
   isActive: z.boolean().optional(),
 });
+
+// --- Manufacturing Schemas ---
+
+export const recipeSchema = z.object({
+  finalProductId: z.string().min(1, 'Output product is required / आउटपुट उत्पाद आवश्यक है'),
+  ingredients: z.array(z.object({
+    productId: z.string().min(1, 'Ingredient is required / सामग्री आवश्यक है'),
+    quantityRequired: z.number().min(0.01, 'Quantity must be greater than 0 / मात्रा 0 से अधिक होनी चाहिए')
+  })).min(1, 'At least one ingredient is required / कम से कम एक सामग्री आवश्यक है'),
+  notes: z.string().optional()
+});
+
+export const productionSchema = z.object({
+  recipeId: z.string().min(1, 'Recipe is required / रेसिपी आवश्यक है'),
+  quantityProduced: z.number().min(1, 'Quantity must be at least 1 / मात्रा कम से कम 1 होनी चाहिए')
+});
+
+// --- Sales & Expenses Schemas ---
+
+export const purchaseSchema = z.object({
+  supplier: z.string().min(1, 'Supplier is required / आपूर्तिकर्ता आवश्यक है'),
+  items: z.array(z.object({
+    product: z.string().min(1, 'Product is required / उत्पाद आवश्यक है'),
+    quantity: z.number().min(0.01, 'Quantity must be greater than 0 / मात्रा 0 से अधिक होनी चाहिए'),
+    unitPrice: z.number().min(0, 'Unit price cannot be negative / इकाई मूल्य नकारात्मक नहीं हो सकता')
+  })).min(1, 'At least one item is required / कम से कम एक आइटम आवश्यक है'),
+  shippingFee: z.number().optional(),
+  taxAmount: z.number().optional(),
+  discount: z.number().optional(),
+  paymentStatus: z.string().optional(),
+  paymentMethod: z.string().optional(),
+  notes: z.string().optional()
+});
+
+export const expenseSchema = z.object({
+  payee: z.string().min(1, 'Payee/Vendor is required / प्राप्तकर्ता/विक्रेता आवश्यक है'),
+  category: z.string().min(1, 'Category is required / श्रेणी आवश्यक है'),
+  amount: z.number().min(0.01, 'Amount must be greater than 0 / राशि 0 से अधिक होनी चाहिए'),
+  date: z.string().min(1, 'Date is required / तिथि आवश्यक है'),
+  paymentMethod: z.string().optional(),
+  status: z.string().optional(),
+  description: z.string().optional()
+});
+
+// --- Payments Schema ---
+
+export const paymentSchema = z.object({
+  partyId: z.string().min(1, 'Party is required / पार्टी आवश्यक है'),
+  paymentType: z.string().min(1, 'Payment type is required / भुगतान प्रकार आवश्यक है'),
+  amount: z.number().min(0.01, 'Amount must be greater than 0 / राशि 0 से अधिक होनी चाहिए'),
+  date: z.string().min(1, 'Date is required / तिथि आवश्यक है'),
+  paymentMethod: z.string().min(1, 'Payment method is required / भुगतान विधि आवश्यक है'),
+  referenceNo: z.string().optional(),
+  notes: z.string().optional()
+});
+
+// --- HR & Payroll Schemas ---
+
+export const userSchema = z.object({
+  fullName: z.string().min(1, 'Full Name is required / पूरा नाम आवश्यक है'),
+  email: z.string().email('Invalid email address / अमान्य ईमेल पता'),
+  phone: phoneSchema,
+  role: z.string().min(1, 'Role is required / भूमिका आवश्यक है'),
+  status: z.string().optional()
+});
+
+export const teamMemberSchema = z.object({
+  name: z.string().min(1, 'Name is required / नाम आवश्यक है'),
+  position: z.string().min(1, 'Position is required / पद आवश्यक है'),
+  department: z.string().optional(),
+  salary: z.number().min(0, 'Salary cannot be negative / वेतन नकारात्मक नहीं हो सकता'),
+  joinDate: z.string().min(1, 'Join Date is required / कार्यभार ग्रहण करने की तिथि आवश्यक है'),
+  status: z.string().optional()
+});
+
+export const salarySchema = z.object({
+  employeeId: z.string().min(1, 'Employee is required / कर्मचारी आवश्यक है'),
+  month: z.string().min(1, 'Month is required / महीना आवश्यक है'),
+  year: z.string().min(1, 'Year is required / वर्ष आवश्यक है'),
+  baseSalary: z.number().min(0, 'Base salary cannot be negative / मूल वेतन नकारात्मक नहीं हो सकता'),
+  bonuses: z.number().optional(),
+  deductions: z.number().optional(),
+  paymentMethod: z.string().min(1, 'Payment method is required / भुगतान विधि आवश्यक है'),
+  paymentDate: z.string().min(1, 'Payment date is required / भुगतान की तिथि आवश्यक है'),
+  notes: z.string().optional()
+});
+
+export const advanceSchema = z.object({
+  employeeId: z.string().min(1, 'Employee is required / कर्मचारी आवश्यक है'),
+  amount: z.number().min(0.01, 'Amount must be greater than 0 / राशि 0 से अधिक होनी चाहिए'),
+  date: z.string().min(1, 'Date is required / तिथि आवश्यक है'),
+  reason: z.string().optional(),
+  repaymentTerm: z.string().optional(),
+  emiAmount: z.number().optional()
+});

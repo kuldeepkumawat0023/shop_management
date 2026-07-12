@@ -1,6 +1,6 @@
 import React from 'react';
-import NewPurchaseView from '@/components/dashboard/sales-group/purchases/NewPurchaseView';
+import PurchaseForm from '@/components/dashboard/sales-group/purchases/PurchaseForm';
 
-export default function Page() {
-  return <NewPurchaseView />;
+export default function NewPurchasePage() {
+  return <PurchaseForm />;
 }
