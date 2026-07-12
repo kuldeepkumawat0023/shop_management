@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 
 export default function CustomerForm() {
   const router = useRouter();
-  
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -121,147 +121,147 @@ export default function CustomerForm() {
 
       <div className="p-4 md:p-6 lg:p-8 flex-1 w-full flex flex-col gap-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Column - Personal Info */}
-        <div className="flex flex-col gap-6">
-          <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
-            <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
-              <User className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">Personal Information</h2>
-            </div>
-            
-            <div className="grid grid-cols-1 gap-5">
-              <div>
-                <Input
-                  label="Full Name / पूरा नाम"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  placeholder="e.g. Rajesh Kumar"
-                  error={!!errors.name}
-                />
-                {errors.name && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.name}</p>}
+          {/* Left Column - Personal Info */}
+          <div className="flex flex-col gap-6">
+            <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
+              <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
+                <User className="w-5 h-5 text-primary" />
+                <h2 className="text-lg font-bold text-on-surface">Personal Information</h2>
               </div>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <Input
-                  label="Email Address / ईमेल पता"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder="rajesh@example.com"
-                  error={!!errors.email}
-                />
-                {errors.email && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.email}</p>}
+
+              <div className="grid grid-cols-1 gap-5">
+                <div>
+                  <Input
+                    label="Full Name / पूरा नाम"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    placeholder="e.g. Rajesh Kumar"
+                    error={!!errors.name}
+                  />
+                  {errors.name && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.name}</p>}
+                </div>
               </div>
-              <div>
-                <Input
-                  label="Phone Number / फ़ोन नंबर"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  placeholder="9876543210"
-                  error={!!errors.phone}
-                />
-                {errors.phone && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.phone}</p>}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <Input
+                    label="Email Address / ईमेल पता"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    placeholder="rajesh@example.com"
+                    error={!!errors.email}
+                  />
+                  {errors.email && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.email}</p>}
+                </div>
+                <div>
+                  <Input
+                    label="Phone Number / फ़ोन नंबर"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    placeholder="9876543210"
+                    error={!!errors.phone}
+                  />
+                  {errors.phone && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.phone}</p>}
+                </div>
               </div>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <Input
-                label="Company (Optional)"
-                name="company"
-                value={formData.company}
-                onChange={handleInputChange}
-                placeholder="Company Name"
-              />
-              <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Status</label>
-                <select 
-                  name="status"
-                  value={formData.status}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <Input
+                  label="Company (Optional)"
+                  name="company"
+                  value={formData.company}
                   onChange={handleInputChange}
-                  className="flex w-full h-10 rounded-xl bg-surface border border-outline-variant/30 px-3 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all appearance-none"
-                >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
+                  placeholder="Company Name"
+                />
+                <div className="flex flex-col gap-1.5 w-full">
+                  <label className="text-sm font-bold text-on-surface">Status</label>
+                  <select
+                    name="status"
+                    value={formData.status}
+                    onChange={handleInputChange}
+                    className="flex w-full h-10 rounded-xl bg-surface border border-outline-variant/30 px-3 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all appearance-none"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Right Column - Address */}
-        <div className="flex flex-col gap-6">
-          <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
-            <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
-              <MapPin className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">Address Details</h2>
-            </div>
-            
-            <div className="flex flex-col gap-5">
-              <Input
-                label="Street Address"
-                name="street"
-                value={addressData.street}
-                onChange={handleAddressChange}
-                placeholder="123 Main St, Apartment 4B"
-              />
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <Input
-                  label="City"
-                  name="city"
-                  value={addressData.city}
-                  onChange={handleAddressChange}
-                  placeholder="Mumbai"
-                />
-                <Input
-                  label="State/Province"
-                  name="state"
-                  value={addressData.state}
-                  onChange={handleAddressChange}
-                  placeholder="Maharashtra"
-                />
+          {/* Right Column - Address */}
+          <div className="flex flex-col gap-6">
+            <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
+              <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
+                <MapPin className="w-5 h-5 text-primary" />
+                <h2 className="text-lg font-bold text-on-surface">Address Details</h2>
               </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+              <div className="flex flex-col gap-5">
                 <Input
-                  label="ZIP / Postal Code"
-                  name="zip"
-                  value={addressData.zip}
+                  label="Street Address"
+                  name="street"
+                  value={addressData.street}
                   onChange={handleAddressChange}
-                  placeholder="400001"
+                  placeholder="123 Main St, Apartment 4B"
                 />
-                <Input
-                  label="Country"
-                  name="country"
-                  value={addressData.country}
-                  onChange={handleAddressChange}
-                  placeholder="India"
-                />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <Input
+                    label="City"
+                    name="city"
+                    value={addressData.city}
+                    onChange={handleAddressChange}
+                    placeholder="Mumbai"
+                  />
+                  <Input
+                    label="State/Province"
+                    name="state"
+                    value={addressData.state}
+                    onChange={handleAddressChange}
+                    placeholder="Maharashtra"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <Input
+                    label="ZIP / Postal Code"
+                    name="zip"
+                    value={addressData.zip}
+                    onChange={handleAddressChange}
+                    placeholder="400001"
+                  />
+                  <Input
+                    label="Country"
+                    name="country"
+                    value={addressData.country}
+                    onChange={handleAddressChange}
+                    placeholder="India"
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-4 pt-6 border-t border-outline-variant/20">
-          <Button type="button" onClick={handleClear} variant="ghost" className="w-full sm:w-auto text-on-surface-variant hover:text-error flex items-center justify-center gap-2">
-            <RefreshCcw className="w-4 h-4" />
-            Clear Form
-          </Button>
-          <Button type="button" onClick={() => router.back()} variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
-            Cancel
-          </Button>
-          <Button type="submit" disabled={loading} className="w-full sm:w-auto gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
-            <Save className="w-4 h-4" />
-            <span className="font-bold tracking-wide">{loading ? 'Saving...' : 'Save Customer'}</span>
-          </Button>
-        </div>
+      {/* Action Buttons */}
+      <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-4 pt-6 border-t border-outline-variant/20">
+        <Button type="button" onClick={handleClear} variant="ghost" className="w-full sm:w-auto text-on-surface-variant hover:text-error flex items-center justify-center gap-2">
+          <RefreshCcw className="w-4 h-4" />
+          Clear Form
+        </Button>
+        <Button type="button" onClick={() => router.back()} variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
+          Cancel
+        </Button>
+        <Button type="submit" disabled={loading} className="w-full sm:w-auto gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
+          <Save className="w-4 h-4" />
+          <span className="font-bold tracking-wide">{loading ? 'Saving...' : 'Save Customer'}</span>
+        </Button>
       </div>
     </form>
   );
