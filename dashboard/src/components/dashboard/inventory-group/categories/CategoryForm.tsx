@@ -125,7 +125,7 @@ export default function CategoryForm({ editId }: CategoryFormProps) {
   return (
     <form onSubmit={handleSubmit} className="p-4 md:p-6 lg:p-8 mx-auto w-full flex flex-col gap-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl pb-4 pt-4 -mt-4 -mx-4 px-4 md:-mt-6 md:-mx-6 md:px-6 lg:-mt-8 lg:-mx-8 lg:px-8 border-b border-outline-variant/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-2 shadow-sm">
         <div className="flex items-center gap-3">
           <Button type="button" onClick={() => router.back()} variant="ghost" size="icon" className="w-10 h-10 rounded-xl bg-surface-container-low border border-outline-variant/20 text-on-surface hover:text-primary hover:bg-primary/10 transition-colors">
             <ArrowLeft className="w-5 h-5" />

@@ -10,7 +10,7 @@ const shopScope = (req, res, next) => {
   // 1. Super Admin Logic (Can access any shop if specified)
   if (req.user.role === 'super_admin') {
     // Check if super admin is trying to access a specific shop's data
-    const targetShopId = req.query.shopId || req.body.shopId || req.params.shopId;
+    const targetShopId = req.query?.shopId || req.body?.shopId || req.params?.shopId;
     
     // req.scopedShopId will be used globally in all controllers
     req.scopedShopId = targetShopId || null; // null means they are querying system-wide data
@@ -29,7 +29,7 @@ const shopScope = (req, res, next) => {
     req.scopedShopId = req.user.shopId;
     
     // Security Check: Prevent malicious users from injecting another shopId in request body
-    if (req.body.shopId && req.body.shopId.toString() !== req.user.shopId.toString()) {
+    if (req.body?.shopId && req.body.shopId.toString() !== req.user.shopId.toString()) {
       return res.status(403).json({ 
         success: false, 
         statusCode: 403, 

@@ -47,9 +47,9 @@ export default function NewPurchaseView() {
       </div>
 
       {/* Form Content */}
-      <div className="p-4 md:p-6 lg:p-8 flex-1 max-w-5xl mx-auto w-full">
+      <div className="p-4 md:p-6 lg:p-8 flex-1 mx-auto w-full">
         <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col gap-8">
-          
+
           {/* General Information */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="flex flex-col gap-5">
@@ -57,18 +57,18 @@ export default function NewPurchaseView() {
                 <Truck className="w-5 h-5 text-primary" />
                 <h3 className="text-lg font-bold text-on-surface">Supplier Info</h3>
               </div>
-              <Input 
-                label="Supplier Name" 
+              <Input
+                label="Supplier Name"
                 placeholder="Search or select supplier..."
                 required
               />
               <div className="grid grid-cols-2 gap-5">
-                <Input 
-                  label="PO Number" 
+                <Input
+                  label="PO Number"
                   placeholder="PO-2023-006"
                 />
-                <Input 
-                  label="Order Date" 
+                <Input
+                  label="Order Date"
                   type="date"
                   required
                 />
@@ -81,23 +81,23 @@ export default function NewPurchaseView() {
                 <h3 className="text-lg font-bold text-on-surface">Terms & Shipping</h3>
               </div>
               <div className="grid grid-cols-2 gap-5">
-                <Input 
-                  label="Expected Delivery" 
+                <Input
+                  label="Expected Delivery"
                   type="date"
                 />
-                <Input 
-                  label="Shipping Cost" 
+                <Input
+                  label="Shipping Cost"
                   type="number"
                   placeholder="₹0.00"
                 />
               </div>
               <div className="grid grid-cols-2 gap-5">
-                <Input 
-                  label="Payment Terms" 
+                <Input
+                  label="Payment Terms"
                   placeholder="e.g. Net 30"
                 />
-                <Input 
-                  label="Discount Amount" 
+                <Input
+                  label="Discount Amount"
                   type="number"
                   placeholder="₹0.00"
                 />
@@ -117,47 +117,47 @@ export default function NewPurchaseView() {
                 Add Item
               </Button>
             </div>
-            
+
             <div className="flex flex-col gap-4">
               {items.map((item, index) => (
                 <div key={item.id} className="flex flex-col md:flex-row gap-3 items-end bg-surface-container/30 p-3 rounded-xl border border-outline-variant/10">
                   <div className="w-full md:flex-1">
-                    <Input 
+                    <Input
                       label={index === 0 ? "Product / Raw Material" : ""}
                       placeholder="Select product..."
                     />
                   </div>
                   <div className="w-full md:w-24">
-                    <Input 
+                    <Input
                       label={index === 0 ? "Qty" : ""}
                       type="number"
                       placeholder="0"
                     />
                   </div>
                   <div className="w-full md:w-32">
-                    <Input 
+                    <Input
                       label={index === 0 ? "Rate (₹)" : ""}
                       type="number"
                       placeholder="0.00"
                     />
                   </div>
                   <div className="w-full md:w-24">
-                    <Input 
+                    <Input
                       label={index === 0 ? "Tax (%)" : ""}
                       type="number"
                       placeholder="18"
                     />
                   </div>
                   <div className="w-full md:w-32">
-                    <Input 
+                    <Input
                       label={index === 0 ? "Total (₹)" : ""}
                       type="number"
                       placeholder="0.00"
                       disabled
                     />
                   </div>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => removeItem(item.id)}
                     disabled={items.length === 1}
                     className="w-full md:w-12 h-10 border-error/30 text-error hover:bg-error/10 shrink-0"
@@ -168,7 +168,7 @@ export default function NewPurchaseView() {
               ))}
             </div>
           </div>
-          
+
           {/* Billing Summary */}
           <div className="flex flex-col md:flex-row justify-end mt-4">
             <div className="w-full md:w-80 bg-surface/50 border border-outline-variant/20 rounded-2xl p-6">

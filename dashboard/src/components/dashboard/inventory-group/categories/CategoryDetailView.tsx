@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/common/Button';
 import { DataTable } from '@/components/common/DataTable';
 import { StatusBadge } from '@/components/common/StatusBadge';
-import { ArrowLeft, Tag, Layers, Search, Filter, Download, MoreVertical, Edit, Trash2, Globe, Archive, Package, Plus, ImageIcon, Type, Link as LinkIcon, Eye, CheckCircle2, AlertCircle, FolderTree, LayoutGrid } from 'lucide-react';
+import { ArrowLeft, Tag, Layers, Search, Filter, Download, MoreVertical, Edit, Trash2, Globe, Archive, Package, Plus, ImageIcon, Type, Link as LinkIcon, Eye, CheckCircle2, AlertCircle, FolderTree, LayoutGrid, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/utils/cn';
@@ -62,7 +62,7 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
     if (window.confirm('Are you sure you want to delete this category? / क्या आप वाकई इस श्रेणी को हटाना चाहते हैं?')) {
       try {
         const res = await categoryService.deleteCategory(categoryId);
-        if (res.success || res.status === 200) {
+        if (res.success || (res as any).status === 200) {
           toast.success('Category deleted successfully');
           router.push('/categories');
         } else {
