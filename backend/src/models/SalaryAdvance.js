@@ -27,6 +27,23 @@ const salaryAdvanceSchema = new mongoose.Schema({
   deductionMonth: {
     type: String // e.g. "2023-10"
   },
+  repaymentTerm: {
+    type: String,
+    enum: ['Next Salary', 'EMI'],
+    default: 'Next Salary'
+  },
+  emiAmount: {
+    type: Number,
+    default: 0
+  },
+  status: {
+    type: String,
+    enum: ['Approved', 'Pending', 'Rejected', 'Settled'],
+    default: 'Approved'
+  },
+  reason: {
+    type: String
+  },
   notes: {
     type: String
   },

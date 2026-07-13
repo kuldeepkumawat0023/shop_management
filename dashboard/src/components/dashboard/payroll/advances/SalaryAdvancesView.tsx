@@ -1,33 +1,48 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { DataTable } from '@/components/common/DataTable';
 import { Button } from '@/components/common/Button';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { StatsCard } from '@/components/common/StatsCard';
 import { Plus, Download, Filter, Search, Banknote, HandCoins, UserMinus, Eye, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-
-// Mock Data
-const advanceKPIs = [
-  { title: "Total Granted", value: "₹45,000", trend: "This month", isPositive: true, icon: Banknote },
-  { title: "Recovered", value: "₹15,000", trend: "Via deductions", isPositive: true, icon: HandCoins },
-  { title: "Outstanding", value: "₹30,000", trend: "Active balances", isPositive: false, icon: UserMinus },
-];
-
-const advanceList = [
-  { id: 'ADV-010', employeeName: 'Suresh Kumar', amount: 10000, dateRequested: 'Jul 15, 2026', repaymentTerm: '₹2,000/mo', status: 'Approved' },
-  { id: 'ADV-011', employeeName: 'Megha Gupta', amount: 5000, dateRequested: 'Jul 20, 2026', repaymentTerm: 'Next Salary', status: 'Pending' },
-  { id: 'ADV-012', employeeName: 'Ravi Verma', amount: 15000, dateRequested: 'May 10, 2026', repaymentTerm: '₹3,000/mo', status: 'Settled' },
-];
+import { payrollService } from '@/lib/services/payroll.services';
+import toast from 'react-hot-toast';
 
 export default function SalaryAdvancesView() {
+  const [advances, setAdvances] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const fetchAdvances = async () => {
+    setLoading(true);
+    try {
+      const res = await payrollService.getAdvances();
+      if (res.success && res.data) {
+        setAdvances(res.data);
+      }
+    } catch (error) {
+      toast.error('Failed to load advances');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAdvances();
+  }, []);
+
+  const filteredAdvances = advances.filter((a) => 
+    (a.staffId?.name && a.staffId.name.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   const columns = [
-    { header: 'Ref ID', accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id}</span> },
-    { header: 'Employee', accessorKey: 'employeeName', cell: (row: any) => <span className="font-semibold text-primary">{row.employeeName}</span> },
-    { header: 'Amount', accessorKey: 'amount', cell: (row: any) => <span className="font-bold text-on-surface">₹{row.amount.toLocaleString()}</span> },
-    { header: 'Date Requested', accessorKey: 'dateRequested', cell: (row: any) => <span className="text-sm text-on-surface-variant">{row.dateRequested}</span> },
-    { header: 'Repayment Terms', accessorKey: 'repaymentTerm', cell: (row: any) => <span className="text-sm font-medium text-on-surface">{row.repaymentTerm}</span> },
+    { header: 'Ref ID', accessorKey: '_id', cell: (row: any) => <span className="font-bold text-on-surface">{row._id?.substring(row._id.length - 6).toUpperCase()}</span> },
+    { header: 'Employee', accessorKey: 'staffId.name', cell: (row: any) => <span className="font-semibold text-primary">{row.staffId?.name || 'Unknown'}</span> },
+    { header: 'Amount', accessorKey: 'amount', cell: (row: any) => <span className="font-bold text-on-surface">₹{row.amount?.toLocaleString()}</span> },
+    { header: 'Date Requested', accessorKey: 'advanceDate', cell: (row: any) => <span className="text-sm text-on-surface-variant">{new Date(row.advanceDate).toLocaleDateString()}</span> },
+    { header: 'Repayment Terms', accessorKey: 'repaymentTerm', cell: (row: any) => <span className="text-sm font-medium text-on-surface">{row.repaymentTerm === 'EMI' ? `₹${row.emiAmount}/mo` : row.repaymentTerm}</span> },
     { header: 'Status', accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
     { header: 'Actions', accessorKey: 'actions', cell: (row: any) => (
       <div className="flex items-center gap-2">
@@ -63,12 +78,7 @@ export default function SalaryAdvancesView() {
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
-        {advanceKPIs.map((kpi, idx) => (
-          <StatsCard key={idx} {...kpi} />
-        ))}
-      </div>
+
 
       {/* Table Section */}
       <div className="flex flex-col flex-1 min-h-0 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm overflow-hidden">
@@ -79,6 +89,8 @@ export default function SalaryAdvancesView() {
             <input 
               type="text"
               placeholder="Search employee name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface border border-outline-variant/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm font-medium transition-all text-on-surface placeholder:text-on-surface-variant/50"
             />
           </div>
@@ -92,7 +104,7 @@ export default function SalaryAdvancesView() {
         <div className="flex-1 overflow-auto custom-scrollbar">
           <DataTable 
             columns={columns} 
-            data={advanceList} 
+            data={filteredAdvances} 
           />
         </div>
       </div>

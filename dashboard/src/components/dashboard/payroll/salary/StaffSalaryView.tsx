@@ -1,42 +1,54 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { DataTable } from '@/components/common/DataTable';
 import { Button } from '@/components/common/Button';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { StatsCard } from '@/components/common/StatsCard';
 import { Plus, Download, Filter, Search, Wallet, CheckCircle2, AlertCircle, CalendarClock, Eye, CreditCard } from 'lucide-react';
 import Link from 'next/link';
-
-// Mock Data
-const salaryKPIs = [
-  { title: "Total Payroll (July)", value: "₹2,45,000", trend: "+5% vs last month", isPositive: true, icon: Wallet },
-  { title: "Amount Paid", value: "₹1,80,000", trend: "75% completed", isPositive: true, icon: CheckCircle2 },
-  { title: "Pending Amount", value: "₹65,000", trend: "5 employees pending", isPositive: false, icon: AlertCircle },
-  { title: "Next Payday", value: "Aug 1st", trend: "In 7 days", isPositive: true, icon: CalendarClock },
-];
-
-const salaryList = [
-  { id: 'SAL-001', employeeName: 'Ravi Verma', role: 'Store Manager', baseSalary: 45000, deductions: 2000, netSalary: 43000, status: 'Paid', date: 'Jul 24, 2026' },
-  { id: 'SAL-002', employeeName: 'Anjali Sharma', role: 'Sales Executive', baseSalary: 30000, deductions: 500, netSalary: 29500, status: 'Paid', date: 'Jul 24, 2026' },
-  { id: 'SAL-003', employeeName: 'Suresh Kumar', role: 'Warehouse Staff', baseSalary: 25000, deductions: 0, netSalary: 25000, status: 'Pending', date: '-' },
-  { id: 'SAL-004', employeeName: 'Megha Gupta', role: 'Cashier', baseSalary: 28000, deductions: 1000, netSalary: 27000, status: 'Pending', date: '-' },
-  { id: 'SAL-005', employeeName: 'Rahul Desai', role: 'Delivery Agent', baseSalary: 22000, deductions: 0, netSalary: 22000, status: 'Paid', date: 'Jul 20, 2026' },
-];
+import { payrollService } from '@/lib/services/payroll.services';
+import toast from 'react-hot-toast';
 
 export default function StaffSalaryView() {
+  const [salaries, setSalaries] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const fetchSalaries = async () => {
+    setLoading(true);
+    try {
+      const res = await payrollService.getSalaries();
+      if (res.success && res.data) {
+        setSalaries(res.data);
+      }
+    } catch (error) {
+      toast.error('Failed to load salaries');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSalaries();
+  }, []);
+
+  const filteredSalaries = salaries.filter((s) => 
+    (s.staffId?.name && s.staffId.name.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   const columns = [
-    { header: 'ID', accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id}</span> },
-    { header: 'Employee', accessorKey: 'employeeName', cell: (row: any) => (
+    { header: 'ID', accessorKey: '_id', cell: (row: any) => <span className="font-bold text-on-surface">{row._id?.substring(row._id.length - 6).toUpperCase()}</span> },
+    { header: 'Employee', accessorKey: 'staffId.name', cell: (row: any) => (
       <div className="flex flex-col">
-        <span className="font-semibold text-primary">{row.employeeName}</span>
-        <span className="text-xs text-on-surface-variant">{row.role}</span>
+        <span className="font-semibold text-primary">{row.staffId?.name || 'Unknown'}</span>
+        <span className="text-xs text-on-surface-variant">{row.staffId?.role || ''}</span>
       </div>
     )},
-    { header: 'Base Salary', accessorKey: 'baseSalary', cell: (row: any) => <span className="font-medium text-on-surface">₹{row.baseSalary.toLocaleString()}</span> },
-    { header: 'Deductions', accessorKey: 'deductions', cell: (row: any) => <span className="font-medium text-error">-₹{row.deductions.toLocaleString()}</span> },
-    { header: 'Net Salary', accessorKey: 'netSalary', cell: (row: any) => <span className="font-black text-on-surface">₹{row.netSalary.toLocaleString()}</span> },
-    { header: 'Payment Date', accessorKey: 'date', cell: (row: any) => <span className="text-sm text-on-surface-variant">{row.date}</span> },
+    { header: 'Base Salary', accessorKey: 'baseSalary', cell: (row: any) => <span className="font-medium text-on-surface">₹{row.baseSalary?.toLocaleString()}</span> },
+    { header: 'Deductions', accessorKey: 'deductions', cell: (row: any) => <span className="font-medium text-error">-₹{row.deductions?.toLocaleString() || 0}</span> },
+    { header: 'Net Salary', accessorKey: 'netSalary', cell: (row: any) => <span className="font-black text-on-surface">₹{row.netSalary?.toLocaleString()}</span> },
+    { header: 'Payment Date', accessorKey: 'paymentDate', cell: (row: any) => <span className="text-sm text-on-surface-variant">{row.paymentDate ? new Date(row.paymentDate).toLocaleDateString() : '-'}</span> },
     { header: 'Status', accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
     { header: 'Actions', accessorKey: 'actions', cell: (row: any) => (
       <div className="flex items-center gap-2">
@@ -77,11 +89,14 @@ export default function StaffSalaryView() {
       </div>
 
       {/* KPI Cards */}
+      {/* KPI section hidden until backend aggregation is done */}
+      {/*
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
         {salaryKPIs.map((kpi, idx) => (
           <StatsCard key={idx} {...kpi} />
         ))}
       </div>
+      */}
 
       {/* Table Section */}
       <div className="flex flex-col flex-1 min-h-0 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm overflow-hidden">
@@ -92,6 +107,8 @@ export default function StaffSalaryView() {
             <input 
               type="text"
               placeholder="Search employee name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface border border-outline-variant/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm font-medium transition-all text-on-surface placeholder:text-on-surface-variant/50"
             />
           </div>
@@ -105,7 +122,7 @@ export default function StaffSalaryView() {
         <div className="flex-1 overflow-auto custom-scrollbar">
           <DataTable 
             columns={columns} 
-            data={salaryList} 
+            data={filteredSalaries} 
           />
         </div>
       </div>

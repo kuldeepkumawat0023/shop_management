@@ -1,15 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/common/Button';
 import { ArrowLeft, Save, Banknote, Calculator, ReceiptText, RefreshCcw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/utils/cn';
 import { salarySchema } from '@/utils/validations';
 import toast from 'react-hot-toast';
+import { teamService } from '@/lib/services/team.services';
+import { payrollService } from '@/lib/services/payroll.services';
 
 export default function PaySalaryForm() {
   const router = useRouter();
+  const [staffList, setStaffList] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     employeeId: '',
     month: 'July 2026',
@@ -23,6 +26,20 @@ export default function PaySalaryForm() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const fetchStaff = async () => {
+      try {
+        const res = await teamService.getStaff();
+        if (res.success && res.data) {
+          setStaffList(res.data);
+        }
+      } catch (error) {
+        toast.error('Failed to load staff list / कर्मचारी सूची लोड करने में विफल');
+      }
+    };
+    fetchStaff();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -58,8 +75,9 @@ export default function PaySalaryForm() {
     
     const submissionData = {
       ...formData,
+      staffId: formData.employeeId, // Mapped to match backend expected payload
       baseSalary: Number(formData.baseSalary) || 0,
-      bonuses: Number(formData.bonus) || 0,
+      bonus: Number(formData.bonus) || 0,
       deductions: Number(formData.deductions) || 0
     };
 
@@ -74,15 +92,18 @@ export default function PaySalaryForm() {
     }
 
     setSubmitting(true);
-    const toastId = toast.loading('Processing salary...');
+    const toastId = toast.loading('Processing salary... / वेतन संसाधित किया जा रहा है...');
     
     try {
-      // API call would go here
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Salary processed successfully!', { id: toastId });
-      router.back();
+      const res = await payrollService.processSalary(submissionData as any);
+      if (res.success) {
+        toast.success('Salary processed successfully! / वेतन सफलतापूर्वक संसाधित!', { id: toastId });
+        router.back();
+      } else {
+        toast.error(res.message || 'Failed to process salary / वेतन संसाधित करने में विफल', { id: toastId });
+      }
     } catch (err: any) {
-      toast.error('Failed to process salary', { id: toastId });
+      toast.error('Failed to process salary / वेतन संसाधित करने में विफल', { id: toastId });
     } finally {
       setSubmitting(false);
     }
@@ -97,12 +118,13 @@ export default function PaySalaryForm() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">Process Salary</h1>
-            <p className="text-sm text-on-surface-variant mt-1 font-medium">Record salary payment for an employee</p>
+            <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">Process Salary / वेतन संसाधित करें</h1>
+            <p className="text-sm text-on-surface-variant mt-1 font-medium">Record salary payment for an employee / कर्मचारी के लिए वेतन भुगतान रिकॉर्ड करें</p>
           </div>
         </div>
       </div>
 
+      {/* Form Content */}
       <div className="p-4 md:p-6 lg:p-8 flex-1 w-full flex flex-col gap-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column - Calculation */}
@@ -115,7 +137,7 @@ export default function PaySalaryForm() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Employee <span className="text-error ml-1">*</span></label>
+                <label className="text-sm font-bold text-on-surface">Employee / कर्मचारी <span className="text-error ml-1">*</span></label>
                 <select 
                   name="employeeId"
                   value={formData.employeeId}
@@ -125,15 +147,17 @@ export default function PaySalaryForm() {
                     errors.employeeId ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
                   )}
                 >
-                  <option value="">Select employee...</option>
-                  <option value="EMP-001">Ravi Verma (Store Manager)</option>
-                  <option value="EMP-002">Anjali Sharma (Sales Exec)</option>
-                  <option value="EMP-003">Suresh Kumar (Warehouse)</option>
+                  <option value="">Select employee... / कर्मचारी चुनें...</option>
+                  {staffList.map((staff) => (
+                    <option key={staff._id} value={staff._id}>
+                      {staff.name} {staff.role ? `(${staff.role})` : ''}
+                    </option>
+                  ))}
                 </select>
                 {errors.employeeId && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.employeeId}</p>}
               </div>
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Salary Month <span className="text-error ml-1">*</span></label>
+                <label className="text-sm font-bold text-on-surface">Salary Month / वेतन माह <span className="text-error ml-1">*</span></label>
                 <select 
                   name="month"
                   value={formData.month}
@@ -153,7 +177,7 @@ export default function PaySalaryForm() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Base Salary (₹) <span className="text-error ml-1">*</span></label>
+                <label className="text-sm font-bold text-on-surface">Base Salary (₹) / मूल वेतन <span className="text-error ml-1">*</span></label>
                 <input
                   type="number"
                   name="baseSalary"
@@ -167,7 +191,7 @@ export default function PaySalaryForm() {
                 {errors.baseSalary && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.baseSalary}</p>}
               </div>
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Bonuses / Allowances (₹)</label>
+                <label className="text-sm font-bold text-on-surface">Bonuses / Allowances (₹) / बोनस</label>
                 <input
                   type="number"
                   name="bonus"
@@ -180,7 +204,7 @@ export default function PaySalaryForm() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Deductions (₹) e.g. Advance, Leaves</label>
+                <label className="text-sm font-bold text-on-surface">Deductions (₹) e.g. Advance, Leaves / कटौती</label>
                 <input
                   type="number"
                   name="deductions"
@@ -197,20 +221,20 @@ export default function PaySalaryForm() {
         {/* Right Column - Final Net & Payment Info */}
         <div className="flex flex-col gap-6">
           <div className="bg-primary/5 rounded-2xl shadow-sm border border-primary/20 p-6 flex flex-col items-center justify-center text-center gap-2">
-            <h3 className="text-sm font-bold text-primary uppercase tracking-wider">Net Salary Payable</h3>
+            <h3 className="text-sm font-bold text-primary uppercase tracking-wider">Net Salary Payable / देय शुद्ध वेतन</h3>
             <p className="text-5xl font-black text-on-surface tracking-tighter">₹{netSalary.toLocaleString()}</p>
           </div>
 
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6 h-full">
             <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
               <Banknote className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">Payment Information</h2>
+              <h2 className="text-lg font-bold text-on-surface">Payment Information / भुगतान की जानकारी</h2>
             </div>
             
             <div className="flex flex-col gap-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Payment Method <span className="text-error ml-1">*</span></label>
+                  <label className="text-sm font-bold text-on-surface">Payment Method / भुगतान विधि <span className="text-error ml-1">*</span></label>
                   <select 
                     name="paymentMethod"
                     value={formData.paymentMethod}
@@ -228,7 +252,7 @@ export default function PaySalaryForm() {
                   {errors.paymentMethod && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.paymentMethod}</p>}
                 </div>
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Payment Date <span className="text-error ml-1">*</span></label>
+                  <label className="text-sm font-bold text-on-surface">Payment Date / भुगतान तिथि <span className="text-error ml-1">*</span></label>
                   <input
                     type="date"
                     name="paymentDate"
@@ -244,7 +268,7 @@ export default function PaySalaryForm() {
               </div>
 
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Internal Remarks / Reference No</label>
+                <label className="text-sm font-bold text-on-surface">Internal Remarks / आंतरिक टिप्पणियां</label>
                 <textarea 
                   name="notes"
                   value={formData.notes}
@@ -257,20 +281,19 @@ export default function PaySalaryForm() {
             </div>
           </div>
         </div>
-      </div>
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-4 pt-6 border-t border-outline-variant/20">
           <Button type="button" onClick={handleClear} variant="ghost" className="w-full sm:w-auto text-on-surface-variant hover:text-error flex items-center justify-center gap-2">
             <RefreshCcw className="w-4 h-4" />
-            Clear Form
+            Clear Form / साफ़ करें
           </Button>
           <Button type="button" onClick={() => router.back()} variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
-            Cancel
+            Cancel / रद्द करें
           </Button>
           <Button type="submit" disabled={submitting} className="w-full sm:w-auto gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
             <Save className="w-4 h-4" />
-            <span className="font-bold tracking-wide">{submitting ? 'Processing...' : 'Confirm Payment'}</span>
+            <span className="font-bold tracking-wide">{submitting ? 'Processing... / संसाधित किया जा रहा है...' : 'Confirm Payment / भुगतान की पुष्टि करें'}</span>
           </Button>
         </div>
       </div>

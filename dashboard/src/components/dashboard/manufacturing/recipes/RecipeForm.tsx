@@ -240,18 +240,18 @@ export default function RecipeForm() {
               const qtyError = errors[`ingredient_${ing.id}_quantityRequired`];
               
               return (
-              <div key={ing.id} className="flex flex-col sm:flex-row gap-3 items-end bg-surface-container-low/50 p-4 rounded-xl border border-outline-variant/10">
-                <div className="w-full sm:flex-1">
+              <div key={ing.id} className="flex flex-col sm:flex-row gap-3 items-end bg-surface p-4 rounded-xl border border-outline-variant/10 shadow-sm">
+                <div className="w-full sm:flex-1 space-y-1.5">
                   {index === 0 && (
-                    <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">
-                      Raw Material / कच्चा माल <span className="text-error">*</span>
+                    <label className="text-sm font-bold text-on-surface">
+                      Raw Material / कच्चा माल <span className="text-error ml-1">*</span>
                     </label>
                   )}
                   <select
                     value={ing.productId}
                     onChange={(e) => updateIngredient(ing.id, 'productId', e.target.value)}
                     className={cn(
-                      "w-full h-11 px-4 bg-surface-container-low border rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 transition-all appearance-none cursor-pointer",
+                      "w-full h-10 px-3 bg-surface border rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 transition-all appearance-none cursor-pointer",
                       prodError ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
                     )}
                   >
@@ -295,7 +295,7 @@ export default function RecipeForm() {
                   variant="outline"
                   onClick={() => removeIngredient(ing.id)}
                   disabled={ingredients.length === 1}
-                  className="w-full sm:w-12 h-11 border-error/30 text-error hover:bg-error/10 shrink-0 rounded-xl"
+                  className="w-full sm:w-12 h-10 border-error/30 text-error hover:bg-error/10 shrink-0 rounded-xl"
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>

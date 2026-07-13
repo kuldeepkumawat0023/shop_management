@@ -1,15 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/common/Button';
 import { ArrowLeft, Save, Banknote, CalendarClock, MessageSquareText, RefreshCcw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/utils/cn';
 import { advanceSchema } from '@/utils/validations';
 import toast from 'react-hot-toast';
+import { teamService } from '@/lib/services/team.services';
+import { payrollService } from '@/lib/services/payroll.services';
 
 export default function AdvanceForm() {
   const router = useRouter();
+  const [staffList, setStaffList] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     employeeId: '',
     amount: '',
@@ -21,6 +24,20 @@ export default function AdvanceForm() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const fetchStaff = async () => {
+      try {
+        const res = await teamService.getStaff();
+        if (res.success && res.data) {
+          setStaffList(res.data);
+        }
+      } catch (error) {
+        toast.error('Failed to load staff list / कर्मचारी सूची लोड करने में विफल');
+      }
+    };
+    fetchStaff();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -67,15 +84,18 @@ export default function AdvanceForm() {
     }
 
     setSubmitting(true);
-    const toastId = toast.loading('Saving advance request...');
+    const toastId = toast.loading('Saving advance request... / अग्रिम अनुरोध सहेजा जा रहा है...');
 
     try {
-      // API call would go here
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Advance request saved successfully!', { id: toastId });
-      router.back();
+      const res = await payrollService.grantAdvance(submissionData as any);
+      if (res.success) {
+        toast.success('Advance request saved successfully! / अग्रिम अनुरोध सफलतापूर्वक सहेजा गया!', { id: toastId });
+        router.back();
+      } else {
+        toast.error(res.message || 'Failed to save request / अनुरोध सहेजने में विफल', { id: toastId });
+      }
     } catch (err: any) {
-      toast.error('Failed to save request', { id: toastId });
+      toast.error('Failed to save request / अनुरोध सहेजने में विफल', { id: toastId });
     } finally {
       setSubmitting(false);
     }
@@ -90,8 +110,8 @@ export default function AdvanceForm() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">Grant Salary Advance</h1>
-            <p className="text-sm text-on-surface-variant mt-1 font-medium">Record a new advance payment for an employee</p>
+            <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">Grant Salary Advance / वेतन अग्रिम दें</h1>
+            <p className="text-sm text-on-surface-variant mt-1 font-medium">Record a new advance payment for an employee / कर्मचारी के लिए नया अग्रिम रिकॉर्ड करें</p>
           </div>
         </div>
       </div>
@@ -108,7 +128,7 @@ export default function AdvanceForm() {
 
               <div className="grid grid-cols-1 gap-5">
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Employee <span className="text-error ml-1">*</span></label>
+                  <label className="text-sm font-bold text-on-surface">Employee / कर्मचारी <span className="text-error ml-1">*</span></label>
                   <select
                     name="employeeId"
                     value={formData.employeeId}
@@ -118,11 +138,12 @@ export default function AdvanceForm() {
                       errors.employeeId ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
                     )}
                   >
-                    <option value="">Select employee...</option>
-                    <option value="EMP-001">Ravi Verma (Store Manager)</option>
-                    <option value="EMP-002">Anjali Sharma (Sales Exec)</option>
-                    <option value="EMP-003">Suresh Kumar (Warehouse)</option>
-                    <option value="EMP-004">Megha Gupta (Cashier)</option>
+                    <option value="">Select employee... / कर्मचारी चुनें...</option>
+                    {staffList.map((staff) => (
+                      <option key={staff._id} value={staff._id}>
+                        {staff.name} {staff.role ? `(${staff.role})` : ''}
+                      </option>
+                    ))}
                   </select>
                   {errors.employeeId && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.employeeId}</p>}
                 </div>
@@ -130,7 +151,7 @@ export default function AdvanceForm() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Advance Amount (₹) <span className="text-error ml-1">*</span></label>
+                  <label className="text-sm font-bold text-on-surface">Advance Amount (₹) / अग्रिम राशि <span className="text-error ml-1">*</span></label>
                   <input
                     type="number"
                     name="amount"
@@ -145,7 +166,7 @@ export default function AdvanceForm() {
                   {errors.amount && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.amount}</p>}
                 </div>
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Date Requested <span className="text-error ml-1">*</span></label>
+                  <label className="text-sm font-bold text-on-surface">Date Requested / अनुरोध तिथि <span className="text-error ml-1">*</span></label>
                   <input
                     type="date"
                     name="date"
@@ -168,7 +189,7 @@ export default function AdvanceForm() {
               </div>
 
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Reason for Advance</label>
+                <label className="text-sm font-bold text-on-surface">Reason for Advance / अग्रिम का कारण</label>
                 <textarea
                   name="reason"
                   value={formData.reason}
@@ -180,7 +201,7 @@ export default function AdvanceForm() {
               </div>
 
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Approval Status</label>
+                <label className="text-sm font-bold text-on-surface">Approval Status / स्वीकृति स्थिति</label>
                 <select
                   name="status"
                   value={formData.status}
@@ -205,7 +226,7 @@ export default function AdvanceForm() {
 
               <div className="flex flex-col gap-6">
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Deduction Plan</label>
+                  <label className="text-sm font-bold text-on-surface">Deduction Plan / कटौती योजना</label>
                   <select
                     name="repaymentTerm"
                     value={formData.repaymentTerm}
@@ -220,7 +241,7 @@ export default function AdvanceForm() {
                 {formData.repaymentTerm === 'EMI' && (
                   <div className="animate-in fade-in slide-in-from-top-4 duration-300">
                     <div className="flex flex-col gap-1.5 w-full">
-                      <label className="text-sm font-bold text-on-surface">EMI Amount per Month (₹) <span className="text-error ml-1">*</span></label>
+                      <label className="text-sm font-bold text-on-surface">EMI Amount per Month (₹) / ईएमआई राशि प्रति माह <span className="text-error ml-1">*</span></label>
                       <input
                         type="number"
                         name="emiAmount"
@@ -253,21 +274,21 @@ export default function AdvanceForm() {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-4 pt-6 border-t border-outline-variant/20">
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-4 pt-6 border-t border-outline-variant/20">
         <Button type="button" onClick={handleClear} variant="ghost" className="w-full sm:w-auto text-on-surface-variant hover:text-error flex items-center justify-center gap-2">
           <RefreshCcw className="w-4 h-4" />
-          Clear Form
+          Clear Form / फॉर्म साफ़ करें
         </Button>
         <Button type="button" onClick={() => router.back()} variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
-          Cancel
+          Cancel / रद्द करें
         </Button>
         <Button type="submit" disabled={submitting} className="w-full sm:w-auto gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
           <Save className="w-4 h-4" />
-          <span className="font-bold tracking-wide">{submitting ? 'Saving...' : 'Save Request'}</span>
+          <span className="font-bold tracking-wide">{submitting ? 'Saving... / सहेजा जा रहा है...' : 'Save Request / अनुरोध सहेजें'}</span>
         </Button>
+      </div>
       </div>
     </form>
   );
