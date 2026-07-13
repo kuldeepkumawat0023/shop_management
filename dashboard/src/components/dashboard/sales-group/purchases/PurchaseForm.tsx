@@ -203,7 +203,7 @@ export default function PurchaseForm() {
                 </div>
 
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Order Date / आदेश तिथि</label>
+                  <label className="text-sm font-bold text-on-surface">Order Date / आदेश की तारीख</label>
                   <input
                     type="date"
                     name="orderDate"
@@ -222,7 +222,7 @@ export default function PurchaseForm() {
               </div>
               <div className="grid grid-cols-2 gap-5">
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Expected Delivery / अपेक्षित वितरण</label>
+                  <label className="text-sm font-bold text-on-surface">Expected Delivery / संभावित डिलीवरी</label>
                   <input
                     type="date"
                     name="expectedDelivery"
@@ -245,7 +245,7 @@ export default function PurchaseForm() {
               </div>
               <div className="grid grid-cols-2 gap-5">
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Payment Terms / भुगतान शर्तें</label>
+                  <label className="text-sm font-bold text-on-surface">Payment Terms / भुगतान की शर्तें</label>
                   <input
                     name="paymentTerms"
                     value={formData.paymentTerms}

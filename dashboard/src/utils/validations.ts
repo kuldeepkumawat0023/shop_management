@@ -1,18 +1,19 @@
 import { z } from 'zod';
 
 // Reusable basic schemas
-const phoneRegex = /^[0-9]{10}$/;
-const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+const phoneRegex = /^(\+?\d{1,3}[- ]?)?\d{10}$/;
+const gstRegex = /^[0-9]{2}[a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}[1-9a-zA-Z]{1}[zZ]{1}[0-9a-zA-Z]{1}$/;
+const urlRegex = /^(https?:\/\/)?([\da-zA-Z\.-]+)\.([a-zA-Z\.]{2,6})([\/\w \.-]*)*\/?$/;
 
 export const phoneSchema = z
   .string()
-  .min(1, 'Phone number is required')
-  .regex(phoneRegex, 'Invalid phone number (must be 10 digits)');
+  .min(1, 'Phone number is required / फ़ोन नंबर आवश्यक है')
+  .regex(phoneRegex, 'Invalid phone number (must be 10 digits) / अमान्य फ़ोन नंबर');
 
 export const emailSchema = z
   .string()
-  .min(1, 'Email is required')
-  .email('Invalid email address');
+  .min(1, 'Email is required / ईमेल आवश्यक है')
+  .email('Invalid email address / अमान्य ईमेल पता');
 
 export const passwordSchema = z
   .string()
@@ -30,7 +31,7 @@ export const shopCreationSchema = z.object({
   gstNumber: z
     .string()
     .optional()
-    .refine((val) => !val || gstRegex.test(val.toUpperCase()), {
+    .refine((val) => !val || gstRegex.test(val), {
       message: 'Invalid GST number format',
     }),
   address: z.string().min(5, 'Address must be at least 5 characters').max(500, 'Address is too long'),
@@ -70,7 +71,7 @@ export const resetPasswordSchema = z.object({
 
 export const brandSchema = z.object({
   name: z.string().min(1, 'Brand Name is required / ब्रांड का नाम आवश्यक है').max(100, 'Brand Name is too long / ब्रांड का नाम बहुत लंबा है'),
-  website: z.union([z.literal(''), z.string().url('Invalid URL format / अमान्य URL प्रारूप')]).optional(),
+  website: z.union([z.literal(''), z.string().regex(urlRegex, 'Invalid URL format / अमान्य URL प्रारूप')]).optional(),
   contactPerson: z.string().max(100).optional(),
   category: z.string().optional(),
   description: z.string().max(500, 'Description is too long / विवरण बहुत लंबा है').optional(),
@@ -84,7 +85,7 @@ export const categorySchema = z.object({
 
 export const customerSchema = z.object({
   name: z.string().min(1, 'Customer Name is required / ग्राहक का नाम आवश्यक है').max(100, 'Customer Name is too long / ग्राहक का नाम बहुत लंबा है'),
-  phone: z.string().min(1, 'Phone number is required / फ़ोन नंबर आवश्यक है').regex(phoneRegex, 'Invalid phone number (must be 10 digits) / अमान्य फ़ोन नंबर (10 अंक होने चाहिए)'),
+  phone: z.string().min(1, 'Phone number is required / फ़ोन नंबर आवश्यक है').regex(phoneRegex, 'Invalid phone number / अमान्य फ़ोन नंबर'),
   email: z.union([z.literal(''), z.string().email('Invalid email address / अमान्य ईमेल पता')]).optional(),
   address: z.string().max(500, 'Address is too long / पता बहुत लंबा है').optional(),
 });
