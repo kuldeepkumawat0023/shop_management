@@ -9,66 +9,131 @@ exports.getDashboardStats = async (req, res, next) => {
   try {
     const shopId = req.scopedShopId;
     
-    // Calculate start and end of today
+    // Calculate date boundaries
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
     const endOfToday = new Date();
     endOfToday.setHours(23, 59, 59, 999);
+    
+    const startOfMonth = new Date(startOfToday.getFullYear(), startOfToday.getMonth(), 1);
+    startOfMonth.setHours(0, 0, 0, 0);
 
-    // 1. Today's Sales & Profit Aggregation
+    // ==========================================
+    // 1. SALES METRICS FACET
+    // ==========================================
     const salesAgg = await Sale.aggregate([
-      { 
-        $match: { 
-          shopId, 
-          saleDate: { $gte: startOfToday, $lte: endOfToday } 
-        } 
-      },
+      { $match: { shopId } }, // Master Match: Filter by shop immediately
       {
-        $group: {
-          _id: null,
-          totalSales: { $sum: '$netAmount' },
-          totalProfit: { $sum: '$totalProfit' }
+        $facet: {
+          todaysStats: [
+            { $match: { saleDate: { $gte: startOfToday, $lte: endOfToday } } },
+            { $group: { _id: null, revenue: { $sum: '$netAmount' }, profit: { $sum: '$totalProfit' } } }
+          ],
+          thisMonthStats: [
+            { $match: { saleDate: { $gte: startOfMonth, $lte: endOfToday } } },
+            { $group: { _id: null, revenue: { $sum: '$netAmount' }, profit: { $sum: '$totalProfit' } } }
+          ],
+          unpaidInvoices: [
+            { $match: { paymentStatus: { $ne: 'Paid' } } },
+            { $group: { 
+                _id: null, 
+                outstanding: { $sum: { $subtract: ['$netAmount', '$paidAmount'] } },
+                count: { $sum: 1 }
+              } 
+            }
+          ]
         }
       }
     ]);
 
-    const todaysSales = salesAgg.length > 0 ? salesAgg[0].totalSales : 0;
-    const todaysProfit = salesAgg.length > 0 ? salesAgg[0].totalProfit : 0;
-
-    // 2. Today's Expenses
+    // ==========================================
+    // 2. EXPENSE METRICS FACET
+    // ==========================================
     const expensesAgg = await Expense.aggregate([
-      { 
-        $match: { 
-          shopId, 
-          isActive: true,
-          expenseDate: { $gte: startOfToday, $lte: endOfToday } 
-        } 
-      },
+      { $match: { shopId, isActive: true } },
       {
-        $group: {
-          _id: null,
-          totalExpense: { $sum: '$amount' }
+        $facet: {
+          todaysStats: [
+            { $match: { expenseDate: { $gte: startOfToday, $lte: endOfToday } } },
+            { $group: { _id: null, totalExpense: { $sum: '$amount' } } }
+          ],
+          thisMonthStats: [
+            { $match: { expenseDate: { $gte: startOfMonth, $lte: endOfToday } } },
+            { $group: { _id: null, totalExpense: { $sum: '$amount' } } }
+          ]
         }
       }
     ]);
-    const todaysExpenses = expensesAgg.length > 0 ? expensesAgg[0].totalExpense : 0;
 
-    // 3. Low Stock Items (Threshold: 5)
-    // Could also make threshold dynamic based on product settings
-    const lowStockProducts = await Product.find({ 
-      shopId, 
-      isActive: true, 
-      currentStock: { $lte: 10 } 
-    }).select('name currentStock').limit(10).sort('currentStock');
+    // ==========================================
+    // 3. INVENTORY METRICS FACET
+    // ==========================================
+    const inventoryAgg = await Product.aggregate([
+      { $match: { shopId, isActive: true } },
+      {
+        $facet: {
+          lowStockAlerts: [
+            // Only find items that are low on stock but NOT totally out of stock
+            { $match: { $expr: { $and: [ { $lte: ['$currentStock', '$minStock'] }, { $gt: ['$currentStock', 0] } ] } } },
+            { $project: { name: 1, currentStock: 1, minStock: 1 } },
+            { $sort: { currentStock: 1 } },
+            { $limit: 10 } // Limit to prevent large payload
+          ],
+          outOfStock: [
+            { $match: { currentStock: { $lte: 0 } } },
+            { $count: "totalOut" }
+          ],
+          valuation: [
+            { $group: { 
+                _id: null, 
+                totalValue: { $sum: { $multiply: ['$currentStock', '$purchasePrice'] } } 
+              } 
+            }
+          ]
+        }
+      }
+    ]);
+
+    // ==========================================
+    // 4. PARSE RESULTS
+    // ==========================================
+    const s = salesAgg[0];
+    const e = expensesAgg[0];
+    const i = inventoryAgg[0];
+
+    const todaysSales = s.todaysStats[0]?.revenue || 0;
+    const todaysProfit = s.todaysStats[0]?.profit || 0;
+    const thisMonthSales = s.thisMonthStats[0]?.revenue || 0;
+    const thisMonthProfit = s.thisMonthStats[0]?.profit || 0;
+    const totalPendingPayments = s.unpaidInvoices[0]?.outstanding || 0;
+    
+    const todaysExpenses = e.todaysStats[0]?.totalExpense || 0;
+    const thisMonthExpenses = e.thisMonthStats[0]?.totalExpense || 0;
+
+    const lowStockAlerts = i.lowStockAlerts || [];
+    const outOfStockCount = i.outOfStock[0]?.totalOut || 0;
+    const inventoryValuation = i.valuation[0]?.totalValue || 0;
 
     res.status(200).json({
       success: true,
       data: {
+        // Daily
         todaysSales,
         todaysProfit,
         todaysExpenses,
-        netProfit: todaysProfit - todaysExpenses, // Today's actual bottom line
-        lowStockAlerts: lowStockProducts
+        netProfit: todaysProfit - todaysExpenses,
+        
+        // Monthly
+        thisMonthSales,
+        thisMonthProfit,
+        thisMonthExpenses,
+        thisMonthNetProfit: thisMonthProfit - thisMonthExpenses,
+        
+        // General Stats
+        totalPendingPayments,
+        inventoryValuation,
+        outOfStockCount,
+        lowStockAlerts
       }
     });
   } catch (error) {
