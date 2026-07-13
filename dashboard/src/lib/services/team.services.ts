@@ -21,6 +21,14 @@ export const teamService = {
     const response = await apiClient.get('/team/all');
     return response.data;
   },
+  getStaffById: async (id: string): Promise<ApiResponse<StaffData>> => {
+    const response = await apiClient.get(`/team/${id}`);
+    return response.data;
+  },
+  updateStaff: async (id: string, data: any): Promise<ApiResponse<StaffData>> => {
+    const response = await apiClient.put(`/team/update/${id}`, data);
+    return response.data;
+  },
   deleteStaff: async (id: string): Promise<ApiResponse<any>> => {
     const response = await apiClient.delete(`/team/delete/${id}`);
     return response.data;
