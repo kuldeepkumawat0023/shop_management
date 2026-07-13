@@ -17,10 +17,9 @@ interface DataTableProps {
   headerContent?: React.ReactNode;
   className?: string;
   itemsPerPage?: number;
-  isLoading?: boolean;
 }
 
-export function DataTable({ data, columns, searchPlaceholder, headerContent, className, itemsPerPage, isLoading }: DataTableProps) {
+export function DataTable({ data, columns, searchPlaceholder, headerContent, className, itemsPerPage }: DataTableProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -85,17 +84,7 @@ export function DataTable({ data, columns, searchPlaceholder, headerContent, cla
             </tr>
           </thead>
           <tbody className="divide-y divide-outline-variant/5">
-            {isLoading ? (
-              Array.from({ length: 5 }).map((_, idx) => (
-                <tr key={`skeleton-${idx}`} className="animate-pulse">
-                  {columns.map((_, colIdx) => (
-                    <td key={colIdx} className="px-6 py-4">
-                      <div className="h-5 bg-on-surface/10 rounded-md w-3/4"></div>
-                    </td>
-                  ))}
-                </tr>
-              ))
-            ) : paginatedData.length > 0 ? (
+            {paginatedData.length > 0 ? (
               paginatedData.map((row, rowIdx) => (
                 <tr 
                   key={row.id || rowIdx} 
