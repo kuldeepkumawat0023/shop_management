@@ -35,6 +35,7 @@ export interface AuthUser {
   assignedShops?: string[]; // Array of shop IDs they have access to
   customRoleId?: string;
   isActive: boolean;
+  isPending?: boolean;
   isOtpVerified: boolean;
   twoFactorEnabled: boolean;
   notificationPreferences?: NotificationPreferences;

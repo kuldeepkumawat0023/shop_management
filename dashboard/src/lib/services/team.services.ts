@@ -3,10 +3,18 @@ import apiClient, { ApiResponse } from '../apiClient';
 export interface StaffData {
   _id?: string;
   name: string;
+  email?: string;
   mobile: string;
+  dob?: string;
   role: string;
+  department?: string;
   baseSalary?: number;
   joiningDate?: string;
+  emergencyContact?: {
+    name: string;
+    relation: string;
+    phone: string;
+  };
   isActive?: boolean;
   shopId?: string;
   userId?: any;

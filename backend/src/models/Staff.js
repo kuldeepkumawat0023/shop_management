@@ -14,13 +14,24 @@ const staffSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  email: {
+    type: String,
+    trim: true,
+    lowercase: true
+  },
   mobile: {
     type: String,
     required: true
   },
+  dob: {
+    type: String
+  },
   role: {
     type: String, // e.g. Cashier, Helper, Manager
     required: true
+  },
+  department: {
+    type: String
   },
   baseSalary: {
     type: Number,
@@ -30,6 +41,11 @@ const staffSchema = new mongoose.Schema({
   joiningDate: {
     type: Date,
     default: Date.now
+  },
+  emergencyContact: {
+    name: { type: String, default: '' },
+    relation: { type: String, default: '' },
+    phone: { type: String, default: '' }
   },
   documents: [{
     docType: String, // e.g. Aadhar, PAN

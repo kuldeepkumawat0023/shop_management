@@ -191,7 +191,13 @@ export const teamMemberSchema = z.object({
   department: z.string().optional(),
   salary: z.number().min(0, 'Salary cannot be negative / वेतन नकारात्मक नहीं हो सकता'),
   joinDate: z.string().min(1, 'Join Date is required / कार्यभार ग्रहण करने की तिथि आवश्यक है'),
-  status: z.string().optional()
+  status: z.string().optional(),
+  phone: z.union([z.literal(''), phoneSchema]).optional(),
+  email: z.union([z.literal(''), z.string().email('Invalid email address / अमान्य ईमेल पता')]).optional(),
+  dob: z.string().optional(),
+  emergencyName: z.string().optional(),
+  emergencyRelation: z.string().optional(),
+  emergencyPhone: z.union([z.literal(''), phoneSchema]).optional(),
 });
 
 export const salarySchema = z.object({

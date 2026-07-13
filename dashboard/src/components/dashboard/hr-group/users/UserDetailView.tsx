@@ -1,20 +1,57 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/common/Button';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { ArrowLeft, User, Mail, Edit, Trash2, ShieldAlert, Key, MonitorPlay, CalendarClock, History, CheckCircle2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
+import { userService } from '@/lib/services/user.services';
+import toast from 'react-hot-toast';
+import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
+import Link from 'next/link';
 
 export default function UserDetailView() {
   const router = useRouter();
+  const params = useParams();
+  const id = params?.id as string;
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const activityLog = [
-    { id: 'LOG-304', time: 'Today, 10:45 AM', action: 'Logged in', details: 'IP: 192.168.1.1 (Mumbai, India)', status: 'Success' },
-    { id: 'LOG-303', time: 'Yesterday, 04:20 PM', action: 'Updated Inventory', details: 'Added 50 units of "Wireless Mouse"', status: 'Success' },
-    { id: 'LOG-302', time: 'Jul 24, 2026, 09:15 AM', action: 'Failed Login Attempt', details: 'IP: 10.0.0.5 (Unknown)', status: 'Failed' },
-    { id: 'LOG-301', time: 'Jul 20, 2026, 11:30 AM', action: 'Created Purchase Order', details: 'PO-2026-041 for Global Traders', status: 'Success' },
-  ];
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (!id) return;
+      try {
+        const res = await userService.getProfile(id);
+        if (res.success && res.data) {
+          setUser(res.data);
+        }
+      } catch (error) {
+        toast.error('Failed to fetch user details');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUser();
+  }, [id]);
+
+  const handleSuspend = async () => {
+    if (confirm('Are you sure you want to suspend this user?')) {
+      try {
+        const res = await userService.deleteProfile(id);
+        if (res.success || (res as any).status === 200) {
+          toast.success('User suspended successfully');
+          router.push('/users');
+        } else {
+          toast.error((res as any).message || 'Failed to suspend user');
+        }
+      } catch (error) {
+        toast.error('Failed to suspend user');
+      }
+    }
+  };
+
+  if (loading) return <ViewPageSkeleton />;
+  if (!user) return <div className="p-8 text-center text-on-surface-variant">User not found</div>;
 
   return (
     <div className="flex flex-col h-full bg-background overflow-y-auto custom-scrollbar w-full ">
@@ -27,18 +64,22 @@ export default function UserDetailView() {
             </Button>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-2xl font-black text-on-surface tracking-tight">Dinesh Thori</h2>
-                <StatusBadge status="Active" />
+                <h2 className="text-2xl font-black text-on-surface tracking-tight">{user.fullname}</h2>
+                <StatusBadge status={user.isActive === false ? 'Inactive' : (user.isPending ? 'Pending' : 'Active')} />
               </div>
-              <p className="text-sm font-medium text-on-surface-variant">USR-001 • Super Admin</p>
+              <p className="text-sm font-medium text-on-surface-variant">
+                {user.role} {user.shopId ? `• ${user.shopId.name || 'Shop'}` : ''}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <Button variant="outline" className="flex-1 sm:flex-none border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-primary/10 font-semibold gap-2 rounded-xl transition-colors">
-              <Edit className="w-4 h-4" />
-              <span className="hidden sm:inline">Edit Account</span>
-            </Button>
-            <Button variant="outline" className="flex-1 sm:flex-none border-outline-variant/30 text-error hover:bg-error/10 font-semibold gap-2 rounded-xl transition-colors">
+            <Link href={`/users/${id}/edit`} className="flex-1 sm:flex-none">
+              <Button variant="outline" className="w-full border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-primary/10 font-semibold gap-2 rounded-xl transition-colors">
+                <Edit className="w-4 h-4" />
+                <span className="hidden sm:inline">Edit Account</span>
+              </Button>
+            </Link>
+            <Button variant="outline" onClick={handleSuspend} className="flex-1 sm:flex-none border-outline-variant/30 text-error hover:bg-error/10 font-semibold gap-2 rounded-xl transition-colors">
               <Trash2 className="w-4 h-4" />
               <span className="hidden sm:inline">Suspend User</span>
             </Button>
@@ -56,8 +97,13 @@ export default function UserDetailView() {
               <CalendarClock className="w-4 h-4" />
               <h3 className="text-sm font-bold uppercase tracking-wider">Account Age</h3>
             </div>
-            <p className="text-3xl font-black text-on-surface tracking-tight">2.5 Yrs</p>
-            <p className="text-sm text-primary font-bold">Created Jan 2024</p>
+            <p className="text-3xl font-black text-on-surface tracking-tight">
+              {user.createdAt ? (() => {
+                const diff = (new Date().getTime() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24 * 365.25);
+                return `${diff.toFixed(1)} Yrs`;
+              })() : 'N/A'}
+            </p>
+            <p className="text-sm text-primary font-bold">Created {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</p>
           </div>
           <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-6 shadow-sm flex flex-col gap-2 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-success/5 rounded-bl-full -mr-4 -mt-4"></div>
@@ -65,8 +111,8 @@ export default function UserDetailView() {
               <MonitorPlay className="w-4 h-4" />
               <h3 className="text-sm font-bold uppercase tracking-wider">Total Logins</h3>
             </div>
-            <p className="text-3xl font-black text-on-surface tracking-tight">842</p>
-            <p className="text-sm text-on-surface-variant font-medium">Avg 2/day</p>
+            <p className="text-3xl font-black text-on-surface tracking-tight">--</p>
+            <p className="text-sm text-on-surface-variant font-medium">Analytics pending</p>
           </div>
           <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-6 shadow-sm flex flex-col gap-2 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-warning/5 rounded-bl-full -mr-4 -mt-4"></div>
@@ -74,8 +120,8 @@ export default function UserDetailView() {
               <History className="w-4 h-4" />
               <h3 className="text-sm font-bold uppercase tracking-wider">Last Active</h3>
             </div>
-            <p className="text-3xl font-black text-on-surface tracking-tight">Today</p>
-            <p className="text-sm text-warning font-bold">10:45 AM</p>
+            <p className="text-3xl font-black text-on-surface tracking-tight">--</p>
+            <p className="text-sm text-warning font-bold">Analytics pending</p>
           </div>
         </div>
 
@@ -94,8 +140,8 @@ export default function UserDetailView() {
                     <User className="w-4 h-4 text-on-surface-variant" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Username</span>
-                    <span className="font-semibold text-on-surface">dinesh_t</span>
+                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Phone</span>
+                    <span className="font-semibold text-on-surface">{user.phoneNumber || 'Not provided'}</span>
                   </div>
                 </div>
 
@@ -105,7 +151,7 @@ export default function UserDetailView() {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Email</span>
-                    <a href="mailto:admin@shop.com" className="font-semibold text-primary hover:underline">admin@shop.com</a>
+                    <a href={`mailto:${user.email}`} className="font-semibold text-primary hover:underline">{user.email}</a>
                   </div>
                 </div>
 
@@ -115,7 +161,7 @@ export default function UserDetailView() {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">System Role</span>
-                    <span className="font-semibold text-on-surface">Super Admin</span>
+                    <span className="font-semibold text-on-surface">{user.role}</span>
                   </div>
                 </div>
               </div>
@@ -150,40 +196,14 @@ export default function UserDetailView() {
                   <History className="w-5 h-5 text-primary" />
                   System Activity Log
                 </h3>
-                <Button variant="ghost" className="text-primary font-bold hover:bg-primary/10 rounded-lg">View All Logs</Button>
               </div>
-
-              {activityLog.length > 0 ? (
-                <div className="flex flex-col gap-4">
-                  {activityLog.map((log) => (
-                    <div key={log.id} className="flex items-center justify-between p-4 rounded-2xl bg-surface hover:bg-surface-container transition-colors border border-outline-variant/10">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${log.status === 'Success' ? 'bg-primary/10 text-primary' : 'bg-error/10 text-error'}`}>
-                          {log.status === 'Success' ? <CheckCircle2 className="w-5 h-5" /> : <ShieldAlert className="w-5 h-5" />}
-                        </div>
-                        <div>
-                          <p className="font-bold text-on-surface">{log.action}</p>
-                          <p className="text-sm text-on-surface-variant font-medium">{log.details}</p>
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-end gap-1 text-right">
-                        <p className="text-sm font-bold text-on-surface-variant">{log.time}</p>
-                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${log.status === 'Success' ? 'bg-success/10 text-success' : 'bg-error/10 text-error'}`}>
-                          {log.status}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+              <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
+                <div className="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center mb-4">
+                  <History className="w-8 h-8 text-on-surface-variant/50" />
                 </div>
-              ) : (
-                <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
-                  <div className="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center mb-4">
-                    <History className="w-8 h-8 text-on-surface-variant/50" />
-                  </div>
-                  <p className="text-lg font-bold text-on-surface mb-1">No activity recorded</p>
-                  <p className="text-sm text-on-surface-variant">This user hasn't performed any actions yet.</p>
-                </div>
-              )}
+                <p className="text-lg font-bold text-on-surface mb-1">No activity recorded</p>
+                <p className="text-sm text-on-surface-variant">This user hasn't performed any actions yet.</p>
+              </div>
             </div>
           </div>
         </div>
