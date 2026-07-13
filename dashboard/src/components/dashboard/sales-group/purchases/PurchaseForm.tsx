@@ -114,7 +114,7 @@ export default function PurchaseForm() {
         }
       }
       setErrors(newErrors);
-      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें');
+      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें', { id: 'please-correct-the-errors-----' });
     }
 
     setSubmitting(true);

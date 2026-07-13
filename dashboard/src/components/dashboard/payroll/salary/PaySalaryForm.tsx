@@ -35,7 +35,7 @@ export default function PaySalaryForm() {
           setStaffList(res.data);
         }
       } catch (error) {
-        toast.error('Failed to load staff list / कर्मचारी सूची लोड करने में विफल');
+        toast.error('Failed to load staff list / कर्मचारी सूची लोड करने में विफल', { id: 'failed-to-load-staff-list-----' });
       }
     };
     fetchStaff();
@@ -88,7 +88,7 @@ export default function PaySalaryForm() {
         if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
       }
       setErrors(newErrors);
-      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें');
+      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें', { id: 'please-correct-the-errors-----' });
     }
 
     setSubmitting(true);

@@ -26,7 +26,7 @@ export default function UserDetailView() {
           setUser(res.data);
         }
       } catch (error) {
-        toast.error('Failed to fetch user details');
+        toast.error('Failed to fetch user details', { id: 'failed-to-fetch-user-details' });
       } finally {
         setLoading(false);
       }
@@ -45,7 +45,7 @@ export default function UserDetailView() {
           toast.error((res as any).message || 'Failed to suspend user');
         }
       } catch (error) {
-        toast.error('Failed to suspend user');
+        toast.error('Failed to suspend user', { id: 'failed-to-suspend-user' });
       }
     }
   };

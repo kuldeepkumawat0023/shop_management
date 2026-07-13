@@ -23,7 +23,7 @@ export default function SalaryAdvancesView() {
         setAdvances(res.data);
       }
     } catch (error) {
-      toast.error('Failed to load advances');
+      toast.error('Failed to load advances', { id: 'failed-to-load-advances' });
     } finally {
       setLoading(false);
     }

@@ -45,7 +45,7 @@ export default function RecipeDetailView({ recipeId }: RecipeDetailViewProps) {
           toast.error(res.message || 'Failed to delete recipe');
         }
       } catch (err) {
-        toast.error('Error deleting recipe');
+        toast.error('Error deleting recipe', { id: 'error-deleting-recipe' });
       }
     }
   };

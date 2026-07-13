@@ -51,7 +51,7 @@ export default function BrandsView() {
           toast.error((res as any).message || 'Failed to delete brand');
         }
       } catch (err) {
-        toast.error('Error deleting brand');
+        toast.error('Error deleting brand', { id: 'error-deleting-brand' });
       }
     }
   };

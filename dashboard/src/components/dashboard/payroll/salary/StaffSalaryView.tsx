@@ -23,7 +23,7 @@ export default function StaffSalaryView() {
         setSalaries(res.data);
       }
     } catch (error) {
-      toast.error('Failed to load salaries');
+      toast.error('Failed to load salaries', { id: 'failed-to-load-salaries' });
     } finally {
       setLoading(false);
     }

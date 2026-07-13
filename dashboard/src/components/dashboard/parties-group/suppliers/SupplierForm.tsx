@@ -73,7 +73,7 @@ export default function SupplierForm({ editId }: { editId?: string }) {
             }
           }
         } catch (error) {
-          toast.error('Failed to fetch supplier details');
+          toast.error('Failed to fetch supplier details', { id: 'failed-to-fetch-supplier-detai' });
         } finally {
           setIsFetching(false);
         }
@@ -139,7 +139,7 @@ export default function SupplierForm({ editId }: { editId?: string }) {
         if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
       }
       setErrors(newErrors);
-      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें');
+      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें', { id: 'please-correct-the-errors-----' });
     }
 
     setLoading(true);

@@ -26,7 +26,7 @@ export default function CustomersView() {
         setCustomers(res.data);
       }
     } catch (error) {
-      toast.error('Failed to load customers');
+      toast.error('Failed to load customers', { id: 'failed-to-load-customers' });
     } finally {
       setLoading(false);
     }
@@ -47,7 +47,7 @@ export default function CustomersView() {
           toast.error(res.message || 'Failed to delete customer');
         }
       } catch (error) {
-        toast.error('Failed to delete customer');
+        toast.error('Failed to delete customer', { id: 'failed-to-delete-customer' });
       }
     }
   };

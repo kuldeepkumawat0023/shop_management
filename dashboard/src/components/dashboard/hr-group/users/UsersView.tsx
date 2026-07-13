@@ -61,7 +61,7 @@ export default function UsersView() {
         setUsers(res.data);
       }
     } catch (error) {
-      toast.error('Failed to load users');
+      toast.error('Failed to load users', { id: 'failed-to-load-users' });
     } finally {
       setLoading(false);
     }
@@ -82,7 +82,7 @@ export default function UsersView() {
           toast.error(res.message || 'Failed to deactivate user');
         }
       } catch (error) {
-        toast.error('Failed to deactivate user');
+        toast.error('Failed to deactivate user', { id: 'failed-to-deactivate-user' });
       }
     }
   };

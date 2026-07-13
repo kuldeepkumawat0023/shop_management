@@ -26,7 +26,7 @@ export default function SuppliersView() {
         setSuppliers(res.data);
       }
     } catch (error) {
-      toast.error('Failed to load suppliers');
+      toast.error('Failed to load suppliers', { id: 'failed-to-load-suppliers' });
     } finally {
       setLoading(false);
     }
@@ -47,7 +47,7 @@ export default function SuppliersView() {
           toast.error(res.message || 'Failed to delete supplier');
         }
       } catch (error) {
-        toast.error('Failed to delete supplier');
+        toast.error('Failed to delete supplier', { id: 'failed-to-delete-supplier' });
       }
     }
   };

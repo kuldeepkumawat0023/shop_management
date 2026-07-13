@@ -39,7 +39,7 @@ export default function TodaySalesView() {
         setSales(res.data);
       }
     } catch (error) {
-      toast.error('Failed to load sales / बिक्री लोड करने में विफल');
+      toast.error('Failed to load sales / बिक्री लोड करने में विफल', { id: 'failed-to-load-sales----------' });
     } finally {
       setLoading(false);
     }

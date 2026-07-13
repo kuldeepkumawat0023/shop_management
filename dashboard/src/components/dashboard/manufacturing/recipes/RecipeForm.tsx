@@ -112,12 +112,12 @@ export default function RecipeForm() {
       });
       
       setErrors(newErrors);
-      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें');
+      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें', { id: 'please-correct-the-errors-----' });
     }
 
     if (ingredients.some(ing => ing.productId === finalProductId)) {
       setErrors(prev => ({ ...prev, ingredients: 'An ingredient cannot be the same as the final product / सामग्री अंतिम उत्पाद जैसी नहीं हो सकती' }));
-      return toast.error('An ingredient cannot be the same as the final product');
+      return toast.error('An ingredient cannot be the same as the final product', { id: 'an-ingredient-cannot-be-the-sa' });
     }
 
     setSubmitting(true);

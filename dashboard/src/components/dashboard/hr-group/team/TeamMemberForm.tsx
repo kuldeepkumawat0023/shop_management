@@ -86,7 +86,7 @@ export default function TeamMemberForm() {
         });
       }
     } catch (error) {
-      toast.error('Failed to load team member data');
+      toast.error('Failed to load team member data', { id: 'failed-to-load-team-member-dat' });
     } finally {
       setLoading(false);
     }
@@ -111,7 +111,7 @@ export default function TeamMemberForm() {
         if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
       }
       setErrors(newErrors);
-      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें');
+      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें', { id: 'please-correct-the-errors-----' });
     }
 
     setSubmitting(true);

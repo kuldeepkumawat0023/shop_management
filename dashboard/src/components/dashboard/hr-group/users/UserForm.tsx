@@ -65,7 +65,7 @@ export default function UserForm() {
         });
       }
     } catch (error) {
-      toast.error('Failed to load user data');
+      toast.error('Failed to load user data', { id: 'failed-to-load-user-data' });
     } finally {
       setLoading(false);
     }
@@ -98,7 +98,7 @@ export default function UserForm() {
         if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
       }
       setErrors(newErrors);
-      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें');
+      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें', { id: 'please-correct-the-errors-----' });
     }
 
     setSubmitting(true);

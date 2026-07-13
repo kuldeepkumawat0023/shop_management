@@ -44,7 +44,7 @@ export default function ProductionDetailView({ productionId }: ProductionDetailV
           toast.error(res.message || 'Failed to delete production log');
         }
       } catch (err) {
-        toast.error('Error deleting production log');
+        toast.error('Error deleting production log', { id: 'error-deleting-production-log' });
       }
     }
   };

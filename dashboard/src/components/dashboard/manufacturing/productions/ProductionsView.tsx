@@ -56,7 +56,7 @@ export default function ProductionsView() {
           toast.error(res.message || 'Failed to delete production');
         }
       } catch (err) {
-        toast.error('Error deleting production log');
+        toast.error('Error deleting production log', { id: 'error-deleting-production-log' });
       }
     }
   };

@@ -41,10 +41,10 @@ export default function BarcodeScanner() {
                 addToCart(res.data);
                 toast.success(`Scanned: ${res.data.name}`);
               } else {
-                toast.error(`Unknown barcode: ${barcodeValue}`);
+                toast.error(`Unknown barcode: ${barcodeValue}`, { id: 'unknown-barcode----barcodevalu' });
               }
             }).catch(() => {
-              toast.error(`Barcode not found: ${barcodeValue}`);
+              toast.error(`Barcode not found: ${barcodeValue}`, { id: 'barcode-not-found----barcodeva' });
             });
           }
         }

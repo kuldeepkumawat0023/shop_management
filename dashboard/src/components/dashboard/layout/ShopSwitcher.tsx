@@ -64,7 +64,7 @@ export default function ShopSwitcher() {
         toast.error(res.message || 'Failed to switch shop', { id: toastId });
       }
     } catch (err) {
-      toast.error('Failed to switch shop');
+      toast.error('Failed to switch shop', { id: 'failed-to-switch-shop' });
     } finally {
       setIsShopDropdownOpen(false);
     }

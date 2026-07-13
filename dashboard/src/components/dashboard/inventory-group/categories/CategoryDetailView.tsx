@@ -70,7 +70,7 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
           toast.error(res.message || 'Failed to delete category');
         }
       } catch (err) {
-        toast.error('Error deleting category');
+        toast.error('Error deleting category', { id: 'error-deleting-category' });
       }
     }
   };

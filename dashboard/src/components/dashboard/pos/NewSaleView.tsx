@@ -43,10 +43,10 @@ export default function NewSaleView() {
           addToCart(res.data);
           toast.success(`Scanned: ${res.data.name}`);
         } else {
-          toast.error(`Not found: ${query} / नहीं मिला`);
+          toast.error(`Not found: ${query} / नहीं मिला`, { id: 'not-found----query------------' });
         }
       } catch {
-        toast.error(`Not found: ${query} / नहीं मिला`);
+        toast.error(`Not found: ${query} / नहीं मिला`, { id: 'not-found----query------------' });
       }
     }
     setBarcodeInput('');

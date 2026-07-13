@@ -59,7 +59,7 @@ export default function TeamMembersView() {
         setStaffList(res.data);
       }
     } catch (error) {
-      toast.error('Failed to load team members');
+      toast.error('Failed to load team members', { id: 'failed-to-load-team-members' });
     } finally {
       setLoading(false);
     }
@@ -80,7 +80,7 @@ export default function TeamMembersView() {
           toast.error(res.message || 'Failed to remove staff member');
         }
       } catch (error) {
-        toast.error('Failed to remove staff member');
+        toast.error('Failed to remove staff member', { id: 'failed-to-remove-staff-member' });
       }
     }
   };

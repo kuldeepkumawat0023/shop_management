@@ -22,7 +22,7 @@ export default function CustomerCreateModal({ onClose, onSuccess }: CustomerCrea
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.mobile) {
-      toast.error('Name and Mobile are required / नाम और मोबाइल आवश्यक हैं');
+      toast.error('Name and Mobile are required / नाम और मोबाइल आवश्यक हैं', { id: 'name-and-mobile-are-required--' });
       return;
     }
 

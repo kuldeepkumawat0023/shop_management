@@ -62,7 +62,7 @@ export default function RecipesView() {
           toast.error(res.message || 'Failed to delete recipe');
         }
       } catch (err) {
-        toast.error('Error deleting recipe');
+        toast.error('Error deleting recipe', { id: 'error-deleting-recipe' });
       }
     }
   };

@@ -38,7 +38,7 @@ export default function SupplierDetailView({ id }: { id: string }) {
           setRecentPOs(supplierPurchases);
         }
       } catch (error) {
-        toast.error('Failed to load supplier details');
+        toast.error('Failed to load supplier details', { id: 'failed-to-load-supplier-detail' });
       } finally {
         setLoading(false);
       }
@@ -57,7 +57,7 @@ export default function SupplierDetailView({ id }: { id: string }) {
           toast.error(res.message || 'Failed to delete supplier');
         }
       } catch (error) {
-        toast.error('Failed to delete supplier');
+        toast.error('Failed to delete supplier', { id: 'failed-to-delete-supplier' });
       }
     }
   };

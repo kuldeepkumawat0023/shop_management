@@ -40,7 +40,7 @@ export default function CustomerDetailView({ id }: { id: string }) {
           setRecentOrders(customerSales);
         }
       } catch (error) {
-        toast.error('Failed to load customer details');
+        toast.error('Failed to load customer details', { id: 'failed-to-load-customer-detail' });
       } finally {
         setLoading(false);
       }
@@ -59,7 +59,7 @@ export default function CustomerDetailView({ id }: { id: string }) {
           toast.error(res.message || 'Failed to delete customer');
         }
       } catch (error) {
-        toast.error('Failed to delete customer');
+        toast.error('Failed to delete customer', { id: 'failed-to-delete-customer' });
       }
     }
   };

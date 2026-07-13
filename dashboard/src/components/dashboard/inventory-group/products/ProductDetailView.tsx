@@ -51,7 +51,7 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
           toast.error(res.message || 'Failed to delete product');
         }
       } catch (err) {
-        toast.error('Error deleting product');
+        toast.error('Error deleting product', { id: 'error-deleting-product' });
       }
     }
   };

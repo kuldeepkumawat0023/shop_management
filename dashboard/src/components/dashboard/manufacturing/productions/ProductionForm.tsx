@@ -98,11 +98,11 @@ export default function ProductionForm() {
         if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
       }
       setErrors(newErrors);
-      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें');
+      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें', { id: 'please-correct-the-errors-----' });
     }
 
     if (!allStockAvailable) {
-      return toast.error('Insufficient stock for one or more raw materials / एक या अधिक कच्चे माल के लिए अपर्याप्त स्टॉक');
+      return toast.error('Insufficient stock for one or more raw materials / एक या अधिक कच्चे माल के लिए अपर्याप्त स्टॉक', { id: 'insufficient-stock-for-one-or-' });
     }
 
     setSubmitting(true);

@@ -65,12 +65,12 @@ export default function ShopCreationModal({ isOpen, onClose, isForced = false, o
         if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
       }
       setFieldErrors(newErrors);
-      toast.error('Please correct the errors in the form');
+      toast.error('Please correct the errors in the form', { id: 'please-correct-the-errors-in-t' });
       return;
     }
 
     if (!user?._id) {
-      toast.error('User session expired. Please login again.');
+      toast.error('User session expired. Please login again.', { id: 'user-session-expired--please-l' });
       return;
     }
 
