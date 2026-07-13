@@ -12,8 +12,8 @@ const { PERMISSIONS } = require('../config/permissions');
 router.use(protect);
 router.use(shopScope);
 
-// Both endpoints restricted to Super Admin or Shop Owner
-router.get('/get', getSettings); // maybe allow managers to view? Sure, let's keep it simple.
-router.put('/update', requirePermission(PERMISSIONS.SUPER_ADMIN), updateSettings);
+// Both endpoints restricted to proper permissions
+router.get('/get', requirePermission(PERMISSIONS.SETTINGS_VIEW), getSettings); 
+router.put('/update', requirePermission(PERMISSIONS.SETTINGS_UPDATE), updateSettings);
 
 module.exports = router;

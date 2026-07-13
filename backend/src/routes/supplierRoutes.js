@@ -9,9 +9,9 @@ const { PERMISSIONS } = require('../config/permissions');
 router.use(protect);
 router.use(shopScope);
 
-router.post('/create', requirePermission(PERMISSIONS.MANAGE_INVENTORY), createSupplier);
-router.get('/all', requirePermission(PERMISSIONS.MANAGE_INVENTORY), getSuppliers);
-router.put('/update/:id', requirePermission(PERMISSIONS.MANAGE_INVENTORY), updateSupplier);
-router.delete('/delete/:id', requirePermission(PERMISSIONS.MANAGE_INVENTORY), deleteSupplier);
+router.post('/create', requirePermission(PERMISSIONS.SUPPLIERS_CREATE), createSupplier);
+router.get('/all', requirePermission(PERMISSIONS.SUPPLIERS_VIEW), getSuppliers);
+router.put('/update/:id', requirePermission(PERMISSIONS.SUPPLIERS_UPDATE), updateSupplier);
+router.delete('/delete/:id', requirePermission(PERMISSIONS.SUPPLIERS_DELETE), deleteSupplier);
 
 module.exports = router;

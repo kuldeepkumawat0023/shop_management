@@ -14,9 +14,11 @@ const {
   checkShopLimit
 } = require('../controllers/shopController');
 
-const { protect, authorizeRoles } = require('../middlewares/authMiddleware');
+const { protect } = require('../middlewares/authMiddleware');
 const shopScope = require('../middlewares/shopScope');
 const upload = require('../middlewares/upload');
+const requirePermission = require('../middlewares/requirePermission');
+const { PERMISSIONS } = require('../config/permissions');
 
 // Apply protection to all routes
 router.use(protect);
@@ -33,12 +35,12 @@ router.post('/check-name', checkShopName);
 router.get('/check-limit', checkShopLimit);
 
 // Basic Shop Operations
-router.post('/init-create', authorizeRoles('super_admin', 'shop_owner', 'manager', 'staff'), initCreateShop);
-router.post('/create', authorizeRoles('super_admin', 'shop_owner', 'manager', 'staff'), createShop);
-router.get('/all', authorizeRoles('super_admin'), getShops);
-router.delete('/delete/:id', authorizeRoles('super_admin'), deleteShop);
+router.post('/init-create', requirePermission(PERMISSIONS.SHOPS_CREATE), initCreateShop);
+router.post('/create', requirePermission(PERMISSIONS.SHOPS_CREATE), createShop);
+router.get('/all', requirePermission(PERMISSIONS.SHOPS_VIEW), getShops);
+router.delete('/delete/:id', requirePermission(PERMISSIONS.SHOPS_DELETE), deleteShop);
 
-// Update route (Owner can update their own shop, Super Admin can update any)
-router.put('/update/:id', authorizeRoles('super_admin', 'shop_owner'), upload.single('logo'), updateShop);
+// Update route
+router.put('/update/:id', requirePermission(PERMISSIONS.SHOPS_UPDATE), upload.single('logo'), updateShop);
 
 module.exports = router;

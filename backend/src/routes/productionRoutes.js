@@ -9,9 +9,9 @@ const { PERMISSIONS } = require('../config/permissions');
 router.use(protect);
 router.use(shopScope);
 
-router.post('/create', requirePermission(PERMISSIONS.MANAGE_INVENTORY), logProduction);
-router.get('/all', requirePermission(PERMISSIONS.MANAGE_INVENTORY), getProductions);
-router.get('/:id', requirePermission(PERMISSIONS.MANAGE_INVENTORY), getProductionById);
-router.delete('/:id', requirePermission(PERMISSIONS.MANAGE_INVENTORY), deleteProduction);
+router.post('/create', requirePermission(PERMISSIONS.PRODUCTIONS_CREATE), logProduction);
+router.get('/all', requirePermission(PERMISSIONS.PRODUCTIONS_VIEW), getProductions);
+router.get('/:id', requirePermission(PERMISSIONS.PRODUCTIONS_VIEW), getProductionById);
+router.delete('/:id', requirePermission(PERMISSIONS.PRODUCTIONS_DELETE), deleteProduction);
 
 module.exports = router;

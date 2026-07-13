@@ -9,7 +9,7 @@ const { PERMISSIONS } = require('../config/permissions');
 router.use(protect);
 router.use(shopScope);
 
-router.post('/create', requirePermission(PERMISSIONS.POS_ACCESS), recordPayment);
-router.get('/all', requirePermission(PERMISSIONS.POS_ACCESS), getPayments);
+router.post('/create', requirePermission(PERMISSIONS.PAYMENTS_CREATE), recordPayment);
+router.get('/all', requirePermission(PERMISSIONS.PAYMENTS_VIEW), getPayments);
 
 module.exports = router;

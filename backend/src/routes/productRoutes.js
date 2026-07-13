@@ -18,11 +18,11 @@ const { PERMISSIONS } = require('../config/permissions');
 router.use(protect);
 router.use(shopScope);
 
-router.post('/create', requirePermission(PERMISSIONS.MANAGE_INVENTORY), upload.single('image'), createProduct);
-router.get('/all', getProducts);
-router.get('/barcode/:barcode', getProductByBarcode);
-router.put('/update/:id', requirePermission(PERMISSIONS.MANAGE_INVENTORY), upload.single('image'), updateProduct);
-router.put('/adjust-stock/:id', requirePermission(PERMISSIONS.MANAGE_INVENTORY), adjustStock);
-router.delete('/delete/:id', requirePermission(PERMISSIONS.MANAGE_INVENTORY), deleteProduct);
+router.post('/create', requirePermission(PERMISSIONS.PRODUCTS_CREATE), upload.single('image'), createProduct);
+router.get('/all', requirePermission(PERMISSIONS.PRODUCTS_VIEW), getProducts);
+router.get('/barcode/:barcode', requirePermission(PERMISSIONS.PRODUCTS_VIEW), getProductByBarcode);
+router.put('/update/:id', requirePermission(PERMISSIONS.PRODUCTS_UPDATE), upload.single('image'), updateProduct);
+router.put('/adjust-stock/:id', requirePermission(PERMISSIONS.PRODUCTS_UPDATE), adjustStock);
+router.delete('/delete/:id', requirePermission(PERMISSIONS.PRODUCTS_DELETE), deleteProduct);
 
 module.exports = router;

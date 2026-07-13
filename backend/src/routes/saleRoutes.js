@@ -10,13 +10,13 @@ const { PERMISSIONS } = require('../config/permissions');
 router.use(protect);
 router.use(shopScope);
 
-router.post('/create', requirePermission(PERMISSIONS.POS_ACCESS), createSale);
-router.get('/all', requirePermission(PERMISSIONS.VIEW_SALES), getSales);
-router.get('/get/:id', requirePermission(PERMISSIONS.VIEW_SALES), getSaleById);
-router.put('/update/:id', requirePermission(PERMISSIONS.POS_ACCESS), updateSale);
-router.delete('/delete/:id', requirePermission(PERMISSIONS.POS_ACCESS), deleteSale);
+router.post('/create', requirePermission(PERMISSIONS.SALES_CREATE), createSale);
+router.get('/all', requirePermission(PERMISSIONS.SALES_VIEW), getSales);
+router.get('/get/:id', requirePermission(PERMISSIONS.SALES_VIEW), getSaleById);
+router.put('/update/:id', requirePermission(PERMISSIONS.SALES_UPDATE), updateSale);
+router.delete('/delete/:id', requirePermission(PERMISSIONS.SALES_DELETE), deleteSale);
 // Offline Bulk Sync Route
-router.post('/sync', requirePermission(PERMISSIONS.POS_ACCESS), async (req, res, next) => {
+router.post('/sync', requirePermission(PERMISSIONS.SALES_CREATE), async (req, res, next) => {
   try {
     const { bills } = req.body;
     if (!Array.isArray(bills) || bills.length === 0) {

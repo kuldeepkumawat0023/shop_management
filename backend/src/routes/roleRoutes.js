@@ -4,19 +4,23 @@ const router = express.Router();
 const { 
   createRole, 
   getRoles, 
+  getAllPermissions,
   updateRole, 
   deleteRole 
 } = require('../controllers/roleController');
 
-const { protect, authorizeRoles } = require('../middlewares/authMiddleware');
+const { protect } = require('../middlewares/authMiddleware');
 const shopScope = require('../middlewares/shopScope');
+const requirePermission = require('../middlewares/requirePermission');
+const { PERMISSIONS } = require('../config/permissions');
 
 router.use(protect);
 router.use(shopScope);
 
-router.post('/create', authorizeRoles('super_admin', 'shop_owner'), createRole);
-router.get('/all', getRoles);
-router.put('/update/:id', authorizeRoles('super_admin', 'shop_owner'), updateRole);
-router.delete('/delete/:id', authorizeRoles('super_admin', 'shop_owner'), deleteRole);
+router.post('/create', requirePermission(PERMISSIONS.ROLES_CREATE), createRole);
+router.get('/all', requirePermission(PERMISSIONS.ROLES_VIEW), getRoles);
+router.get('/permissions', requirePermission(PERMISSIONS.ROLES_VIEW), getAllPermissions);
+router.put('/update/:id', requirePermission(PERMISSIONS.ROLES_UPDATE), updateRole);
+router.delete('/delete/:id', requirePermission(PERMISSIONS.ROLES_DELETE), deleteRole);
 
 module.exports = router;

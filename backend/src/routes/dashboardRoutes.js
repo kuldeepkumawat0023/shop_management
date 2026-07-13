@@ -9,6 +9,6 @@ const { PERMISSIONS } = require('../config/permissions');
 router.use(protect);
 router.use(shopScope);
 
-router.get('/stats', requirePermission(PERMISSIONS.VIEW_REPORTS), getDashboardStats);
+router.get('/stats', requirePermission(PERMISSIONS.DASHBOARD_VIEW), getDashboardStats);
 
 module.exports = router;

@@ -9,8 +9,8 @@ const { PERMISSIONS } = require('../config/permissions');
 router.use(protect);
 router.use(shopScope);
 
-router.post('/create', requirePermission(PERMISSIONS.MANAGE_PURCHASES), createPurchase);
-router.get('/all', requirePermission(PERMISSIONS.MANAGE_PURCHASES), getPurchases);
-router.get('/get/:id', requirePermission(PERMISSIONS.MANAGE_PURCHASES), getPurchaseById);
+router.post('/create', requirePermission(PERMISSIONS.PURCHASES_CREATE), createPurchase);
+router.get('/all', requirePermission(PERMISSIONS.PURCHASES_VIEW), getPurchases);
+router.get('/get/:id', requirePermission(PERMISSIONS.PURCHASES_VIEW), getPurchaseById);
 
 module.exports = router;

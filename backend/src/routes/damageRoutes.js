@@ -9,7 +9,7 @@ const { PERMISSIONS } = require('../config/permissions');
 router.use(protect);
 router.use(shopScope);
 
-router.post('/create', requirePermission(PERMISSIONS.MANAGE_INVENTORY), logDamage);
-router.get('/all', requirePermission(PERMISSIONS.MANAGE_INVENTORY), getDamages);
+router.post('/create', requirePermission(PERMISSIONS.DAMAGES_CREATE), logDamage);
+router.get('/all', requirePermission(PERMISSIONS.DAMAGES_VIEW), getDamages);
 
 module.exports = router;

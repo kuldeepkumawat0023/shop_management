@@ -1,5 +1,5 @@
 const CustomRole = require('../models/CustomRole');
-const { PERMISSION_LIST } = require('../config/permissions');
+const { PERMISSION_LIST, PERMISSION_MODULES } = require('../config/permissions');
 
 // @desc    Create a Custom Role
 // @route   POST /api/v1/roles
@@ -33,6 +33,22 @@ exports.createRole = async (req, res, next) => {
       statusCode: 201,
       message: 'Custom role created successfully',
       data: role
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get all available permissions (grouped by module)
+// @route   GET /api/v1/roles/permissions
+// @access  Private
+exports.getAllPermissions = (req, res, next) => {
+  try {
+    res.status(200).json({
+      success: true,
+      statusCode: 200,
+      message: 'Permissions fetched successfully',
+      data: PERMISSION_MODULES
     });
   } catch (error) {
     next(error);

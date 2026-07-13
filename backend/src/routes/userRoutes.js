@@ -9,9 +9,11 @@ const {
   createStaff
 } = require('../controllers/userController');
 
-const { protect, authorizeRoles } = require('../middlewares/authMiddleware');
+const { protect } = require('../middlewares/authMiddleware');
 const shopScope = require('../middlewares/shopScope');
 const upload = require('../middlewares/upload'); // For profile photo
+const requirePermission = require('../middlewares/requirePermission');
+const { PERMISSIONS } = require('../config/permissions');
 
 // =====================
 // Profile Routes (For logged in user)
@@ -27,13 +29,13 @@ router.put('/profile/update/:id', protect, upload.single('profilePhoto'), update
 // Staff Management Routes (Requires shopScope & Role Check)
 // =====================
 
-// Get all staff users in the shop (Super Admin gets all users)
-router.get('/all', protect, shopScope, getUsers);
+// Get all staff users in the shop
+router.get('/all', protect, shopScope, requirePermission(PERMISSIONS.USERS_VIEW), getUsers);
 
-// Create a new staff member (Only for Super Admin and Shop Owner)
-router.post('/staff', protect, authorizeRoles('super_admin', 'shop_owner'), createStaff);
+// Create a new staff member
+router.post('/staff', protect, requirePermission(PERMISSIONS.USERS_CREATE), createStaff);
 
 // Deactivate a user account
-router.delete('/profile/delete/:id', protect, authorizeRoles('super_admin', 'shop_owner'), deleteProfile);
+router.delete('/profile/delete/:id', protect, requirePermission(PERMISSIONS.USERS_DELETE), deleteProfile);
 
 module.exports = router;

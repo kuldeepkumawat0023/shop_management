@@ -9,15 +9,15 @@ const { PERMISSIONS } = require('../config/permissions');
 router.use(protect);
 router.use(shopScope);
 
-// Only Super Admin can manage staff directly
-router.post('/create', requirePermission(PERMISSIONS.SUPER_ADMIN), addStaff);
-router.get('/all', requirePermission(PERMISSIONS.SUPER_ADMIN), getStaff);
-router.get('/:id', requirePermission(PERMISSIONS.SUPER_ADMIN), getStaffById);
-router.put('/update/:id', requirePermission(PERMISSIONS.SUPER_ADMIN), updateStaff);
-router.delete('/delete/:id', requirePermission(PERMISSIONS.SUPER_ADMIN), deleteStaff);
+// Only Super Admin or those with team manage permissions can manage staff directly
+router.post('/create', requirePermission(PERMISSIONS.TEAM_CREATE), addStaff);
+router.get('/all', requirePermission(PERMISSIONS.TEAM_VIEW), getStaff);
+router.get('/:id', requirePermission(PERMISSIONS.TEAM_VIEW), getStaffById);
+router.put('/update/:id', requirePermission(PERMISSIONS.TEAM_UPDATE), updateStaff);
+router.delete('/delete/:id', requirePermission(PERMISSIONS.TEAM_DELETE), deleteStaff);
 
 // Advances and Expenses
-router.post('/advance', requirePermission(PERMISSIONS.SUPER_ADMIN), recordAdvance);
-router.post('/expense', requirePermission(PERMISSIONS.SUPER_ADMIN), recordExpense);
+router.post('/advance', requirePermission(PERMISSIONS.PAYROLL_CREATE), recordAdvance);
+router.post('/expense', requirePermission(PERMISSIONS.EXPENSES_CREATE), recordExpense);
 
 module.exports = router;
