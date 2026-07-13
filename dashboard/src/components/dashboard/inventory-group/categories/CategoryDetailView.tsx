@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/common/Button';
 import { DataTable } from '@/components/common/DataTable';
 import { StatusBadge } from '@/components/common/StatusBadge';
+import { DetailViewSkeleton } from '@/components/common/DetailViewSkeleton';
 import { ArrowLeft, Tag, Layers, Search, Filter, Download, MoreVertical, Edit, Trash2, Globe, Archive, Package, Plus, ImageIcon, Type, Link as LinkIcon, Eye, CheckCircle2, AlertCircle, FolderTree, LayoutGrid, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -159,9 +160,7 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
     }
   ];
 
-  if (loading) {
-    return <div className="p-8 flex items-center justify-center h-full text-on-surface-variant">Loading Category Data...</div>;
-  }
+  if (loading) return <DetailViewSkeleton />;
 
   if (!categoryData) {
     return (

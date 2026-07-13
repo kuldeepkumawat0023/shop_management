@@ -5,6 +5,7 @@ import { Button } from '@/components/common/Button';
 import { ArrowLeft, Edit, Trash2, Package, TrendingUp, IndianRupee, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { StatusBadge } from '@/components/common/StatusBadge';
+import { DetailViewSkeleton } from '@/components/common/DetailViewSkeleton';
 import { cn } from '@/utils/cn';
 import { useRouter } from 'next/navigation';
 import { productService } from '@/lib/services/product.services';
@@ -55,9 +56,7 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
     }
   };
 
-  if (loading) {
-    return <div className="p-8 flex items-center justify-center h-full text-on-surface-variant">Loading Product Data...</div>;
-  }
+  if (loading) return <DetailViewSkeleton />;
 
   if (!productData) {
     return (

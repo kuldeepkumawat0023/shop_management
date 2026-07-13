@@ -6,6 +6,7 @@ import { Button } from '@/components/common/Button';
 import { Package, AlertTriangle, AlertCircle, Banknote, Edit, Eye, Trash2 } from 'lucide-react';
 import { StatsCard } from '@/components/common/StatsCard';
 import { StatusBadge } from '@/components/common/StatusBadge';
+import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import { cn } from '@/utils/cn';
 import { productService } from '@/lib/services/product.services';
 
@@ -148,6 +149,8 @@ export default function InventoryView() {
     </div>
   );
 
+  if (loading) return <ViewPageSkeleton />;
+
   return (
     <div className="flex flex-col h-full bg-background p-4 md:p-6 overflow-y-auto custom-scrollbar">
       <div className="flex items-center justify-between mb-8">
@@ -192,26 +195,22 @@ export default function InventoryView() {
       </div>
 
       <div className="w-full bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 flex flex-col min-h-[400px]">
-        {loading ? (
-          <div className="flex-1 flex items-center justify-center text-on-surface-variant font-medium">Loading Inventory...</div>
-        ) : (
-          <DataTable 
-            data={filteredData}
-            columns={columns}
-            headerContent={
-              <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-6 w-full">
-                <div className="flex items-center gap-2 shrink-0">
-                  <h2 className="text-lg font-bold text-on-surface">Product List</h2>
-                  <StatusBadge status="Live Sync" variant="dot" colorTheme="success" className="ml-2 bg-success/10 text-success border-success/20" />
-                </div>
-                {TabsComponent}
+        <DataTable 
+          data={filteredData}
+          columns={columns}
+          headerContent={
+            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-6 w-full">
+              <div className="flex items-center gap-2 shrink-0">
+                <h2 className="text-lg font-bold text-on-surface">Product List</h2>
+                <StatusBadge status="Live Sync" variant="dot" colorTheme="success" className="ml-2 bg-success/10 text-success border-success/20" />
               </div>
-            }
-            searchPlaceholder="Search by product name or SKU..."
-            className="border-none shadow-none bg-transparent"
-            itemsPerPage={10}
-          />
-        )}
+              {TabsComponent}
+            </div>
+          }
+          searchPlaceholder="Search by product name or SKU..."
+          className="border-none shadow-none bg-transparent"
+          itemsPerPage={10}
+        />
       </div>
     </div>
   );

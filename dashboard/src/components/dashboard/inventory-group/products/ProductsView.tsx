@@ -6,6 +6,7 @@ import { Button } from '@/components/common/Button';
 import { Package, FolderTree, Trophy, FileEdit, Edit, Eye, Trash2, Plus } from 'lucide-react';
 import { StatsCard } from '@/components/common/StatsCard';
 import { StatusBadge } from '@/components/common/StatusBadge';
+import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import Link from 'next/link';
 import { cn } from '@/utils/cn';
 import { productService } from '@/lib/services/product.services';
@@ -156,6 +157,8 @@ export default function ProductsView() {
     </div>
   );
 
+  if (loading) return <ViewPageSkeleton />;
+
   return (
     <div className="flex flex-col h-full bg-background p-4 md:p-6 overflow-y-auto custom-scrollbar">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -206,22 +209,18 @@ export default function ProductsView() {
       </div>
 
       <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl shadow-sm overflow-hidden min-h-[400px] flex flex-col">
-        {loading ? (
-          <div className="flex-1 flex items-center justify-center text-on-surface-variant font-medium">Loading Products...</div>
-        ) : (
-          <DataTable
-            data={filteredData}
-            columns={columns}
-            searchPlaceholder="Search products by name, sku, or brand..."
-            itemsPerPage={10}
-            headerContent={
-              <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 mb-2">
-                <h2 className="text-xl font-bold text-on-surface">Product Catalog</h2>
-                {TabsComponent}
-              </div>
-            }
-          />
-        )}
+        <DataTable
+          data={filteredData}
+          columns={columns}
+          searchPlaceholder="Search products by name, sku, or brand..."
+          itemsPerPage={10}
+          headerContent={
+            <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 mb-2">
+              <h2 className="text-xl font-bold text-on-surface">Product Catalog</h2>
+              {TabsComponent}
+            </div>
+          }
+        />
       </div>
     </div>
   );

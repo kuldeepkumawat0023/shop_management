@@ -5,6 +5,7 @@ import { DataTable } from '@/components/common/DataTable';
 import { Button } from '@/components/common/Button';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { StatsCard } from '@/components/common/StatsCard';
+import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import { Plus, Download, Filter, Search, IndianRupee, Clock, Zap, TrendingUp, Eye, Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { expenseService } from '@/lib/services/expense.services';
@@ -95,7 +96,7 @@ export default function ExpensesView() {
   }, []);
 
   if (loading) {
-    return <div className="p-8 flex items-center justify-center h-full">Loading expenses...</div>;
+    return <ViewPageSkeleton />;
   }
   return (
     <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full ">

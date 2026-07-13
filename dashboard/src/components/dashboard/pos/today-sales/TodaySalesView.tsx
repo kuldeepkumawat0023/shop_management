@@ -7,6 +7,7 @@ import { Button } from '@/components/common/Button';
 import { Printer, Eye, TrendingUp, CheckCircle2, Edit, Trash2 } from 'lucide-react';
 import { StatsCard } from '@/components/common/StatsCard';
 import { StatusBadge } from '@/components/common/StatusBadge';
+import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import { saleService } from '@/lib/services/sale.services';
 import { formatCurrency } from '@/utils/formatCurrency';
 import toast from 'react-hot-toast';
@@ -157,6 +158,8 @@ export default function TodaySalesView() {
 
   const totalRevenue = sales.reduce((sum, sale) => sum + sale.netAmount, 0);
 
+  if (loading) return <ViewPageSkeleton />;
+
   return (
     <div className="flex flex-col h-full bg-background p-4 md:p-6 overflow-y-auto custom-scrollbar">
       <div className="flex items-center justify-between mb-8">
@@ -196,23 +199,19 @@ export default function TodaySalesView() {
       </div>
 
       <div className="w-full bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 flex flex-col min-h-[400px]">
-        {loading ? (
-          <div className="p-8 text-center text-on-surface-variant">Loading sales...</div>
-        ) : (
-          <DataTable
-            data={sales}
-            columns={columns}
-            headerContent={
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold text-on-surface">Recent Transactions</h2>
-                <StatusBadge status="Live Sync" variant="dot" colorTheme="success" className="ml-2 bg-success/10 text-success border-success/20" />
-              </div>
-            }
-            searchPlaceholder="Search by receipt or customer..."
-            className="border-none shadow-none bg-transparent"
-            itemsPerPage={10}
-          />
-        )}
+        <DataTable
+          data={sales}
+          columns={columns}
+          headerContent={
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-bold text-on-surface">Recent Transactions</h2>
+              <StatusBadge status="Live Sync" variant="dot" colorTheme="success" className="ml-2 bg-success/10 text-success border-success/20" />
+            </div>
+          }
+          searchPlaceholder="Search by receipt or customer..."
+          className="border-none shadow-none bg-transparent"
+          itemsPerPage={10}
+        />
       </div>
 
       <InvoiceModal

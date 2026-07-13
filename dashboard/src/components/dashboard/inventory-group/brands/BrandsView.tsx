@@ -5,6 +5,7 @@ import { DataTable } from '@/components/common/DataTable';
 import { Button } from '@/components/common/Button';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { StatsCard } from '@/components/common/StatsCard';
+import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import { Download, Plus, Search, Filter, Tag, Handshake, Trophy, Edit, Trash2, Eye, TrendingUp, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/utils/cn';
@@ -131,6 +132,8 @@ export default function BrandsView() {
     }
   ];
 
+  if (loading) return <ViewPageSkeleton />;
+
   return (
     <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full ">
       {/* Page Header */}
@@ -189,36 +192,32 @@ export default function BrandsView() {
 
       {/* Brands Ledger */}
       <div className="w-full bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 flex flex-col min-h-[400px]">
-        {loading ? (
-          <div className="flex-1 flex items-center justify-center text-on-surface-variant font-medium">Loading Brands...</div>
-        ) : (
-          <DataTable 
-            data={filteredData}
-            columns={columns}
-            headerContent={
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full gap-4">
-                <h3 className="text-xl font-black text-on-surface">Brand Directory</h3>
-                <div className="flex items-center gap-3 w-full sm:w-auto">
-                  <div className="relative focus-within:ring-2 focus-within:ring-primary-container rounded-lg w-full sm:w-48">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant w-4 h-4" />
-                    <input 
-                      className="w-full bg-surface-container-low border border-outline-variant/20 rounded-xl pl-9 pr-4 py-2 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:ring-0 transition-colors placeholder:text-on-surface-variant/50" 
-                      placeholder="Filter brands..." 
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
-                  <button className="p-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-xl transition-colors border border-outline-variant/30 bg-surface-container-lowest shrink-0">
-                    <Filter className="w-4 h-4" />
-                  </button>
+        <DataTable 
+          data={filteredData}
+          columns={columns}
+          headerContent={
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full gap-4">
+              <h3 className="text-xl font-black text-on-surface">Brand Directory</h3>
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                <div className="relative focus-within:ring-2 focus-within:ring-primary-container rounded-lg w-full sm:w-48">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant w-4 h-4" />
+                  <input 
+                    className="w-full bg-surface-container-low border border-outline-variant/20 rounded-xl pl-9 pr-4 py-2 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:ring-0 transition-colors placeholder:text-on-surface-variant/50" 
+                    placeholder="Filter brands..." 
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                 </div>
+                <button className="p-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-xl transition-colors border border-outline-variant/30 bg-surface-container-lowest shrink-0">
+                  <Filter className="w-4 h-4" />
+                </button>
               </div>
-            }
-            className="border-none shadow-none bg-transparent"
-            itemsPerPage={10}
-          />
-        )}
+            </div>
+          }
+          className="border-none shadow-none bg-transparent"
+          itemsPerPage={10}
+        />
       </div>
     </div>
   );

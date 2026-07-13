@@ -6,6 +6,7 @@ import { Button } from '@/components/common/Button';
 import { FolderTree, Edit, Trash2, Plus, LayoutGrid, Package, AlertCircle, CheckCircle2, Eye } from 'lucide-react';
 import { StatsCard } from '@/components/common/StatsCard';
 import { StatusBadge } from '@/components/common/StatusBadge';
+import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import { cn } from '@/utils/cn';
 import Link from 'next/link';
 import { categoryService, CategoryData } from '@/lib/services/category.services';
@@ -136,6 +137,8 @@ export default function CategoriesView() {
     </div>
   );
 
+  if (loading) return <ViewPageSkeleton />;
+
   return (
     <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar gap-6 w-full ">
       {/* Header */}
@@ -176,26 +179,22 @@ export default function CategoriesView() {
 
       {/* Data Table Area */}
       <div className="w-full bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 flex flex-col min-h-[400px]">
-        {loading ? (
-          <div className="flex-1 flex items-center justify-center text-on-surface-variant font-medium">Loading Categories...</div>
-        ) : (
-          <DataTable
-            data={filteredData}
-            columns={columns}
-            headerContent={
-              <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-6 w-full">
-                <div className="flex items-center gap-2 shrink-0">
-                  <LayoutGrid className="w-5 h-5 text-primary" />
-                  <h2 className="text-lg font-bold text-on-surface">Category List</h2>
-                </div>
-                {TabsComponent}
+        <DataTable
+          data={filteredData}
+          columns={columns}
+          headerContent={
+            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-6 w-full">
+              <div className="flex items-center gap-2 shrink-0">
+                <LayoutGrid className="w-5 h-5 text-primary" />
+                <h2 className="text-lg font-bold text-on-surface">Category List</h2>
               </div>
-            }
-            searchPlaceholder="Search by category name or slug..."
-            itemsPerPage={10}
-            className="border-none shadow-none bg-transparent"
-          />
-        )}
+              {TabsComponent}
+            </div>
+          }
+          searchPlaceholder="Search by category name or slug..."
+          itemsPerPage={10}
+          className="border-none shadow-none bg-transparent"
+        />
       </div>
     </div>
   );

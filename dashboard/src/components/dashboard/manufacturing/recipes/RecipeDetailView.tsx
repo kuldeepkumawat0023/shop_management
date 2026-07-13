@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/common/Button';
+import { DetailViewSkeleton } from '@/components/common/DetailViewSkeleton';
 import { ArrowLeft, Edit, Trash2, BookOpen, Layers } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -49,9 +50,7 @@ export default function RecipeDetailView({ recipeId }: RecipeDetailViewProps) {
     }
   };
 
-  if (loading) {
-    return <div className="p-8 flex items-center justify-center h-full text-on-surface-variant">Loading Recipe Data...</div>;
-  }
+  if (loading) return <DetailViewSkeleton />;
 
   if (!recipeData) {
     return (

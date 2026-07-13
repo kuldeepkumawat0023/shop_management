@@ -5,6 +5,7 @@ import { DataTable } from '@/components/common/DataTable';
 import { Button } from '@/components/common/Button';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { StatsCard } from '@/components/common/StatsCard';
+import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import { Plus, Download, Receipt, Users, Banknote, FileText, ChevronRight, Eye, Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { saleService } from '@/lib/services/sale.services';
@@ -66,7 +67,7 @@ export default function SalesHistoryView() {
     s.customer.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (loading) return <div className="p-8">Loading sales...</div>;
+  if (loading) return <ViewPageSkeleton />;
 
   const columns = [
     { header: 'Invoice No.', accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id}</span> },

@@ -5,6 +5,7 @@ import { DataTable } from '@/components/common/DataTable';
 import { Button } from '@/components/common/Button';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { StatsCard } from '@/components/common/StatsCard';
+import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import { Plus, Download, ShoppingCart, Truck, Wallet, FileText, ChevronRight, Eye, Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { purchaseService } from '@/lib/services/purchase.services';
@@ -72,7 +73,7 @@ export default function PurchasesView() {
     p.supplier.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (loading) return <div className="p-8">Loading purchases...</div>;
+  if (loading) return <ViewPageSkeleton />;
 
   const columns = [
     { header: 'PO Number', accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id}</span> },

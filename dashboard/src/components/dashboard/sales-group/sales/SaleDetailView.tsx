@@ -3,6 +3,7 @@
 import React from 'react';
 import { Button } from '@/components/common/Button';
 import { StatusBadge } from '@/components/common/StatusBadge';
+import { DetailViewSkeleton } from '@/components/common/DetailViewSkeleton';
 import { ArrowLeft, Printer, Download, Share2, Receipt, User, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -29,7 +30,7 @@ export default function SaleDetailView() {
     if (id) fetchSale();
   }, [id]);
 
-  if (loading) return <div className="p-8">Loading... / लोड हो रहा है...</div>;
+  if (loading) return <DetailViewSkeleton />;
   if (!sale) return <div className="p-8">Sale not found / बिक्री नहीं मिली</div>;
   
   return (

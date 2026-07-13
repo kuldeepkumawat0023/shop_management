@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/common/Button';
+import { DetailViewSkeleton } from '@/components/common/DetailViewSkeleton';
 import { ArrowLeft, Trash2, Factory, ClipboardList, CheckCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { productionService } from '@/lib/services/production.services';
@@ -48,9 +49,7 @@ export default function ProductionDetailView({ productionId }: ProductionDetailV
     }
   };
 
-  if (loading) {
-    return <div className="p-8 flex items-center justify-center h-full text-on-surface-variant">Loading Production Data...</div>;
-  }
+  if (loading) return <DetailViewSkeleton />;
 
   if (!productionData) {
     return (
