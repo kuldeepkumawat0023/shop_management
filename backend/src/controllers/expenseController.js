@@ -30,6 +30,20 @@ exports.getExpenses = async (req, res, next) => {
   }
 };
 
+// @desc    Get expense by ID
+// @route   GET /api/v1/expenses/get/:id
+// @access  Private
+exports.getExpenseById = async (req, res, next) => {
+  try {
+    const expense = await Expense.findOne({ _id: req.params.id, shopId: req.scopedShopId })
+      .populate('userId', 'fullname');
+    if (!expense || !expense.isActive) return res.status(404).json({ success: false, message: 'Expense not found' });
+    res.status(200).json({ success: true, data: expense });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc    Update an expense
 // @route   PUT /api/v1/expenses/:id
 // @access  Private

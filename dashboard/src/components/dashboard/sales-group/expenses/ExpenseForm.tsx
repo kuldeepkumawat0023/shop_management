@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { cn } from '@/utils/cn';
 import { expenseSchema } from '@/utils/validations';
 import toast from 'react-hot-toast';
+import { expenseService } from '@/lib/services/expense.services';
 
 export default function ExpenseForm() {
   const router = useRouter();
@@ -74,15 +75,27 @@ export default function ExpenseForm() {
     }
 
     setSubmitting(true);
-    const toastId = toast.loading('Saving expense...');
+    const toastId = toast.loading('Saving expense... / व्यय सहेज रहा है...');
     
     try {
-      // API call would go here
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Expense saved successfully!', { id: toastId });
-      router.back();
+      const payload = {
+        expenseName: submissionData.payee,
+        amount: submissionData.amount,
+        category: submissionData.category,
+        paymentMethod: submissionData.paymentMethod,
+        notes: submissionData.description,
+        expenseDate: submissionData.date || new Date().toISOString()
+      };
+      
+      const response = await expenseService.createExpense(payload);
+      if (response.success) {
+        toast.success('Expense saved successfully! / व्यय सफलतापूर्वक सहेजा गया!', { id: toastId });
+        router.back();
+      } else {
+        toast.error(response.message || 'Failed to save expense / व्यय सहेजने में विफल', { id: toastId });
+      }
     } catch (err: any) {
-      toast.error('Failed to save expense', { id: toastId });
+      toast.error('Failed to save expense / व्यय सहेजने में विफल', { id: toastId });
     } finally {
       setSubmitting(false);
     }
@@ -97,8 +110,8 @@ export default function ExpenseForm() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">Log Expense</h1>
-            <p className="text-sm text-on-surface-variant mt-1 font-medium">Record a new outgoing payment or bill</p>
+            <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">Log Expense / व्यय दर्ज करें</h1>
+            <p className="text-sm text-on-surface-variant mt-1 font-medium">Record a new outgoing payment or bill / एक नया आउटगोइंग भुगतान या बिल दर्ज करें</p>
           </div>
         </div>
       </div>
@@ -110,12 +123,12 @@ export default function ExpenseForm() {
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
             <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
               <Info className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">General Details</h2>
+              <h2 className="text-lg font-bold text-on-surface">General Details / सामान्य विवरण</h2>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Payee / Vendor <span className="text-error ml-1">*</span></label>
+                <label className="text-sm font-bold text-on-surface">Payee / Vendor / प्राप्तकर्ता / विक्रेता <span className="text-error ml-1">*</span></label>
                 <input
                   name="payee"
                   value={formData.payee}
@@ -129,7 +142,7 @@ export default function ExpenseForm() {
                 {errors.payee && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.payee}</p>}
               </div>
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Expense Category <span className="text-error ml-1">*</span></label>
+                <label className="text-sm font-bold text-on-surface">Expense Category / व्यय श्रेणी <span className="text-error ml-1">*</span></label>
                 <select 
                   name="category"
                   value={formData.category}
@@ -139,8 +152,8 @@ export default function ExpenseForm() {
                     errors.category ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
                   )}
                 >
-                  <option value="">Select category...</option>
-                  <option value="Utilities">Utilities (Electricity, Water)</option>
+                  <option value="">Select category... / श्रेणी चुनें...</option>
+                  <option value="Utilities">Utilities (Electricity, Water) / उपयोगिताएँ</option>
                   <option value="Rent">Rent</option>
                   <option value="Maintenance">Maintenance & Repairs</option>
                   <option value="Marketing">Marketing & Advertising</option>
@@ -154,7 +167,7 @@ export default function ExpenseForm() {
             </div>
 
             <div className="flex flex-col gap-1.5 w-full">
-              <label className="text-sm font-bold text-on-surface">Description (Optional)</label>
+              <label className="text-sm font-bold text-on-surface">Description (Optional) / विवरण (वैकल्पिक)</label>
               <textarea 
                 name="description"
                 value={formData.description}
@@ -169,12 +182,12 @@ export default function ExpenseForm() {
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
             <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
               <IndianRupee className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">Payment Info</h2>
+              <h2 className="text-lg font-bold text-on-surface">Payment Info / भुगतान जानकारी</h2>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Amount <span className="text-error ml-1">*</span></label>
+                <label className="text-sm font-bold text-on-surface">Amount / राशि <span className="text-error ml-1">*</span></label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-on-surface-variant">₹</span>
                   <input
@@ -193,7 +206,7 @@ export default function ExpenseForm() {
               </div>
 
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Expense Date <span className="text-error ml-1">*</span></label>
+                <label className="text-sm font-bold text-on-surface">Expense Date / व्यय की तिथि <span className="text-error ml-1">*</span></label>
                 <input
                   type="date"
                   name="date"
@@ -210,7 +223,7 @@ export default function ExpenseForm() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Payment Method</label>
+                <label className="text-sm font-bold text-on-surface">Payment Method / भुगतान विधि</label>
                 <select 
                   name="paymentMethod"
                   value={formData.paymentMethod}
@@ -225,7 +238,7 @@ export default function ExpenseForm() {
                 </select>
               </div>
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Status</label>
+                <label className="text-sm font-bold text-on-surface">Status / स्थिति</label>
                 <select 
                   name="status"
                   value={formData.status}
@@ -246,10 +259,10 @@ export default function ExpenseForm() {
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
             <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
               <FileText className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">Receipt / Bill</h2>
+              <h2 className="text-lg font-bold text-on-surface">Receipt / Bill / रसीद / बिल</h2>
             </div>
             
-            <p className="text-sm text-on-surface-variant font-medium">Attach proof of payment or invoice.</p>
+            <p className="text-sm text-on-surface-variant font-medium">Attach proof of payment or invoice. / भुगतान या चालान का प्रमाण संलग्न करें।</p>
             
             <div 
               onDragEnter={handleDrag}
@@ -265,7 +278,7 @@ export default function ExpenseForm() {
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3">
                 <UploadCloud className="w-6 h-6 text-primary" />
               </div>
-              <span className="text-sm font-bold text-on-surface mb-1">Click or drag receipt here</span>
+              <span className="text-sm font-bold text-on-surface mb-1">Click or drag receipt here / रसीद यहाँ क्लिक करें या खींचें</span>
               <span className="text-xs font-medium text-on-surface-variant">PNG, JPG, PDF (max 5MB)</span>
             </div>
           </div>
@@ -276,14 +289,14 @@ export default function ExpenseForm() {
         <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-4 pt-6 border-t border-outline-variant/20">
           <Button type="button" onClick={handleClear} variant="ghost" className="w-full sm:w-auto text-on-surface-variant hover:text-error flex items-center justify-center gap-2">
             <RefreshCcw className="w-4 h-4" />
-            Clear Form
+            Clear Form / फ़ॉर्म साफ़ करें
           </Button>
           <Button type="button" onClick={() => router.back()} variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
-            Cancel
+            Cancel / रद्द करें
           </Button>
           <Button type="submit" disabled={submitting} className="w-full sm:w-auto gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
             <Save className="w-4 h-4" />
-            <span className="font-bold tracking-wide">{submitting ? 'Saving...' : 'Save Expense'}</span>
+            <span className="font-bold tracking-wide">{submitting ? 'Saving... / सहेज रहा है...' : 'Save Expense / व्यय सहेजें'}</span>
           </Button>
         </div>
       </div>

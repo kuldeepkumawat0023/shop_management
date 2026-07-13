@@ -1,44 +1,66 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DataTable } from '@/components/common/DataTable';
 import { Button } from '@/components/common/Button';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { StatsCard } from '@/components/common/StatsCard';
 import { Plus, Download, ShoppingCart, Truck, Wallet, FileText, ChevronRight, Eye, Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import { purchaseService } from '@/lib/services/purchase.services';
 
-// Mock Data
-const MOCK_PURCHASES = [
-  { id: 'PO-2023-001', date: '2023-10-24', supplier: 'TechParts Pvt Ltd', status: 'Paid', delivery: 'Delivered', amount: 145000 },
-  { id: 'PO-2023-002', date: '2023-10-23', supplier: 'Global Supplies', status: 'Pending', delivery: 'In Transit', amount: 22500 },
-  { id: 'PO-2023-003', date: '2023-10-22', supplier: 'Apex Furniture Co', status: 'Partial', delivery: 'Pending', amount: 84000 },
-  { id: 'PO-2023-004', date: '2023-10-20', supplier: 'TechParts Pvt Ltd', status: 'Paid', delivery: 'Delivered', amount: 45000 },
-  { id: 'PO-2023-005', date: '2023-10-18', supplier: 'Nexus Electronics', status: 'Overdue', delivery: 'Delivered', amount: 112000 },
-];
-
+// Note: KPI stats are currently static and can be made dynamic later
 export default function PurchasesView() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [purchasesList, setPurchasesList] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredData = MOCK_PURCHASES.filter(p => 
+  useEffect(() => {
+    const fetchPurchases = async () => {
+      try {
+        const response = await purchaseService.getPurchases();
+        if (response.success) {
+          const mapped = response.data.map((p: any) => ({
+            id: p.invoiceNumber,
+            date: new Date(p.purchaseDate).toLocaleDateString(),
+            supplier: p.supplierId?.name || 'Unknown Supplier',
+            status: p.paymentStatus,
+            delivery: 'Delivered', // placeholder as delivery status isn't in model
+            amount: p.totalAmount,
+            _id: p._id
+          }));
+          setPurchasesList(mapped);
+        }
+      } catch (error) {
+        console.error('Failed to fetch purchases', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPurchases();
+  }, []);
+
+  const filteredData = purchasesList.filter(p => 
     p.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.supplier.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  if (loading) return <div className="p-8">Loading purchases... / खरीदारी लोड हो रही है...</div>;
+
   const columns = [
-    { header: 'PO Number', accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id}</span> },
-    { header: 'Date', accessorKey: 'date' },
-    { header: 'Supplier', accessorKey: 'supplier', cell: (row: any) => <span className="font-semibold text-primary">{row.supplier}</span> },
-    { header: 'Payment Status', accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
-    { header: 'Delivery', accessorKey: 'delivery', cell: (row: any) => (
+    { header: 'PO Number / पीओ नंबर', accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id}</span> },
+    { header: 'Date / दिनांक', accessorKey: 'date' },
+    { header: 'Supplier / आपूर्तिकर्ता', accessorKey: 'supplier', cell: (row: any) => <span className="font-semibold text-primary">{row.supplier}</span> },
+    { header: 'Payment Status / भुगतान की स्थिति', accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
+    { header: 'Delivery / वितरण', accessorKey: 'delivery', cell: (row: any) => (
       <span className={`font-semibold ${row.delivery === 'Delivered' ? 'text-success' : row.delivery === 'In Transit' ? 'text-blue' : 'text-warning'}`}>
         {row.delivery}
       </span>
     )},
-    { header: 'Total Amount', accessorKey: 'amount', cell: (row: any) => <span className="font-bold">₹{row.amount.toLocaleString()}</span> },
-    { header: 'Actions', accessorKey: 'actions', cell: (row: any) => (
+    { header: 'Total Amount / कुल राशि', accessorKey: 'amount', cell: (row: any) => <span className="font-bold">₹{row.amount.toLocaleString()}</span> },
+    { header: 'Actions / कार्रवाइयाँ', accessorKey: 'actions', cell: (row: any) => (
       <div className="flex items-center gap-2">
-        <Link href={`/purchases/${row.id}`}>
+        <Link href={`/purchases/${row._id}`}>
           <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
             <Eye className="w-4 h-4" />
           </Button>
@@ -58,18 +80,18 @@ export default function PurchasesView() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
         <div>
-          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">Purchases</h2>
-          <p className="text-sm font-medium text-on-surface-variant">Manage purchase orders, supplier bills, and inventory restocking.</p>
+          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">Purchases / खरीदारी</h2>
+          <p className="text-sm font-medium text-on-surface-variant">Manage purchase orders, supplier bills, and inventory restocking. / खरीद आदेश, आपूर्तिकर्ता बिल और इन्वेंट्री रीस्टॉकिंग प्रबंधित करें।</p>
         </div>
         <div className="flex gap-3 w-full md:w-auto">
           <Button variant="outline" className="flex-1 md:flex-none bg-surface-container-lowest border-primary text-primary px-4 py-2 rounded-lg font-bold hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2 shadow-sm">
             <Download className="w-4 h-4" />
-            Export
+            <span className="hidden sm:inline">Export / निर्यात</span>
           </Button>
           <Link href="/purchases/new" className="flex-1 md:flex-none">
             <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border-none whitespace-nowrap">
               <Plus className="w-4 h-4 shrink-0" />
-              <span className="truncate">New Purchase</span>
+              <span className="truncate">New Purchase / नई खरीदारी</span>
             </Button>
           </Link>
         </div>
@@ -114,12 +136,12 @@ export default function PurchasesView() {
         <DataTable 
           data={filteredData}
           columns={columns}
-          searchPlaceholder="Search by PO number or supplier..."
+          searchPlaceholder="Search by PO number or supplier... / पीओ नंबर या आपूर्तिकर्ता द्वारा खोजें..."
           itemsPerPage={10}
           headerContent={
             <div className="flex items-center gap-2">
               <ShoppingCart className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-bold text-on-surface">Purchase Orders</h3>
+              <h3 className="text-lg font-bold text-on-surface">Purchase Orders / खरीद आदेश</h3>
             </div>
           }
           className="border-none shadow-none"
