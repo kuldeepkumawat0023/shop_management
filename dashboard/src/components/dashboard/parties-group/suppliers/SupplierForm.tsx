@@ -118,8 +118,8 @@ export default function SupplierForm() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">Add New Supplier</h1>
-            <p className="text-sm text-on-surface-variant mt-1 font-medium">Onboard a new vendor or B2B partner</p>
+            <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">Add New Supplier / नया आपूर्तिकर्ता जोड़ें</h1>
+            <p className="text-sm text-on-surface-variant mt-1 font-medium">Onboard a new vendor or B2B partner / नए विक्रेता या बी2बी पार्टनर को जोड़ें</p>
           </div>
         </div>
       </div>
@@ -131,7 +131,7 @@ export default function SupplierForm() {
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
             <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
               <Building2 className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">Company & Contact Info</h2>
+              <h2 className="text-lg font-bold text-on-surface">Company & Contact Info / कंपनी और संपर्क जानकारी</h2>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -188,7 +188,7 @@ export default function SupplierForm() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <Input
-                  label="GSTIN / Tax ID"
+                  label="GSTIN / Tax ID / जीएसटी नंबर"
                   name="gstNumber"
                   value={formData.gstNumber}
                   onChange={handleInputChange}
@@ -198,15 +198,15 @@ export default function SupplierForm() {
                 {errors.gstNumber && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.gstNumber}</p>}
               </div>
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Status</label>
+                <label className="text-sm font-bold text-on-surface">Status / स्थिति</label>
                 <select 
                   name="status"
                   value={formData.status}
                   onChange={handleInputChange}
                   className="flex w-full h-10 rounded-xl bg-surface border border-outline-variant/30 px-3 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all appearance-none"
                 >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
+                  <option value="Active">Active / सक्रिय</option>
+                  <option value="Inactive">Inactive / निष्क्रिय</option>
                 </select>
               </div>
             </div>
@@ -215,11 +215,11 @@ export default function SupplierForm() {
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
             <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
               <ReceiptText className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">Payment & Notes</h2>
+              <h2 className="text-lg font-bold text-on-surface">Payment & Notes / भुगतान और विवरण</h2>
             </div>
             
             <div className="flex flex-col gap-1.5 w-full">
-              <label className="text-sm font-bold text-on-surface">Payment Terms</label>
+              <label className="text-sm font-bold text-on-surface">Payment Terms / भुगतान शर्तें</label>
               <select 
                 name="paymentTerms"
                 value={formData.paymentTerms}
@@ -236,7 +236,7 @@ export default function SupplierForm() {
             </div>
 
             <div className="flex flex-col gap-1.5 w-full">
-              <label className="text-sm font-bold text-on-surface">Internal Notes</label>
+              <label className="text-sm font-bold text-on-surface">Internal Notes / आंतरिक विवरण</label>
               <textarea 
                 name="notes"
                 value={formData.notes}
@@ -254,12 +254,12 @@ export default function SupplierForm() {
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
             <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
               <MapPin className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">Business Address</h2>
+              <h2 className="text-lg font-bold text-on-surface">Business Address / व्यावसायिक पता</h2>
             </div>
             
             <div className="flex flex-col gap-5">
               <Input
-                label="Street Address"
+                label="Street Address / गली का पता"
                 name="street"
                 value={addressData.street}
                 onChange={handleAddressChange}
@@ -268,35 +268,35 @@ export default function SupplierForm() {
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <Input
-                  label="City"
+                  label="City / शहर"
                   name="city"
                   value={addressData.city}
                   onChange={handleAddressChange}
-                  placeholder="Pune"
+                  placeholder="Jaipur / जयपुर"
                 />
                 <Input
-                  label="State/Province"
+                  label="State/Province / राज्य/प्रांत"
                   name="state"
                   value={addressData.state}
                   onChange={handleAddressChange}
-                  placeholder="Maharashtra"
+                  placeholder="Rajasthan / राजस्थान"
                 />
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <Input
-                  label="ZIP / Postal Code"
+                  label="ZIP / Postal Code / पिन कोड"
                   name="zip"
                   value={addressData.zip}
                   onChange={handleAddressChange}
                   placeholder="411001"
                 />
                 <Input
-                  label="Country"
+                  label="Country / देश"
                   name="country"
                   value={addressData.country}
                   onChange={handleAddressChange}
-                  placeholder="India"
+                  placeholder="India / भारत"
                 />
               </div>
             </div>
@@ -308,14 +308,14 @@ export default function SupplierForm() {
         <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-4 pt-6 border-t border-outline-variant/20">
           <Button type="button" onClick={handleClear} variant="ghost" className="w-full sm:w-auto text-on-surface-variant hover:text-error flex items-center justify-center gap-2">
             <RefreshCcw className="w-4 h-4" />
-            Clear Form
+            Clear Form / फ़ॉर्म साफ़ करें
           </Button>
           <Button type="button" onClick={() => router.back()} variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
-            Cancel
+            Cancel / रद्द करें
           </Button>
           <Button type="submit" disabled={loading} className="w-full sm:w-auto gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
             <Save className="w-4 h-4" />
-            <span className="font-bold tracking-wide">{loading ? 'Saving...' : 'Save Supplier'}</span>
+            <span className="font-bold tracking-wide">{loading ? 'Saving... / सहेजा जा रहा है...' : 'Save Supplier / आपूर्तिकर्ता सहेजें'}</span>
           </Button>
         </div>
       </div>

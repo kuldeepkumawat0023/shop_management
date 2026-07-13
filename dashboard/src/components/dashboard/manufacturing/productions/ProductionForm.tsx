@@ -246,10 +246,10 @@ export default function ProductionForm() {
         <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-4 pt-6 border-t border-outline-variant/20">
           <Button type="button" onClick={handleClear} variant="ghost" className="w-full sm:w-auto text-on-surface-variant hover:text-error flex items-center justify-center gap-2">
             <RefreshCcw className="w-4 h-4" />
-            Clear Form
+            Clear Form / फ़ॉर्म साफ़ करें
           </Button>
           <Button type="button" onClick={() => router.back()} variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
-            Cancel
+            Cancel / रद्द करें
           </Button>
           <Button
             type="submit"
