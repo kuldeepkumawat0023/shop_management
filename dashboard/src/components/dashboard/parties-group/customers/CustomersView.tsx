@@ -82,7 +82,7 @@ export default function CustomersView() {
   ];
 
   const filteredCustomers = customers.filter(c => 
-    c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    (c.name && c.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
     (c.mobile && c.mobile.includes(searchQuery)) ||
     (c.email && c.email.toLowerCase().includes(searchQuery.toLowerCase()))
   );
@@ -92,7 +92,7 @@ export default function CustomersView() {
   const activeCustomers = customers.filter(c => c.isActive !== false).length;
   // Calculate new this month
   const currentMonth = new Date().getMonth();
-  const newThisMonth = customers.filter(c => new Date(c.createdAt).getMonth() === currentMonth).length;
+  const newThisMonth = customers.filter(c => c.createdAt ? new Date(c.createdAt).getMonth() === currentMonth : false).length;
   // Total Receivables (using dueAmount as a placeholder)
   const totalReceivables = customers.reduce((sum, c) => sum + (Number(c.dueAmount) || 0), 0);
 

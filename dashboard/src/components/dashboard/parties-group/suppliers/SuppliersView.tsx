@@ -52,9 +52,9 @@ export default function SuppliersView() {
     }
   };
   const columns = [
-    { header: 'Company', accessorKey: 'companyName', cell: (row: any) => (
+    { header: 'Company', accessorKey: 'name', cell: (row: any) => (
       <div className="flex flex-col">
-        <span className="font-semibold text-primary">{row.companyName}</span>
+        <span className="font-semibold text-primary">{row.name}</span>
         <span className="text-xs text-on-surface-variant">Contact: {row.contactPerson}</span>
       </div>
     )},
@@ -87,7 +87,7 @@ export default function SuppliersView() {
   ];
 
   const filteredSuppliers = suppliers.filter(s => 
-    (s.companyName && s.companyName.toLowerCase().includes(searchQuery.toLowerCase())) || 
+    (s.name && s.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
     (s.contactPerson && s.contactPerson.toLowerCase().includes(searchQuery.toLowerCase())) ||
     (s.mobile && s.mobile.includes(searchQuery))
   );
@@ -96,7 +96,7 @@ export default function SuppliersView() {
   const totalSuppliers = suppliers.length;
   const activeSuppliers = suppliers.filter(s => s.isActive !== false).length;
   const currentMonth = new Date().getMonth();
-  const newThisMonth = suppliers.filter(s => new Date(s.createdAt).getMonth() === currentMonth).length;
+  const newThisMonth = suppliers.filter(s => s.createdAt ? new Date(s.createdAt).getMonth() === currentMonth : false).length;
   const totalPayables = suppliers.reduce((sum, s) => sum + (Number(s.balance) || 0), 0);
 
   const supplierKPIs = [

@@ -87,6 +87,8 @@ export const customerSchema = z.object({
   name: z.string().min(1, 'Customer Name is required / ग्राहक का नाम आवश्यक है').max(100, 'Customer Name is too long / ग्राहक का नाम बहुत लंबा है'),
   phone: z.string().min(1, 'Phone number is required / फ़ोन नंबर आवश्यक है').regex(phoneRegex, 'Invalid phone number / अमान्य फ़ोन नंबर'),
   email: z.union([z.literal(''), z.string().email('Invalid email address / अमान्य ईमेल पता')]).optional(),
+  company: z.string().optional(),
+  notes: z.string().optional(),
   address: z.string().max(500, 'Address is too long / पता बहुत लंबा है').optional(),
 });
 
@@ -99,6 +101,8 @@ export const supplierSchema = z.object({
     z.literal(''),
     z.string().regex(gstRegex, 'Invalid GST number format / अमान्य GST नंबर प्रारूप')
   ]).optional(),
+  paymentTerms: z.string().optional(),
+  notes: z.string().optional(),
   address: z.string().max(500, 'Address is too long / पता बहुत लंबा है').optional(),
 });
 
