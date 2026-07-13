@@ -9,10 +9,18 @@ import { Plus, Download, ShoppingCart, Truck, Wallet, FileText, ChevronRight, Ey
 import Link from 'next/link';
 import { purchaseService } from '@/lib/services/purchase.services';
 
-// Note: KPI stats are currently static and can be made dynamic later
+// Dynamic KPIs will be calculated
+const initialKPIs = [
+  { title: "Total Purchases", value: "₹0", trend: "-", isPositive: true, icon: ShoppingCart },
+  { title: "Pending Payments", value: "₹0", trend: "0 Bills", isPositive: false, icon: Wallet },
+  { title: "Active Orders", value: "0", trend: "-", isPositive: true, icon: Truck },
+  { title: "Top Supplier", value: "-", trend: "-", isPositive: true, icon: FileText },
+];
+
 export default function PurchasesView() {
   const [searchQuery, setSearchQuery] = useState('');
   const [purchasesList, setPurchasesList] = useState<any[]>([]);
+  const [kpis, setKpis] = useState(initialKPIs);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,6 +38,25 @@ export default function PurchasesView() {
             _id: p._id
           }));
           setPurchasesList(mapped);
+
+          // Calculate Dynamic KPIs
+          const totalAmount = response.data.reduce((acc: number, p: any) => acc + (p.totalAmount || 0), 0);
+          const pendingBills = response.data.filter((p: any) => p.paymentStatus !== 'Paid');
+          const pendingAmount = pendingBills.reduce((acc: number, p: any) => acc + (p.totalAmount || 0), 0);
+          
+          const supplierCounts: Record<string, number> = {};
+          response.data.forEach((p: any) => {
+            const name = p.supplierId?.name || 'Unknown';
+            supplierCounts[name] = (supplierCounts[name] || 0) + (p.totalAmount || 0);
+          });
+          const topSupplier = Object.entries(supplierCounts).sort((a, b) => b[1] - a[1])[0];
+
+          setKpis([
+            { title: "Total Purchases", value: `₹${totalAmount.toLocaleString()}`, trend: "Overall", isPositive: true, icon: ShoppingCart },
+            { title: "Pending Payments", value: `₹${pendingAmount.toLocaleString()}`, trend: `${pendingBills.length} Bills`, isPositive: false, icon: Wallet },
+            { title: "Active Orders", value: `${response.data.length}`, trend: "Total orders", isPositive: true, icon: Truck },
+            { title: "Top Supplier", value: topSupplier ? topSupplier[0] : "-", trend: topSupplier ? `₹${topSupplier[1].toLocaleString()}` : "-", isPositive: true, icon: FileText },
+          ]);
         }
       } catch (error) {
         console.error('Failed to fetch purchases', error);
@@ -45,20 +72,20 @@ export default function PurchasesView() {
     p.supplier.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (loading) return <div className="p-8">Loading purchases... / खरीदारी लोड हो रही है...</div>;
+  if (loading) return <div className="p-8">Loading purchases...</div>;
 
   const columns = [
-    { header: 'PO Number / पीओ नंबर', accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id}</span> },
-    { header: 'Date / दिनांक', accessorKey: 'date' },
-    { header: 'Supplier / आपूर्तिकर्ता', accessorKey: 'supplier', cell: (row: any) => <span className="font-semibold text-primary">{row.supplier}</span> },
-    { header: 'Payment Status / भुगतान की स्थिति', accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
-    { header: 'Delivery / वितरण', accessorKey: 'delivery', cell: (row: any) => (
+    { header: 'PO Number', accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id}</span> },
+    { header: 'Date', accessorKey: 'date' },
+    { header: 'Supplier', accessorKey: 'supplier', cell: (row: any) => <span className="font-semibold text-primary">{row.supplier}</span> },
+    { header: 'Payment Status', accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
+    { header: 'Delivery', accessorKey: 'delivery', cell: (row: any) => (
       <span className={`font-semibold ${row.delivery === 'Delivered' ? 'text-success' : row.delivery === 'In Transit' ? 'text-blue' : 'text-warning'}`}>
         {row.delivery}
       </span>
     )},
-    { header: 'Total Amount / कुल राशि', accessorKey: 'amount', cell: (row: any) => <span className="font-bold">₹{row.amount.toLocaleString()}</span> },
-    { header: 'Actions / कार्रवाइयाँ', accessorKey: 'actions', cell: (row: any) => (
+    { header: 'Total Amount', accessorKey: 'amount', cell: (row: any) => <span className="font-bold">₹{row.amount.toLocaleString()}</span> },
+    { header: 'Actions', accessorKey: 'actions', cell: (row: any) => (
       <div className="flex items-center gap-2">
         <Link href={`/purchases/${row._id}`}>
           <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
@@ -80,18 +107,18 @@ export default function PurchasesView() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
         <div>
-          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">Purchases / खरीदारी</h2>
-          <p className="text-sm font-medium text-on-surface-variant">Manage purchase orders, supplier bills, and inventory restocking. / खरीद आदेश, आपूर्तिकर्ता बिल और इन्वेंट्री रीस्टॉकिंग प्रबंधित करें।</p>
+          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">Purchases</h2>
+          <p className="text-sm font-medium text-on-surface-variant">Manage purchase orders, supplier bills, and inventory restocking.</p>
         </div>
         <div className="flex gap-3 w-full md:w-auto">
           <Button variant="outline" className="flex-1 md:flex-none bg-surface-container-lowest border-primary text-primary px-4 py-2 rounded-lg font-bold hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2 shadow-sm">
             <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Export / निर्यात</span>
+            <span className="hidden sm:inline">Export</span>
           </Button>
           <Link href="/purchases/new" className="flex-1 md:flex-none">
             <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border-none whitespace-nowrap">
               <Plus className="w-4 h-4 shrink-0" />
-              <span className="truncate">New Purchase / नई खरीदारी</span>
+              <span className="truncate">New Purchase</span>
             </Button>
           </Link>
         </div>
@@ -99,36 +126,9 @@ export default function PurchasesView() {
 
       {/* KPI Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
-        <StatsCard 
-          title="Total Purchases"
-          value="₹3.8L"
-          icon={ShoppingCart}
-          trend="+12%"
-          trendDirection="up"
-          trendLabel="vs last month"
-          colorTheme="primary"
-        />
-        <StatsCard 
-          title="Pending Payments"
-          value="₹1.2L"
-          icon={Wallet}
-          trendLabel="Across 8 bills"
-          colorTheme="warning"
-        />
-        <StatsCard 
-          title="Active Orders"
-          value="12"
-          icon={Truck}
-          trendLabel="Awaiting Delivery"
-          colorTheme="blue"
-        />
-        <StatsCard 
-          title="Top Supplier"
-          value="TechParts"
-          icon={FileText}
-          trendLabel="45% of PO volume"
-          colorTheme="purple"
-        />
+        {kpis.map((kpi, idx) => (
+          <StatsCard key={idx} {...kpi} />
+        ))}
       </div>
 
       {/* Purchases Table */}
@@ -136,12 +136,12 @@ export default function PurchasesView() {
         <DataTable 
           data={filteredData}
           columns={columns}
-          searchPlaceholder="Search by PO number or supplier... / पीओ नंबर या आपूर्तिकर्ता द्वारा खोजें..."
+          searchPlaceholder="Search by PO number or supplier..."
           itemsPerPage={10}
           headerContent={
             <div className="flex items-center gap-2">
               <ShoppingCart className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-bold text-on-surface">Purchase Orders / खरीद आदेश</h3>
+              <h3 className="text-lg font-bold text-on-surface">Purchase Orders</h3>
             </div>
           }
           className="border-none shadow-none"
