@@ -313,7 +313,7 @@ export default function BrandForm({ editId }: BrandFormProps) {
               {selectedFile ? selectedFile.name : 'Upload Brand Logo'}
             </p>
             <p className="text-xs text-on-surface-variant text-center">
-              {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB` : 'PNG or JPG (MAX. 800x400px)'}
+              {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB` : 'PNG or JPG (MAX. 5MB) / (अधिकतम 5MB)'}
             </p>
           </div>
         </div>

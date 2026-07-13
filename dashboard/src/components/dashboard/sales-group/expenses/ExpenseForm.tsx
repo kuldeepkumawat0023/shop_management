@@ -315,7 +315,7 @@ export default function ExpenseForm() {
                 {selectedFile ? selectedFile.name : 'Click or drag receipt here / रसीद यहाँ क्लिक करें या खींचें'}
               </span>
               <span className="text-xs font-medium text-on-surface-variant text-center">
-                {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB` : 'PNG, JPG, PDF (max 5MB)'}
+                {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB` : 'PNG, JPG, PDF (MAX. 5MB) / (अधिकतम 5MB)'}
               </span>
             </div>
           </div>

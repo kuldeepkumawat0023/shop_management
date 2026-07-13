@@ -281,7 +281,7 @@ export default function CategoryForm({ editId }: CategoryFormProps) {
               {selectedFile ? selectedFile.name : 'Click to upload or drag and drop'}
             </p>
             <p className="text-xs text-on-surface-variant text-center">
-              {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB` : 'SVG, PNG, JPG or GIF (MAX. 800x400px)'}
+              {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB` : 'SVG, PNG, JPG or GIF (MAX. 5MB) / (अधिकतम 5MB)'}
             </p>
           </div>
         </div>

@@ -451,7 +451,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
               {selectedFile ? selectedFile.name : 'Click to upload or drag and drop'}
             </p>
             <p className="text-xs text-on-surface-variant text-center">
-              {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB` : 'SVG, PNG, JPG or GIF (max. 5MB)'}
+              {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB` : 'SVG, PNG, JPG or GIF (MAX. 5MB) / (अधिकतम 5MB)'}
             </p>
           </div>
         </div>
