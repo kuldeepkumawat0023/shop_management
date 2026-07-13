@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/common/Button';
 import { ArrowLeft, Save, UploadCloud, Info, IndianRupee, FileText, RefreshCcw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useRef } from 'react';
 import { cn } from '@/utils/cn';
 import { expenseSchema } from '@/utils/validations';
 import toast from 'react-hot-toast';
@@ -11,7 +12,9 @@ import { expenseService } from '@/lib/services/expense.services';
 
 export default function ExpenseForm() {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     payee: '',
     category: '',
@@ -54,6 +57,31 @@ export default function ExpenseForm() {
     e.stopPropagation();
     if (e.type === "dragenter" || e.type === "dragover") setDragActive(true);
     else if (e.type === "dragleave") setDragActive(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.size <= 5 * 1024 * 1024) { // 5MB limit
+        setSelectedFile(file);
+      } else {
+        toast.error('File size should not exceed 5MB / फ़ाइल का आकार 5MB से अधिक नहीं होना चाहिए');
+      }
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.size <= 5 * 1024 * 1024) { // 5MB limit
+        setSelectedFile(file);
+      } else {
+        toast.error('File size should not exceed 5MB / फ़ाइल का आकार 5MB से अधिक नहीं होना चाहिए');
+      }
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -264,22 +292,31 @@ export default function ExpenseForm() {
             
             <p className="text-sm text-on-surface-variant font-medium">Attach proof of payment or invoice. / भुगतान या चालान का प्रमाण संलग्न करें।</p>
             
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="hidden"
+              accept=".png,.jpg,.jpeg,.pdf"
+            />
             <div 
+              onClick={() => fileInputRef.current?.click()}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
-              onDrop={(e) => {
-                handleDrag(e);
-                // Handle drop event here
-              }}
+              onDrop={handleDrop}
               className={`flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-2xl transition-all cursor-pointer bg-surface-container-low hover:bg-surface-container
                 ${dragActive ? 'border-primary bg-primary/5' : 'border-outline-variant/30'}`}
             >
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3">
                 <UploadCloud className="w-6 h-6 text-primary" />
               </div>
-              <span className="text-sm font-bold text-on-surface mb-1">Click or drag receipt here / रसीद यहाँ क्लिक करें या खींचें</span>
-              <span className="text-xs font-medium text-on-surface-variant">PNG, JPG, PDF (max 5MB)</span>
+              <span className="text-sm font-bold text-on-surface mb-1 text-center">
+                {selectedFile ? selectedFile.name : 'Click or drag receipt here / रसीद यहाँ क्लिक करें या खींचें'}
+              </span>
+              <span className="text-xs font-medium text-on-surface-variant text-center">
+                {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB` : 'PNG, JPG, PDF (max 5MB)'}
+              </span>
             </div>
           </div>
         </div>
