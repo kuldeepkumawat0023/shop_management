@@ -37,6 +37,19 @@ export default function StaffSalaryView() {
     (s.staffId?.name && s.staffId.name.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
+  // ponytail: client-side KPI aggregation to avoid unnecessary backend endpoints.
+  const totalDisbursed = salaries.filter(s => s.status === 'Paid').reduce((sum, s) => sum + (Number(s.netSalary) || 0), 0);
+  const totalDeductions = salaries.reduce((sum, s) => sum + (Number(s.deductions) || 0), 0);
+  const pendingPayments = salaries.filter(s => s.status === 'Pending').length;
+  const totalRecords = salaries.length;
+
+  const salaryKPIs = [
+    { title: "Net Disbursed", value: `₹${totalDisbursed.toLocaleString()}`, trend: "Lifetime paid", isPositive: true, icon: Wallet },
+    { title: "Total Deductions", value: `₹${totalDeductions.toLocaleString()}`, trend: "Leaves, advances, etc", isPositive: false, icon: AlertCircle },
+    { title: "Pending Salaries", value: pendingPayments.toString(), trend: "Awaiting payment", isPositive: pendingPayments === 0, icon: CalendarClock },
+    { title: "Salary Records", value: totalRecords.toString(), trend: "Total processed", isPositive: true, icon: CheckCircle2 },
+  ];
+
   const columns = [
     { header: 'ID', accessorKey: '_id', cell: (row: any) => <span className="font-bold text-on-surface">{row._id?.substring(row._id.length - 6).toUpperCase()}</span> },
     { header: 'Employee', accessorKey: 'staffId.name', cell: (row: any) => (
@@ -89,14 +102,11 @@ export default function StaffSalaryView() {
       </div>
 
       {/* KPI Cards */}
-      {/* KPI section hidden until backend aggregation is done */}
-      {/*
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
         {salaryKPIs.map((kpi, idx) => (
           <StatsCard key={idx} {...kpi} />
         ))}
       </div>
-      */}
 
       {/* Table Section */}
       <div className="flex flex-col flex-1 min-h-0 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm overflow-hidden">

@@ -37,6 +37,19 @@ export default function SalaryAdvancesView() {
     (a.staffId?.name && a.staffId.name.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
+  // ponytail: client-side KPI aggregation to avoid unnecessary backend endpoints.
+  const totalAdvanceAmount = advances.filter(a => a.status === 'Approved' || a.status === 'Settled').reduce((sum, a) => sum + (Number(a.amount) || 0), 0);
+  const pendingRequests = advances.filter(a => a.status === 'Pending').length;
+  const approvedAdvances = advances.filter(a => a.status === 'Approved').length;
+  const settledAdvances = advances.filter(a => a.status === 'Settled').length;
+
+  const advanceKPIs = [
+    { title: "Total Advanced", value: `₹${totalAdvanceAmount.toLocaleString()}`, trend: "Lifetime disbursed", isPositive: true, icon: Banknote },
+    { title: "Active (Approved)", value: approvedAdvances.toString(), trend: "Awaiting settlement", isPositive: true, icon: HandCoins },
+    { title: "Pending Requests", value: pendingRequests.toString(), trend: "Needs review", isPositive: pendingRequests === 0, icon: UserMinus },
+    { title: "Settled", value: settledAdvances.toString(), trend: "Fully recovered", isPositive: true, icon: Plus }, // Use Plus or another suitable icon for settled
+  ];
+
   const columns = [
     { header: 'Ref ID', accessorKey: '_id', cell: (row: any) => <span className="font-bold text-on-surface">{row._id?.substring(row._id.length - 6).toUpperCase()}</span> },
     { header: 'Employee', accessorKey: 'staffId.name', cell: (row: any) => <span className="font-semibold text-primary">{row.staffId?.name || 'Unknown'}</span> },
@@ -78,7 +91,12 @@ export default function SalaryAdvancesView() {
         </div>
       </div>
 
-
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+        {advanceKPIs.map((kpi, idx) => (
+          <StatsCard key={idx} {...kpi} />
+        ))}
+      </div>
 
       {/* Table Section */}
       <div className="flex flex-col flex-1 min-h-0 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm overflow-hidden">
