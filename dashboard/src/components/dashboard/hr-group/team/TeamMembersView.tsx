@@ -5,6 +5,7 @@ import { DataTable } from '@/components/common/DataTable';
 import { Button } from '@/components/common/Button';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { StatsCard } from '@/components/common/StatsCard';
+import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import { Plus, Download, Filter, Search, Users, UserCheck, CalendarOff, UserPlus, Eye, Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { teamService, StaffData } from '@/lib/services/team.services';
@@ -149,6 +150,8 @@ export default function TeamMembersView() {
     { title: "New Hires", value: newHires.toString(), trend: "In last 30 days", isPositive: true, icon: UserPlus },
   ];
 
+  if (loading) return <ViewPageSkeleton />;
+
   return (
     <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full ">
       {/* Page Header */}
@@ -203,7 +206,6 @@ export default function TeamMembersView() {
           <DataTable 
             columns={columns} 
             data={filteredStaff} 
-            isLoading={loading}
           />
         </div>
       </div>

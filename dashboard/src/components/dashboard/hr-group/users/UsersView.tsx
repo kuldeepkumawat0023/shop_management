@@ -5,6 +5,7 @@ import { DataTable } from '@/components/common/DataTable';
 import { Button } from '@/components/common/Button';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { StatsCard } from '@/components/common/StatsCard';
+import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import { Plus, Download, Filter, Search, Users, ShieldAlert, MonitorPlay, MailWarning, Eye, Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { userService } from '@/lib/services/user.services';
@@ -154,6 +155,8 @@ export default function UsersView() {
     { title: "Pending Invites", value: pendingInvites.toString(), trend: "Needs activation", isPositive: false, icon: MailWarning },
   ];
 
+  if (loading) return <ViewPageSkeleton />;
+
   return (
     <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full ">
       {/* Page Header */}
@@ -208,7 +211,6 @@ export default function UsersView() {
           <DataTable 
             columns={columns} 
             data={filteredUsers} 
-            isLoading={loading}
           />
         </div>
       </div>
