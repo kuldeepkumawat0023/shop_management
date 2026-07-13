@@ -8,50 +8,99 @@ import { StatsCard } from '@/components/common/StatsCard';
 import { Plus, Download, Filter, Search, Users, UserCheck, UserPlus, IndianRupee, Eye, Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
-// Mock Data
-const customerKPIs = [
-  { title: "Total Customers", value: "1,248", trend: "+12% this month", isPositive: true, icon: Users },
-  { title: "Active Customers", value: "856", trend: "Ordered in last 30d", isPositive: true, icon: UserCheck },
-  { title: "New This Month", value: "64", trend: "+8% vs last month", isPositive: true, icon: UserPlus },
-  { title: "Total Receivables", value: "₹45,500", trend: "12 overdue accounts", isPositive: false, icon: IndianRupee },
-];
+// We will use React state for these instead of static arrays
 
-const customerList = [
-  { id: 'CUST-001', name: 'Rajesh Kumar', email: 'rajesh.k@example.com', phone: '+91 98765 43210', status: 'Active', totalSpent: 125000, lastOrder: 'Jul 24, 2026' },
-  { id: 'CUST-002', name: 'Priya Sharma', email: 'priya.sharma@example.com', phone: '+91 98765 43211', status: 'Active', totalSpent: 45000, lastOrder: 'Jul 20, 2026' },
-  { id: 'CUST-003', name: 'Amit Singh', email: 'amit.singh@example.com', phone: '+91 98765 43212', status: 'Inactive', totalSpent: 12000, lastOrder: 'May 15, 2026' },
-  { id: 'CUST-004', name: 'Neha Gupta', email: 'neha.gupta@example.com', phone: '+91 98765 43213', status: 'Active', totalSpent: 85000, lastOrder: 'Jul 22, 2026' },
-  { id: 'CUST-005', name: 'Vikram Patel', email: 'vikram.patel@example.com', phone: '+91 98765 43214', status: 'Inactive', totalSpent: 5000, lastOrder: 'Mar 10, 2026' },
-];
+import { customerService } from '@/lib/services/customer.services';
+import toast from 'react-hot-toast';
 
 export default function CustomersView() {
+  const [customers, setCustomers] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [searchQuery, setSearchQuery] = React.useState('');
+
+  const fetchCustomers = async () => {
+    try {
+      setLoading(true);
+      const res = await customerService.getCustomers();
+      if (res.success && res.data) {
+        setCustomers(res.data);
+      }
+    } catch (error) {
+      toast.error('Failed to load customers');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchCustomers();
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Are you sure you want to delete this customer?')) {
+      try {
+        const res = await customerService.deleteCustomer(id);
+        if (res.success) {
+          toast.success('Customer deleted successfully');
+          fetchCustomers();
+        } else {
+          toast.error(res.message || 'Failed to delete customer');
+        }
+      } catch (error) {
+        toast.error('Failed to delete customer');
+      }
+    }
+  };
   const columns = [
-    { header: 'ID', accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id}</span> },
     { header: 'Name', accessorKey: 'name', cell: (row: any) => <span className="font-semibold text-primary">{row.name}</span> },
     { header: 'Email & Phone', accessorKey: 'contact', cell: (row: any) => (
       <div className="flex flex-col">
-        <span className="text-sm font-medium text-on-surface">{row.email}</span>
-        <span className="text-xs text-on-surface-variant">{row.phone}</span>
+        <span className="text-sm font-medium text-on-surface">{row.email || 'N/A'}</span>
+        <span className="text-xs text-on-surface-variant">{row.mobile}</span>
       </div>
     )},
-    { header: 'Total Spent', accessorKey: 'totalSpent', cell: (row: any) => <span className="font-bold text-on-surface">₹{row.totalSpent.toLocaleString()}</span> },
-    { header: 'Last Order', accessorKey: 'lastOrder', cell: (row: any) => <span className="text-sm text-on-surface-variant">{row.lastOrder}</span> },
-    { header: 'Status', accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
+    { header: 'Total Spent', accessorKey: 'totalSpent', cell: (row: any) => <span className="font-bold text-on-surface">₹{(row.dueAmount || 0).toLocaleString()}</span> },
+    { header: 'Credit Limit', accessorKey: 'creditLimit', cell: (row: any) => <span className="text-sm text-on-surface-variant">₹{(row.creditLimit || 0).toLocaleString()}</span> },
+    { header: 'Status', accessorKey: 'isActive', cell: (row: any) => <StatusBadge status={row.isActive !== false ? 'Active' : 'Inactive'} /> },
     { header: 'Actions', accessorKey: 'actions', cell: (row: any) => (
       <div className="flex items-center gap-2">
-        <Link href={`/customers/${row.id}`}>
+        <Link href={`/customers/${row._id}`}>
           <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
             <Eye className="w-4 h-4" />
           </Button>
         </Link>
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
-          <Edit className="w-4 h-4" />
-        </Button>
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+        <Link href={`/customers/${row._id}/edit`}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
+            <Edit className="w-4 h-4" />
+          </Button>
+        </Link>
+        <Button variant="ghost" size="icon" onClick={() => handleDelete(row._id)} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
           <Trash2 className="w-4 h-4" />
         </Button>
       </div>
     )},
+  ];
+
+  const filteredCustomers = customers.filter(c => 
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    (c.mobile && c.mobile.includes(searchQuery)) ||
+    (c.email && c.email.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
+  // KPIs calculation
+  const totalCustomers = customers.length;
+  const activeCustomers = customers.filter(c => c.isActive !== false).length;
+  // Calculate new this month
+  const currentMonth = new Date().getMonth();
+  const newThisMonth = customers.filter(c => new Date(c.createdAt).getMonth() === currentMonth).length;
+  // Total Receivables (using dueAmount as a placeholder)
+  const totalReceivables = customers.reduce((sum, c) => sum + (Number(c.dueAmount) || 0), 0);
+
+  const customerKPIs = [
+    { title: "Total Customers", value: totalCustomers.toString(), trend: "All time", isPositive: true, icon: Users },
+    { title: "Active Customers", value: activeCustomers.toString(), trend: "Currently active", isPositive: true, icon: UserCheck },
+    { title: "New This Month", value: newThisMonth.toString(), trend: "Current month", isPositive: true, icon: UserPlus },
+    { title: "Total Receivables", value: `₹${totalReceivables.toLocaleString()}`, trend: "Outstanding due", isPositive: false, icon: IndianRupee },
   ];
 
   return (
@@ -91,6 +140,8 @@ export default function CustomersView() {
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
             <input 
               type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search customers..."
               className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface border border-outline-variant/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm font-medium transition-all text-on-surface placeholder:text-on-surface-variant/50"
             />
@@ -103,10 +154,14 @@ export default function CustomersView() {
 
         {/* Data Table */}
         <div className="flex-1 overflow-auto custom-scrollbar">
-          <DataTable 
-            columns={columns} 
-            data={customerList} 
-          />
+          {loading ? (
+            <div className="p-8 text-center text-on-surface-variant">Loading customers...</div>
+          ) : (
+            <DataTable 
+              columns={columns} 
+              data={filteredCustomers} 
+            />
+          )}
         </div>
       </div>
     </div>

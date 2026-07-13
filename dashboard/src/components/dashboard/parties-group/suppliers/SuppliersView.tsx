@@ -8,55 +8,102 @@ import { StatsCard } from '@/components/common/StatsCard';
 import { Plus, Download, Filter, Search, Truck, CheckCircle2, UserPlus, IndianRupee, Eye, Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
-// Mock Data
-const supplierKPIs = [
-  { title: "Total Suppliers", value: "128", trend: "+3 this month", isPositive: true, icon: Truck },
-  { title: "Active Partners", value: "95", trend: "Delivered in last 60d", isPositive: true, icon: CheckCircle2 },
-  { title: "New This Month", value: "8", trend: "+2 vs last month", isPositive: true, icon: UserPlus },
-  { title: "Total Payables", value: "₹2,15,500", trend: "7 overdue invoices", isPositive: false, icon: IndianRupee },
-];
+// We will use React state for these instead of static arrays
 
-const supplierList = [
-  { id: 'SUP-101', company: 'Global Traders', name: 'Sanjay Gupta', email: 'contact@globaltraders.in', phone: '+91 98111 22233', status: 'Active', totalSourced: 450000, lastDelivery: 'Jul 24, 2026' },
-  { id: 'SUP-102', company: 'Prime Electronics', name: 'Alok Mehta', email: 'sales@primeelectronics.com', phone: '+91 98111 22234', status: 'Active', totalSourced: 850000, lastDelivery: 'Jul 20, 2026' },
-  { id: 'SUP-103', company: 'Shree Logistics', name: 'Manoj Tiwari', email: 'manoj@shreelogistics.in', phone: '+91 98111 22235', status: 'Inactive', totalSourced: 120000, lastDelivery: 'Mar 15, 2026' },
-  { id: 'SUP-104', company: 'National Plastics', name: 'Ravi Kumar', email: 'info@nationalplastics.co.in', phone: '+91 98111 22236', status: 'Active', totalSourced: 210000, lastDelivery: 'Jul 22, 2026' },
-  { id: 'SUP-105', company: 'ABC Distributors', name: 'Pooja Singh', email: 'pooja@abcdist.com', phone: '+91 98111 22237', status: 'Inactive', totalSourced: 50000, lastDelivery: 'Jan 10, 2026' },
-];
+import { supplierService } from '@/lib/services/supplier.services';
+import toast from 'react-hot-toast';
 
 export default function SuppliersView() {
+  const [suppliers, setSuppliers] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [searchQuery, setSearchQuery] = React.useState('');
+
+  const fetchSuppliers = async () => {
+    try {
+      setLoading(true);
+      const res = await supplierService.getSuppliers();
+      if (res.success && res.data) {
+        setSuppliers(res.data);
+      }
+    } catch (error) {
+      toast.error('Failed to load suppliers');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchSuppliers();
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Are you sure you want to delete this supplier?')) {
+      try {
+        const res = await supplierService.deleteSupplier(id);
+        if (res.success) {
+          toast.success('Supplier deleted successfully');
+          fetchSuppliers();
+        } else {
+          toast.error(res.message || 'Failed to delete supplier');
+        }
+      } catch (error) {
+        toast.error('Failed to delete supplier');
+      }
+    }
+  };
   const columns = [
-    { header: 'ID', accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id}</span> },
-    { header: 'Company', accessorKey: 'company', cell: (row: any) => (
+    { header: 'Company', accessorKey: 'companyName', cell: (row: any) => (
       <div className="flex flex-col">
-        <span className="font-semibold text-primary">{row.company}</span>
-        <span className="text-xs text-on-surface-variant">Contact: {row.name}</span>
+        <span className="font-semibold text-primary">{row.companyName}</span>
+        <span className="text-xs text-on-surface-variant">Contact: {row.contactPerson}</span>
       </div>
     )},
     { header: 'Email & Phone', accessorKey: 'contact', cell: (row: any) => (
       <div className="flex flex-col">
-        <span className="text-sm font-medium text-on-surface">{row.email}</span>
-        <span className="text-xs text-on-surface-variant">{row.phone}</span>
+        <span className="text-sm font-medium text-on-surface">{row.email || 'N/A'}</span>
+        <span className="text-xs text-on-surface-variant">{row.mobile}</span>
       </div>
     )},
-    { header: 'Total Sourced', accessorKey: 'totalSourced', cell: (row: any) => <span className="font-bold text-on-surface">₹{row.totalSourced.toLocaleString()}</span> },
-    { header: 'Last Delivery', accessorKey: 'lastDelivery', cell: (row: any) => <span className="text-sm text-on-surface-variant">{row.lastDelivery}</span> },
-    { header: 'Status', accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
+    { header: 'GSTIN', accessorKey: 'gstin', cell: (row: any) => <span className="font-mono text-sm text-on-surface-variant">{row.gstin || 'N/A'}</span> },
+    { header: 'Balance', accessorKey: 'balance', cell: (row: any) => <span className="font-bold text-on-surface">₹{(row.balance || 0).toLocaleString()}</span> },
+    { header: 'Status', accessorKey: 'isActive', cell: (row: any) => <StatusBadge status={row.isActive !== false ? 'Active' : 'Inactive'} /> },
     { header: 'Actions', accessorKey: 'actions', cell: (row: any) => (
       <div className="flex items-center gap-2">
-        <Link href={`/suppliers/${row.id}`}>
+        <Link href={`/suppliers/${row._id}`}>
           <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
             <Eye className="w-4 h-4" />
           </Button>
         </Link>
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
-          <Edit className="w-4 h-4" />
-        </Button>
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+        <Link href={`/suppliers/${row._id}/edit`}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
+            <Edit className="w-4 h-4" />
+          </Button>
+        </Link>
+        <Button variant="ghost" size="icon" onClick={() => handleDelete(row._id)} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
           <Trash2 className="w-4 h-4" />
         </Button>
       </div>
     )},
+  ];
+
+  const filteredSuppliers = suppliers.filter(s => 
+    (s.companyName && s.companyName.toLowerCase().includes(searchQuery.toLowerCase())) || 
+    (s.contactPerson && s.contactPerson.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (s.mobile && s.mobile.includes(searchQuery))
+  );
+
+  // KPIs calculation
+  const totalSuppliers = suppliers.length;
+  const activeSuppliers = suppliers.filter(s => s.isActive !== false).length;
+  const currentMonth = new Date().getMonth();
+  const newThisMonth = suppliers.filter(s => new Date(s.createdAt).getMonth() === currentMonth).length;
+  const totalPayables = suppliers.reduce((sum, s) => sum + (Number(s.balance) || 0), 0);
+
+  const supplierKPIs = [
+    { title: "Total Suppliers", value: totalSuppliers.toString(), trend: "All time", isPositive: true, icon: Truck },
+    { title: "Active Partners", value: activeSuppliers.toString(), trend: "Currently active", isPositive: true, icon: CheckCircle2 },
+    { title: "New This Month", value: newThisMonth.toString(), trend: "Current month", isPositive: true, icon: UserPlus },
+    { title: "Total Payables", value: `₹${totalPayables.toLocaleString()}`, trend: "Outstanding balance", isPositive: false, icon: IndianRupee },
   ];
 
   return (
@@ -96,6 +143,8 @@ export default function SuppliersView() {
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
             <input 
               type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search company or contact..."
               className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface border border-outline-variant/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm font-medium transition-all text-on-surface placeholder:text-on-surface-variant/50"
             />
@@ -108,10 +157,14 @@ export default function SuppliersView() {
 
         {/* Data Table */}
         <div className="flex-1 overflow-auto custom-scrollbar">
-          <DataTable 
-            columns={columns} 
-            data={supplierList} 
-          />
+          {loading ? (
+            <div className="p-8 text-center text-on-surface-variant">Loading suppliers...</div>
+          ) : (
+            <DataTable 
+              columns={columns} 
+              data={filteredSuppliers} 
+            />
+          )}
         </div>
       </div>
     </div>

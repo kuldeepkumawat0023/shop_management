@@ -8,7 +8,9 @@ import { useRouter } from 'next/navigation';
 import { customerSchema } from '@/utils/validations';
 import toast from 'react-hot-toast';
 
-export default function CustomerForm() {
+import { customerService } from '@/lib/services/customer.services';
+
+export default function CustomerForm({ editId }: { editId?: string }) {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -30,6 +32,49 @@ export default function CustomerForm() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(!!editId);
+
+  React.useEffect(() => {
+    if (editId) {
+      const fetchCustomer = async () => {
+        try {
+          setIsFetching(true);
+          const res = await customerService.getCustomers();
+          if (res.success && res.data) {
+            const customer = res.data.find(c => c._id === editId);
+            if (customer) {
+              setFormData({
+                name: customer.name || '',
+                email: customer.email || '',
+                phone: customer.mobile || '',
+                company: customer.company || '',
+                status: customer.isActive !== false ? 'Active' : 'Inactive',
+                address: customer.address || ''
+              });
+              // Try to split address into addressData if formatted as "street, city, state, zip, country"
+              if (customer.address) {
+                const parts = customer.address.split(',').map(s => s.trim());
+                if (parts.length >= 5) {
+                  setAddressData({
+                    street: parts[0],
+                    city: parts[1],
+                    state: parts[2],
+                    zip: parts[3],
+                    country: parts[4],
+                  });
+                }
+              }
+            }
+          }
+        } catch (error) {
+          toast.error('Failed to fetch customer details');
+        } finally {
+          setIsFetching(false);
+        }
+      };
+      fetchCustomer();
+    }
+  }, [editId]);
 
   const validate = (name: string, value: string) => {
     let error = '';
@@ -93,10 +138,28 @@ export default function CustomerForm() {
     const toastId = toast.loading('Saving customer...');
 
     try {
-      // API call simulation
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      toast.success('Customer saved successfully! / ग्राहक सफलतापूर्वक सहेजा गया!', { id: toastId });
-      router.back();
+      const apiData = {
+        name: formData.name,
+        email: formData.email,
+        company: formData.company,
+        mobile: formData.phone,
+        address: dataToValidate.address,
+        isActive: formData.status === 'Active'
+      };
+
+      let res;
+      if (editId) {
+        res = await customerService.updateCustomer(editId, apiData);
+      } else {
+        res = await customerService.createCustomer(apiData);
+      }
+
+      if (res.success) {
+        toast.success(editId ? 'Customer updated successfully!' : 'Customer created successfully!', { id: toastId });
+        router.back();
+      } else {
+        toast.error(res.message || 'Failed to save customer', { id: toastId });
+      }
     } catch (error) {
       toast.error('Failed to save customer', { id: toastId });
     } finally {
@@ -113,8 +176,8 @@ export default function CustomerForm() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">Add New Customer / नया ग्राहक जोड़ें</h1>
-            <p className="text-sm text-on-surface-variant mt-1 font-medium">Create a profile for a new client or customer / नए क्लाइंट या ग्राहक के लिए प्रोफ़ाइल बनाएं</p>
+            <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">{editId ? 'Edit Customer' : 'Add New Customer'} / {editId ? 'ग्राहक संपादित करें' : 'नया ग्राहक जोड़ें'}</h1>
+            <p className="text-sm text-on-surface-variant mt-1 font-medium">{editId ? 'Update the profile details of the customer / ग्राहक का प्रोफ़ाइल विवरण अपडेट करें' : 'Create a profile for a new client or customer / नए क्लाइंट या ग्राहक के लिए प्रोफ़ाइल बनाएं'}</p>
           </div>
         </div>
       </div>

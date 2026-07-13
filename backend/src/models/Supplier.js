@@ -15,6 +15,17 @@ const supplierSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  contactPerson: {
+    type: String,
+    trim: true
+  },
+  paymentTerms: {
+    type: String,
+    trim: true
+  },
+  notes: {
+    type: String
+  },
   address: {
     type: String
   },

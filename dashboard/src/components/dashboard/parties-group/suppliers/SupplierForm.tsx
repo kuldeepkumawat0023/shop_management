@@ -8,7 +8,9 @@ import { useRouter } from 'next/navigation';
 import { supplierSchema } from '@/utils/validations';
 import toast from 'react-hot-toast';
 
-export default function SupplierForm() {
+import { supplierService } from '@/lib/services/supplier.services';
+
+export default function SupplierForm({ editId }: { editId?: string }) {
   const router = useRouter();
   
   const [formData, setFormData] = useState({
@@ -33,6 +35,52 @@ export default function SupplierForm() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(!!editId);
+
+  React.useEffect(() => {
+    if (editId) {
+      const fetchSupplier = async () => {
+        try {
+          setIsFetching(true);
+          const res = await supplierService.getSuppliers();
+          if (res.success && res.data) {
+            const supplier = res.data.find((s: any) => s._id === editId);
+            if (supplier) {
+              setFormData({
+                name: supplier.name || '',
+                contactPerson: supplier.contactPerson || '',
+                email: supplier.email || '',
+                phone: supplier.mobile || '',
+                gstNumber: supplier.gstNumber || '',
+                status: supplier.isActive !== false ? 'Active' : 'Inactive',
+                paymentTerms: supplier.paymentTerms || '',
+                notes: supplier.notes || '',
+                address: supplier.address || ''
+              });
+              
+              if (supplier.address) {
+                const parts = supplier.address.split(',').map((s: string) => s.trim());
+                if (parts.length >= 5) {
+                  setAddressData({
+                    street: parts[0],
+                    city: parts[1],
+                    state: parts[2],
+                    zip: parts[3],
+                    country: parts[4],
+                  });
+                }
+              }
+            }
+          }
+        } catch (error) {
+          toast.error('Failed to fetch supplier details');
+        } finally {
+          setIsFetching(false);
+        }
+      };
+      fetchSupplier();
+    }
+  }, [editId]);
 
   const validate = (name: string, value: string) => {
     let error = '';
@@ -98,10 +146,31 @@ export default function SupplierForm() {
     const toastId = toast.loading('Saving supplier...');
 
     try {
-      // API call simulation
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      toast.success('Supplier saved successfully! / आपूर्तिकर्ता सफलतापूर्वक सहेजा गया!', { id: toastId });
-      router.back();
+      const apiData = {
+        name: formData.name,
+        contactPerson: formData.contactPerson,
+        email: formData.email,
+        mobile: formData.phone,
+        gstNumber: formData.gstNumber,
+        isActive: formData.status === 'Active',
+        paymentTerms: formData.paymentTerms,
+        notes: formData.notes,
+        address: dataToValidate.address,
+      };
+
+      let res;
+      if (editId) {
+        res = await supplierService.updateSupplier(editId, apiData);
+      } else {
+        res = await supplierService.createSupplier(apiData);
+      }
+
+      if (res.success) {
+        toast.success(editId ? 'Supplier updated successfully!' : 'Supplier created successfully!', { id: toastId });
+        router.back();
+      } else {
+        toast.error(res.message || 'Failed to save supplier', { id: toastId });
+      }
     } catch (error) {
       toast.error('Failed to save supplier', { id: toastId });
     } finally {
@@ -118,8 +187,8 @@ export default function SupplierForm() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">Add New Supplier / नया आपूर्तिकर्ता जोड़ें</h1>
-            <p className="text-sm text-on-surface-variant mt-1 font-medium">Onboard a new vendor or B2B partner / नए विक्रेता या बी2बी पार्टनर को जोड़ें</p>
+            <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">{editId ? 'Edit Supplier' : 'Add New Supplier'} / {editId ? 'आपूर्तिकर्ता संपादित करें' : 'नया आपूर्तिकर्ता जोड़ें'}</h1>
+            <p className="text-sm text-on-surface-variant mt-1 font-medium">{editId ? 'Update supplier details / आपूर्तिकर्ता विवरण अपडेट करें' : 'Create a profile for a new vendor / नए विक्रेता के लिए प्रोफ़ाइल बनाएं'}</p>
           </div>
         </div>
       </div>

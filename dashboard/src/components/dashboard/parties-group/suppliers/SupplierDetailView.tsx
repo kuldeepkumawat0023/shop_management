@@ -1,19 +1,69 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/common/Button';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { ArrowLeft, User, Phone, Mail, MapPin, Building, Edit, Trash2, ShoppingCart, IndianRupee, History, ReceiptText } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { supplierService } from '@/lib/services/supplier.services';
+import { purchaseService, PurchaseData } from '@/lib/services/purchase.services';
+import toast from 'react-hot-toast';
+import Link from 'next/link';
 
-export default function SupplierDetailView() {
+export default function SupplierDetailView({ id }: { id: string }) {
   const router = useRouter();
+  const [supplier, setSupplier] = useState<any | null>(null);
+  const [recentPOs, setRecentPOs] = useState<PurchaseData[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const recentPOs = [
-    { id: 'PO-2026-041', date: 'Jul 24, 2026', total: 45000, status: 'Delivered' },
-    { id: 'PO-2026-038', date: 'Jul 15, 2026', total: 12000, status: 'Processing' },
-    { id: 'PO-2026-021', date: 'Jun 28, 2026', total: 85000, status: 'Delivered' },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [supRes, purRes] = await Promise.all([
+          supplierService.getSuppliers(),
+          purchaseService.getPurchases()
+        ]);
+
+        if (supRes.success && supRes.data) {
+          const found = supRes.data.find((s: any) => s._id === id);
+          if (found) setSupplier(found);
+        }
+
+        if (purRes.success && purRes.data) {
+          const supplierPurchases = purRes.data.filter(p => 
+            (typeof p.supplierId === 'object' ? p.supplierId?._id === id : p.supplierId === id)
+          ).sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+          
+          setRecentPOs(supplierPurchases);
+        }
+      } catch (error) {
+        toast.error('Failed to load supplier details');
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (id) fetchData();
+  }, [id]);
+
+  const handleDelete = async () => {
+    if (confirm('Are you sure you want to delete this supplier?')) {
+      try {
+        const res = await supplierService.deleteSupplier(id);
+        if (res.success) {
+          toast.success('Supplier deleted successfully');
+          router.push('/suppliers');
+        } else {
+          toast.error(res.message || 'Failed to delete supplier');
+        }
+      } catch (error) {
+        toast.error('Failed to delete supplier');
+      }
+    }
+  };
+
+  if (loading) return <div className="p-8 text-center">Loading supplier details...</div>;
+  if (!supplier) return <div className="p-8 text-center">Supplier not found</div>;
 
   return (
     <div className="flex flex-col h-full bg-background overflow-y-auto custom-scrollbar w-full ">
@@ -26,18 +76,20 @@ export default function SupplierDetailView() {
             </Button>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-2xl font-black text-on-surface tracking-tight">Global Traders</h2>
-                <StatusBadge status="Active" />
+                <h2 className="text-2xl font-black text-on-surface tracking-tight">{supplier.name}</h2>
+                <StatusBadge status={supplier.isActive !== false ? "Active" : "Inactive"} />
               </div>
-              <p className="text-sm font-medium text-on-surface-variant">Supplier ID: SUP-101 • Onboarded Jan 2026</p>
+              <p className="text-sm font-medium text-on-surface-variant">Supplier ID: {supplier._id?.substring(0, 8)} • Onboarded {new Date(supplier.createdAt || Date.now()).toLocaleDateString()}</p>
             </div>
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <Button variant="outline" className="flex-1 sm:flex-none border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-primary/10 font-semibold gap-2 rounded-xl transition-colors">
-              <Edit className="w-4 h-4" />
-              <span className="hidden sm:inline">Edit Profile</span>
-            </Button>
-            <Button variant="outline" className="flex-1 sm:flex-none border-outline-variant/30 text-error hover:bg-error/10 font-semibold gap-2 rounded-xl transition-colors">
+            <Link href={`/suppliers/${id}/edit`}>
+              <Button variant="outline" className="flex-1 sm:flex-none border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-primary/10 font-semibold gap-2 rounded-xl transition-colors">
+                <Edit className="w-4 h-4" />
+                <span className="hidden sm:inline">Edit Profile</span>
+              </Button>
+            </Link>
+            <Button onClick={handleDelete} variant="outline" className="flex-1 sm:flex-none border-outline-variant/30 text-error hover:bg-error/10 font-semibold gap-2 rounded-xl transition-colors">
               <Trash2 className="w-4 h-4" />
               <span className="hidden sm:inline">Delete</span>
             </Button>
@@ -55,7 +107,7 @@ export default function SupplierDetailView() {
               <IndianRupee className="w-4 h-4" />
               <h3 className="text-sm font-bold uppercase tracking-wider">Total Sourced</h3>
             </div>
-            <p className="text-3xl font-black text-on-surface tracking-tight">₹4,50,000</p>
+            <p className="text-3xl font-black text-on-surface tracking-tight">₹{recentPOs.reduce((sum, po) => sum + (po.netAmount || 0), 0).toLocaleString()}</p>
             <p className="text-sm text-primary font-bold">Lifetime Value</p>
           </div>
           <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-6 shadow-sm flex flex-col gap-2 relative overflow-hidden">
@@ -64,8 +116,8 @@ export default function SupplierDetailView() {
               <ShoppingCart className="w-4 h-4" />
               <h3 className="text-sm font-bold uppercase tracking-wider">Total POs</h3>
             </div>
-            <p className="text-3xl font-black text-on-surface tracking-tight">18</p>
-            <p className="text-sm text-on-surface-variant font-medium">Last PO on Jul 24, 2026</p>
+            <p className="text-3xl font-black text-on-surface tracking-tight">{recentPOs.length}</p>
+            <p className="text-sm text-on-surface-variant font-medium">Last PO on {recentPOs.length > 0 ? new Date(recentPOs[0].createdAt || '').toLocaleDateString() : 'N/A'}</p>
           </div>
           <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-6 shadow-sm flex flex-col gap-2 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-warning/5 rounded-bl-full -mr-4 -mt-4"></div>
@@ -73,8 +125,8 @@ export default function SupplierDetailView() {
               <History className="w-4 h-4" />
               <h3 className="text-sm font-bold uppercase tracking-wider">Outstanding Payables</h3>
             </div>
-            <p className="text-3xl font-black text-on-surface tracking-tight">₹12,000</p>
-            <p className="text-sm text-warning font-bold">1 Invoice Pending</p>
+            <p className="text-3xl font-black text-on-surface tracking-tight">₹{(supplier.balance || 0).toLocaleString()}</p>
+            <p className="text-sm text-warning font-bold">Total Balance</p>
           </div>
         </div>
 
@@ -94,7 +146,7 @@ export default function SupplierDetailView() {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Contact Person</span>
-                    <span className="font-semibold text-on-surface">Sanjay Gupta</span>
+                    <span className="font-semibold text-on-surface">{supplier.contactPerson || 'N/A'}</span>
                   </div>
                 </div>
 
@@ -104,7 +156,7 @@ export default function SupplierDetailView() {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Email</span>
-                    <a href="mailto:contact@globaltraders.in" className="font-semibold text-primary hover:underline">contact@globaltraders.in</a>
+                    <a href={`mailto:${supplier.email || ''}`} className="font-semibold text-primary hover:underline">{supplier.email || 'N/A'}</a>
                   </div>
                 </div>
                 
@@ -114,7 +166,7 @@ export default function SupplierDetailView() {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Phone</span>
-                    <a href="tel:+919811122233" className="font-semibold text-on-surface">+91 98111 22233</a>
+                    <a href={`tel:${supplier.mobile || ''}`} className="font-semibold text-on-surface">{supplier.mobile || 'N/A'}</a>
                   </div>
                 </div>
 
@@ -124,7 +176,7 @@ export default function SupplierDetailView() {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">GSTIN</span>
-                    <span className="font-semibold text-on-surface font-mono">22AAAAA0000A1Z5</span>
+                    <span className="font-semibold text-on-surface font-mono">{supplier.gstNumber || 'N/A'}</span>
                   </div>
                 </div>
 
@@ -134,7 +186,7 @@ export default function SupplierDetailView() {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Address</span>
-                    <span className="font-semibold text-on-surface">123 Industrial Estate, Block B<br/>Pune, Maharashtra<br/>411001, India</span>
+                    <span className="font-semibold text-on-surface whitespace-pre-wrap">{supplier.address || 'N/A'}</span>
                   </div>
                 </div>
               </div>
@@ -148,7 +200,7 @@ export default function SupplierDetailView() {
                   <span className="text-sm font-bold text-on-surface">Net 30</span>
                 </div>
                 <p className="text-sm text-on-surface-variant leading-relaxed mt-2 border-t border-outline-variant/10 pt-2">
-                  Reliable supplier for raw materials. Deliveries are usually on time. Need to remind them about packing quality.
+                  {supplier.notes || 'N/A'}
                 </p>
               </div>
             </div>
@@ -167,21 +219,21 @@ export default function SupplierDetailView() {
 
               {recentPOs.length > 0 ? (
                 <div className="flex flex-col gap-4">
-                  {recentPOs.map((po) => (
-                    <div key={po.id} className="flex items-center justify-between p-4 rounded-2xl bg-surface hover:bg-surface-container transition-colors border border-outline-variant/10">
+                  {recentPOs.slice(0, 5).map((po) => (
+                    <div key={po._id} className="flex items-center justify-between p-4 rounded-2xl bg-surface hover:bg-surface-container transition-colors border border-outline-variant/10">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                           <ShoppingCart className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                          <p className="font-bold text-on-surface">{po.id}</p>
-                          <p className="text-sm text-on-surface-variant font-medium">{po.date}</p>
+                          <p className="font-bold text-on-surface">{po.invoiceNumber}</p>
+                          <p className="text-sm text-on-surface-variant font-medium">{new Date(po.createdAt || '').toLocaleDateString()}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-4 text-right">
                         <div>
-                          <p className="font-black text-on-surface">₹{po.total.toLocaleString()}</p>
-                          <StatusBadge status={po.status} />
+                          <p className="font-black text-on-surface">₹{(po.netAmount || 0).toLocaleString()}</p>
+                          <StatusBadge status={po.paymentStatus === 'Paid' ? 'Delivered' : po.paymentStatus} />
                         </div>
                         <Button variant="ghost" size="icon" className="text-on-surface-variant">
                           <ArrowLeft className="w-5 h-5 rotate-180" />

@@ -5,6 +5,8 @@ export interface CustomerData {
   name: string;
   mobile: string;
   email?: string;
+  company?: string;
+  notes?: string;
   address?: string;
   creditLimit?: number;
   dueAmount?: number;
