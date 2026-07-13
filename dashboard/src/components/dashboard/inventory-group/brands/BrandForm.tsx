@@ -5,6 +5,7 @@ import { Button } from '@/components/common/Button';
 import { ArrowLeft, Save, UploadCloud, Tag, FileText, Globe, User, RefreshCcw } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useRef } from 'react';
 import { cn } from '@/utils/cn';
 import { brandSchema } from '@/utils/validations';
 import { brandService } from '@/lib/services/brand.services';
@@ -16,7 +17,9 @@ interface BrandFormProps {
 
 export default function BrandForm({ editId }: BrandFormProps) {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -95,7 +98,25 @@ export default function BrandForm({ editId }: BrandFormProps) {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    // Add file handling logic here
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.size <= 5 * 1024 * 1024) { // 5MB limit
+        setSelectedFile(file);
+      } else {
+        toast.error('File size should not exceed 5MB / फ़ाइल का आकार 5MB से अधिक नहीं होना चाहिए');
+      }
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.size <= 5 * 1024 * 1024) { // 5MB limit
+        setSelectedFile(file);
+      } else {
+        toast.error('File size should not exceed 5MB / फ़ाइल का आकार 5MB से अधिक नहीं होना चाहिए');
+      }
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -267,7 +288,15 @@ export default function BrandForm({ editId }: BrandFormProps) {
             <h2 className="text-lg font-bold text-on-surface">Brand Logo / लोगो</h2>
           </div>
           
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            className="hidden"
+            accept=".png,.jpg,.jpeg"
+          />
           <div 
+            onClick={() => fileInputRef.current?.click()}
             className={cn(
               "relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-2xl transition-all cursor-pointer bg-surface-container-low",
               dragActive ? "border-primary bg-primary/5 scale-[0.98]" : "border-outline-variant/30 hover:border-primary/40 hover:bg-surface-container"
@@ -280,8 +309,12 @@ export default function BrandForm({ editId }: BrandFormProps) {
             <div className="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center mb-4 shadow-sm border border-outline-variant/20 text-on-surface-variant">
               <UploadCloud className="w-6 h-6" />
             </div>
-            <p className="text-sm font-bold text-on-surface text-center mb-1">Upload Brand Logo</p>
-            <p className="text-xs text-on-surface-variant text-center">PNG or JPG (MAX. 800x400px)</p>
+            <p className="text-sm font-bold text-on-surface text-center mb-1">
+              {selectedFile ? selectedFile.name : 'Upload Brand Logo'}
+            </p>
+            <p className="text-xs text-on-surface-variant text-center">
+              {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB` : 'PNG or JPG (MAX. 800x400px)'}
+            </p>
           </div>
         </div>
 
