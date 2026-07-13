@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { addStaff, getStaff, recordAdvance, recordExpense } = require('../controllers/teamController');
+const { addStaff, getStaff, recordAdvance, recordExpense, deleteStaff } = require('../controllers/teamController');
 const { protect } = require('../middlewares/authMiddleware');
 const shopScope = require('../middlewares/shopScope');
 const requirePermission = require('../middlewares/requirePermission');
@@ -12,6 +12,7 @@ router.use(shopScope);
 // Only Super Admin can manage staff directly
 router.post('/create', requirePermission(PERMISSIONS.SUPER_ADMIN), addStaff);
 router.get('/all', requirePermission(PERMISSIONS.SUPER_ADMIN), getStaff);
+router.delete('/delete/:id', requirePermission(PERMISSIONS.SUPER_ADMIN), deleteStaff);
 
 // Advances and Expenses
 router.post('/advance', requirePermission(PERMISSIONS.SUPER_ADMIN), recordAdvance);

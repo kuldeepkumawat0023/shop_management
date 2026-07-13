@@ -66,3 +66,23 @@ exports.recordExpense = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Delete a staff member
+// @route   DELETE /api/v1/team/delete/:id
+// @access  Private (Super Admin)
+exports.deleteStaff = async (req, res, next) => {
+  try {
+    const staff = await Staff.findOne({ _id: req.params.id, shopId: req.scopedShopId });
+    if (!staff) {
+      return res.status(404).json({ success: false, message: 'Staff member not found' });
+    }
+
+    // Soft delete
+    staff.isActive = false;
+    await staff.save();
+    
+    res.status(200).json({ success: true, message: 'Staff member removed successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
