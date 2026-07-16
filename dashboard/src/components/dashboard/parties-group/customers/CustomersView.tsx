@@ -11,9 +11,11 @@ import Link from 'next/link';
 // We will use React state for these instead of static arrays
 
 import { customerService } from '@/lib/services/customer.services';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 
 export default function CustomersView() {
+  const { t } = useTranslation();
   const [customers, setCustomers] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -26,7 +28,7 @@ export default function CustomersView() {
         setCustomers(res.data);
       }
     } catch (error) {
-      toast.error('Failed to load customers', { id: 'failed-to-load-customers' });
+      toast.error(t('parties.customersView.loadError'), { id: 'failed-to-load-customers' });
     } finally {
       setLoading(false);
     }
@@ -37,32 +39,32 @@ export default function CustomersView() {
   }, []);
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this customer?')) {
+    if (confirm(t('parties.customersView.confirmDelete'))) {
       try {
         const res = await customerService.deleteCustomer(id);
         if (res.success) {
-          toast.success('Customer deleted successfully');
+          toast.success(t('parties.customersView.deletedSuccess'));
           fetchCustomers();
         } else {
-          toast.error(res.message || 'Failed to delete customer');
+          toast.error(res.message || t('parties.customersView.deleteFailed'));
         }
       } catch (error) {
-        toast.error('Failed to delete customer', { id: 'failed-to-delete-customer' });
+        toast.error(t('parties.customersView.deleteFailed'), { id: 'failed-to-delete-customer' });
       }
     }
   };
   const columns = [
-    { header: 'Name', accessorKey: 'name', cell: (row: any) => <span className="font-semibold text-primary">{row.name}</span> },
-    { header: 'Email & Phone', accessorKey: 'contact', cell: (row: any) => (
+    { header: t('parties.customersView.name'), accessorKey: 'name', cell: (row: any) => <span className="font-semibold text-primary">{row.name}</span> },
+    { header: t('parties.customersView.emailPhone'), accessorKey: 'contact', cell: (row: any) => (
       <div className="flex flex-col">
-        <span className="text-sm font-medium text-on-surface">{row.email || 'N/A'}</span>
+        <span className="text-sm font-medium text-on-surface">{row.email || t('parties.customersView.na')}</span>
         <span className="text-xs text-on-surface-variant">{row.mobile}</span>
       </div>
     )},
-    { header: 'Total Spent', accessorKey: 'totalSpent', cell: (row: any) => <span className="font-bold text-on-surface">₹{(row.dueAmount || 0).toLocaleString()}</span> },
-    { header: 'Credit Limit', accessorKey: 'creditLimit', cell: (row: any) => <span className="text-sm text-on-surface-variant">₹{(row.creditLimit || 0).toLocaleString()}</span> },
-    { header: 'Status', accessorKey: 'isActive', cell: (row: any) => <StatusBadge status={row.isActive !== false ? 'Active' : 'Inactive'} /> },
-    { header: 'Actions', accessorKey: 'actions', cell: (row: any) => (
+    { header: t('parties.customersView.totalSpent'), accessorKey: 'totalSpent', cell: (row: any) => <span className="font-bold text-on-surface">₹{(row.dueAmount || 0).toLocaleString()}</span> },
+    { header: t('parties.customersView.creditLimit'), accessorKey: 'creditLimit', cell: (row: any) => <span className="text-sm text-on-surface-variant">₹{(row.creditLimit || 0).toLocaleString()}</span> },
+    { header: t('parties.customersView.status'), accessorKey: 'isActive', cell: (row: any) => <StatusBadge status={row.isActive !== false ? t('parties.customersView.active') : t('parties.customersView.inactive')} /> },
+    { header: t('parties.customersView.actions'), accessorKey: 'actions', cell: (row: any) => (
       <div className="flex items-center gap-2">
         <Link href={`/customers/${row._id}`}>
           <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
@@ -97,10 +99,10 @@ export default function CustomersView() {
   const totalReceivables = customers.reduce((sum, c) => sum + (Number(c.dueAmount) || 0), 0);
 
   const customerKPIs = [
-    { title: "Total Customers", value: totalCustomers.toString(), trend: "All time", isPositive: true, icon: Users },
-    { title: "Active Customers", value: activeCustomers.toString(), trend: "Currently active", isPositive: true, icon: UserCheck },
-    { title: "New This Month", value: newThisMonth.toString(), trend: "Current month", isPositive: true, icon: UserPlus },
-    { title: "Total Receivables", value: `₹${totalReceivables.toLocaleString()}`, trend: "Outstanding due", isPositive: false, icon: IndianRupee },
+    { title: t('parties.customersView.totalCustomers'), value: totalCustomers.toString(), trend: t('parties.customersView.allTime'), isPositive: true, icon: Users },
+    { title: t('parties.customersView.activeCustomers'), value: activeCustomers.toString(), trend: t('parties.customersView.currentlyActive'), isPositive: true, icon: UserCheck },
+    { title: t('parties.customersView.newThisMonth'), value: newThisMonth.toString(), trend: t('parties.customersView.currentMonth'), isPositive: true, icon: UserPlus },
+    { title: t('parties.customersView.totalReceivables'), value: `₹${totalReceivables.toLocaleString()}`, trend: t('parties.customersView.outstandingDue'), isPositive: false, icon: IndianRupee },
   ];
 
   return (
@@ -108,18 +110,18 @@ export default function CustomersView() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
         <div>
-          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">Customers</h2>
-          <p className="text-sm font-medium text-on-surface-variant">Manage your customer relationships and track spending.</p>
+          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">{t('parties.customersView.customers')}</h2>
+          <p className="text-sm font-medium text-on-surface-variant">{t('parties.customersView.manageCustomers')}</p>
         </div>
         <div className="flex gap-3 w-full md:w-auto">
           <Button variant="outline" className="flex-1 md:flex-none bg-surface-container-lowest border-primary text-primary px-4 py-2 rounded-lg font-bold hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2 shadow-sm">
             <Download className="w-4 h-4" />
-            Export
+            {t('parties.customersView.export')}
           </Button>
           <Link href="/customers/new" className="flex-1 md:flex-none">
             <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 border-none">
               <Plus className="w-4 h-4" />
-              Add Customer
+              {t('parties.customersView.addCustomer')}
             </Button>
           </Link>
         </div>
@@ -142,20 +144,20 @@ export default function CustomersView() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search customers..."
+              placeholder={t('parties.customersView.searchPlaceholder')}
               className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface border border-outline-variant/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm font-medium transition-all text-on-surface placeholder:text-on-surface-variant/50"
             />
           </div>
           <Button variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface bg-surface font-semibold gap-2">
             <Filter className="w-4 h-4" />
-            Filters
+            {t('parties.customersView.filters')}
           </Button>
         </div>
 
         {/* Data Table */}
         <div className="flex-1 overflow-auto custom-scrollbar">
           {loading ? (
-            <div className="p-8 text-center text-on-surface-variant">Loading customers...</div>
+            <div className="p-8 text-center text-on-surface-variant">{t('parties.customersView.loadingCustomers')}</div>
           ) : (
             <DataTable 
               columns={columns} 

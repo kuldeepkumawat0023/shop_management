@@ -7,10 +7,12 @@ import { ArrowLeft, User, Phone, Mail, MapPin, Building, Edit, Trash2, ShoppingB
 import { useRouter } from 'next/navigation';
 import { customerService, CustomerData } from '@/lib/services/customer.services';
 import { saleService, SaleData } from '@/lib/services/sale.services';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 
 export default function CustomerDetailView({ id }: { id: string }) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [customer, setCustomer] = useState<CustomerData | null>(null);
   const [recentOrders, setRecentOrders] = useState<SaleData[]>([]);
@@ -40,7 +42,7 @@ export default function CustomerDetailView({ id }: { id: string }) {
           setRecentOrders(customerSales);
         }
       } catch (error) {
-        toast.error('Failed to load customer details', { id: 'failed-to-load-customer-detail' });
+        toast.error(t('parties.customerDetailView.loadError'), { id: 'failed-to-load-customer-detail' });
       } finally {
         setLoading(false);
       }
@@ -49,23 +51,23 @@ export default function CustomerDetailView({ id }: { id: string }) {
   }, [id]);
 
   const handleDelete = async () => {
-    if (confirm('Are you sure you want to delete this customer?')) {
+    if (confirm(t('parties.customerDetailView.confirmDelete'))) {
       try {
         const res = await customerService.deleteCustomer(id);
         if (res.success) {
-          toast.success('Customer deleted successfully');
+          toast.success(t('parties.customerDetailView.deletedSuccess'));
           router.push('/customers');
         } else {
-          toast.error(res.message || 'Failed to delete customer');
+          toast.error(res.message || t('parties.customerDetailView.deleteFailed'));
         }
       } catch (error) {
-        toast.error('Failed to delete customer', { id: 'failed-to-delete-customer' });
+        toast.error(t('parties.customerDetailView.deleteFailed'), { id: 'failed-to-delete-customer' });
       }
     }
   };
 
-  if (loading) return <div className="p-8 text-center">Loading customer details...</div>;
-  if (!customer) return <div className="p-8 text-center">Customer not found</div>;
+  if (loading) return <div className="p-8 text-center">{t('parties.customerDetailView.loadingDetails')}</div>;
+  if (!customer) return <div className="p-8 text-center">{t('parties.customerDetailView.customerNotFound')}</div>;
 
   return (
     <div className="flex flex-col h-full bg-background overflow-y-auto custom-scrollbar w-full ">
@@ -81,19 +83,19 @@ export default function CustomerDetailView({ id }: { id: string }) {
                 <h2 className="text-2xl font-black text-on-surface tracking-tight">{customer.name}</h2>
                 <StatusBadge status={customer.isActive !== false ? "Active" : "Inactive"} />
               </div>
-              <p className="text-sm font-medium text-on-surface-variant">Customer ID: {customer._id?.substring(0, 8)} • Joined {new Date(customer.createdAt || Date.now()).toLocaleDateString()}</p>
+              <p className="text-sm font-medium text-on-surface-variant">{t('parties.customerDetailView.customerId')}{customer._id?.substring(0, 8)} • {t('parties.customerDetailView.joined')}{new Date(customer.createdAt || Date.now()).toLocaleDateString()}</p>
             </div>
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <Link href={`/customers/${id}/edit`}>
               <Button variant="outline" className="flex-1 sm:flex-none border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-primary/10 font-semibold gap-2 rounded-xl transition-colors">
                 <Edit className="w-4 h-4" />
-                <span className="hidden sm:inline">Edit Profile</span>
+                <span className="hidden sm:inline">{t('parties.customerDetailView.editProfile')}</span>
               </Button>
             </Link>
             <Button onClick={handleDelete} variant="outline" className="flex-1 sm:flex-none border-outline-variant/30 text-error hover:bg-error/10 font-semibold gap-2 rounded-xl transition-colors">
               <Trash2 className="w-4 h-4" />
-              <span className="hidden sm:inline">Delete</span>
+              <span className="hidden sm:inline">{t('parties.customerDetailView.delete')}</span>
             </Button>
           </div>
         </div>
@@ -107,28 +109,28 @@ export default function CustomerDetailView({ id }: { id: string }) {
             <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full -mr-4 -mt-4"></div>
             <div className="flex items-center gap-2 text-on-surface-variant">
               <IndianRupee className="w-4 h-4" />
-              <h3 className="text-sm font-bold uppercase tracking-wider">Total Spent</h3>
+              <h3 className="text-sm font-bold uppercase tracking-wider">{t('parties.customerDetailView.totalSpent')}</h3>
             </div>
             <p className="text-3xl font-black text-on-surface tracking-tight">₹{recentOrders.reduce((sum, order) => sum + (order.netAmount || 0), 0).toLocaleString()}</p>
-            <p className="text-sm text-primary font-bold">Lifetime Sales</p>
+            <p className="text-sm text-primary font-bold">{t('parties.customerDetailView.lifetimeSales')}</p>
           </div>
           <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-6 shadow-sm flex flex-col gap-2 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-error/5 rounded-bl-full -mr-4 -mt-4"></div>
             <div className="flex items-center gap-2 text-on-surface-variant">
               <ShoppingBag className="w-4 h-4" />
-              <h3 className="text-sm font-bold uppercase tracking-wider">Total Orders</h3>
+              <h3 className="text-sm font-bold uppercase tracking-wider">{t('parties.customerDetailView.totalOrders')}</h3>
             </div>
             <p className="text-3xl font-black text-on-surface tracking-tight">{recentOrders.length}</p>
-            <p className="text-sm text-on-surface-variant font-medium">Last order {recentOrders.length > 0 ? new Date(recentOrders[0].createdAt || '').toLocaleDateString() : 'N/A'}</p>
+            <p className="text-sm text-on-surface-variant font-medium">{t('parties.customerDetailView.lastOrder')}{recentOrders.length > 0 ? new Date(recentOrders[0].createdAt || '').toLocaleDateString() : t('parties.customerDetailView.na')}</p>
           </div>
           <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-6 shadow-sm flex flex-col gap-2 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-warning/5 rounded-bl-full -mr-4 -mt-4"></div>
             <div className="flex items-center gap-2 text-on-surface-variant">
               <History className="w-4 h-4" />
-              <h3 className="text-sm font-bold uppercase tracking-wider">Outstanding Balance</h3>
+              <h3 className="text-sm font-bold uppercase tracking-wider">{t('parties.customerDetailView.outstandingBalance')}</h3>
             </div>
             <p className="text-3xl font-black text-on-surface tracking-tight">₹{(customer.dueAmount || 0).toLocaleString()}</p>
-            <p className="text-sm text-success font-bold">Credit Limit: ₹{(customer.creditLimit || 0).toLocaleString()}</p>
+            <p className="text-sm text-success font-bold">{t('parties.customerDetailView.creditLimit')}₹{(customer.creditLimit || 0).toLocaleString()}</p>
           </div>
         </div>
 
@@ -138,7 +140,7 @@ export default function CustomerDetailView({ id }: { id: string }) {
             <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-3xl p-6 shadow-sm flex flex-col gap-6">
               <h3 className="text-lg font-bold text-on-surface flex items-center gap-2 border-b border-outline-variant/20 pb-2">
                 <User className="w-5 h-5 text-primary" />
-                Contact Details
+                {t('parties.customerDetailView.contactDetails')}
               </h3>
               
               <div className="flex flex-col gap-5">
@@ -147,8 +149,8 @@ export default function CustomerDetailView({ id }: { id: string }) {
                     <Mail className="w-4 h-4 text-on-surface-variant" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Email</span>
-                    <a href={`mailto:${customer.email || ''}`} className="font-semibold text-primary hover:underline">{customer.email || 'N/A'}</a>
+                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">{t('parties.customerDetailView.email')}</span>
+                    <a href={`mailto:${customer.email || ''}`} className="font-semibold text-primary hover:underline">{customer.email || t('parties.customerDetailView.na')}</a>
                   </div>
                 </div>
                 
@@ -157,8 +159,8 @@ export default function CustomerDetailView({ id }: { id: string }) {
                     <Phone className="w-4 h-4 text-on-surface-variant" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Phone</span>
-                    <a href={`tel:${customer.mobile || ''}`} className="font-semibold text-on-surface">{customer.mobile || 'N/A'}</a>
+                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">{t('parties.customerDetailView.phone')}</span>
+                    <a href={`tel:${customer.mobile || ''}`} className="font-semibold text-on-surface">{customer.mobile || t('parties.customerDetailView.na')}</a>
                   </div>
                 </div>
 
@@ -167,8 +169,8 @@ export default function CustomerDetailView({ id }: { id: string }) {
                     <Building className="w-4 h-4 text-on-surface-variant" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Company</span>
-                    <span className="font-semibold text-on-surface">{customer.company || 'N/A'}</span>
+                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">{t('parties.customerDetailView.company')}</span>
+                    <span className="font-semibold text-on-surface">{customer.company || t('parties.customerDetailView.na')}</span>
                   </div>
                 </div>
 
@@ -177,17 +179,17 @@ export default function CustomerDetailView({ id }: { id: string }) {
                     <MapPin className="w-4 h-4 text-on-surface-variant" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Address</span>
-                    <span className="font-semibold text-on-surface whitespace-pre-wrap">{customer.address || 'N/A'}</span>
+                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">{t('parties.customerDetailView.address')}</span>
+                    <span className="font-semibold text-on-surface whitespace-pre-wrap">{customer.address || t('parties.customerDetailView.na')}</span>
                   </div>
                 </div>
               </div>
             </div>
             
             <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-3xl p-6 shadow-sm flex flex-col gap-4">
-              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider">Notes</h3>
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider">{t('parties.customerDetailView.notes')}</h3>
               <p className="text-sm text-on-surface-variant leading-relaxed">
-                {customer.notes || 'N/A'}
+                {customer.notes || t('parties.customerDetailView.na')}
               </p>
             </div>
           </div>
@@ -198,9 +200,9 @@ export default function CustomerDetailView({ id }: { id: string }) {
               <div className="flex justify-between items-center mb-6 pb-2 border-b border-outline-variant/20">
                 <h3 className="text-lg font-bold text-on-surface flex items-center gap-2">
                   <Receipt className="w-5 h-5 text-primary" />
-                  Recent Activity
+                  {t('parties.customerDetailView.recentActivity')}
                 </h3>
-                <Button variant="ghost" className="text-primary font-bold hover:bg-primary/10 rounded-lg">View All</Button>
+                <Button variant="ghost" className="text-primary font-bold hover:bg-primary/10 rounded-lg">{t('parties.customerDetailView.viewAll')}</Button>
               </div>
 
               {recentOrders.length > 0 ? (
@@ -219,7 +221,7 @@ export default function CustomerDetailView({ id }: { id: string }) {
                       <div className="flex items-center gap-4 text-right">
                         <div>
                           <p className="font-black text-on-surface">₹{(order.netAmount || 0).toLocaleString()}</p>
-                          <StatusBadge status={order.paymentStatus === 'Paid' ? 'Completed' : order.paymentStatus} />
+                          <StatusBadge status={order.paymentStatus === 'Paid' ? t('parties.customerDetailView.completed') : order.paymentStatus} />
                         </div>
                         <Button variant="ghost" size="icon" className="text-on-surface-variant">
                           <ArrowLeft className="w-5 h-5 rotate-180" />
@@ -233,8 +235,8 @@ export default function CustomerDetailView({ id }: { id: string }) {
                   <div className="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center mb-4">
                     <Receipt className="w-8 h-8 text-on-surface-variant/50" />
                   </div>
-                  <p className="text-lg font-bold text-on-surface mb-1">No recent activity</p>
-                  <p className="text-sm text-on-surface-variant">This customer hasn't placed any orders yet.</p>
+                  <p className="text-lg font-bold text-on-surface mb-1">{t('parties.customerDetailView.noRecentActivity')}</p>
+                  <p className="text-sm text-on-surface-variant">{t('parties.customerDetailView.noOrdersMsg')}</p>
                 </div>
               )}
             </div>

@@ -6,11 +6,13 @@ import { StatusBadge } from '@/components/common/StatusBadge';
 import { ArrowLeft, User, Mail, Edit, Trash2, ShieldAlert, Key, MonitorPlay, CalendarClock, History, CheckCircle2 } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { userService } from '@/lib/services/user.services';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import Link from 'next/link';
 
 export default function UserDetailView() {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useParams();
   const id = params?.id as string;
@@ -26,7 +28,7 @@ export default function UserDetailView() {
           setUser(res.data);
         }
       } catch (error) {
-        toast.error('Failed to fetch user details', { id: 'failed-to-fetch-user-details' });
+        toast.error(t('hr.userDetail.loadError'), { id: 'failed-to-fetch-user-details' });
       } finally {
         setLoading(false);
       }
@@ -35,23 +37,23 @@ export default function UserDetailView() {
   }, [id]);
 
   const handleSuspend = async () => {
-    if (confirm('Are you sure you want to suspend this user?')) {
+    if (confirm(t('hr.userDetail.confirmSuspend'))) {
       try {
         const res = await userService.deleteProfile(id);
         if (res.success || (res as any).status === 200) {
-          toast.success('User suspended successfully');
+          toast.success(t('hr.userDetail.userSuspended'));
           router.push('/users');
         } else {
-          toast.error((res as any).message || 'Failed to suspend user');
+          toast.error((res as any).message || t('hr.userDetail.suspendFailed'));
         }
       } catch (error) {
-        toast.error('Failed to suspend user', { id: 'failed-to-suspend-user' });
+        toast.error(t('hr.userDetail.suspendFailed'), { id: 'failed-to-suspend-user' });
       }
     }
   };
 
   if (loading) return <ViewPageSkeleton />;
-  if (!user) return <div className="p-8 text-center text-on-surface-variant">User not found</div>;
+  if (!user) return <div className="p-8 text-center text-on-surface-variant">{t('hr.userDetail.notFound')}</div>;
 
   return (
     <div className="flex flex-col h-full bg-background overflow-y-auto custom-scrollbar w-full ">
@@ -65,7 +67,7 @@ export default function UserDetailView() {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-2xl font-black text-on-surface tracking-tight">{user.fullname}</h2>
-                <StatusBadge status={user.isActive === false ? 'Inactive' : (user.isPending ? 'Pending' : 'Active')} />
+                <StatusBadge status={user.isActive === false ? t('hr.userDetail.inactive') : (user.isPending ? t('hr.userDetail.pending') : t('hr.userDetail.active'))} />
               </div>
               <p className="text-sm font-medium text-on-surface-variant">
                 {user.role} {user.shopId ? `• ${user.shopId.name || 'Shop'}` : ''}
@@ -76,12 +78,12 @@ export default function UserDetailView() {
             <Link href={`/users/${id}/edit`} className="flex-1 sm:flex-none">
               <Button variant="outline" className="w-full border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-primary/10 font-semibold gap-2 rounded-xl transition-colors">
                 <Edit className="w-4 h-4" />
-                <span className="hidden sm:inline">Edit Account</span>
+                <span className="hidden sm:inline">{t('hr.userDetail.editAccount')}</span>
               </Button>
             </Link>
             <Button variant="outline" onClick={handleSuspend} className="flex-1 sm:flex-none border-outline-variant/30 text-error hover:bg-error/10 font-semibold gap-2 rounded-xl transition-colors">
               <Trash2 className="w-4 h-4" />
-              <span className="hidden sm:inline">Suspend User</span>
+              <span className="hidden sm:inline">{t('hr.userDetail.suspendUser')}</span>
             </Button>
           </div>
         </div>
@@ -95,33 +97,33 @@ export default function UserDetailView() {
             <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full -mr-4 -mt-4"></div>
             <div className="flex items-center gap-2 text-on-surface-variant">
               <CalendarClock className="w-4 h-4" />
-              <h3 className="text-sm font-bold uppercase tracking-wider">Account Age</h3>
+              <h3 className="text-sm font-bold uppercase tracking-wider">{t('hr.userDetail.accountAge')}</h3>
             </div>
             <p className="text-3xl font-black text-on-surface tracking-tight">
               {user.createdAt ? (() => {
                 const diff = (new Date().getTime() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24 * 365.25);
-                return `${diff.toFixed(1)} Yrs`;
+                return `${diff.toFixed(1)} ${t('hr.userDetail.yrs')}`;
               })() : 'N/A'}
             </p>
-            <p className="text-sm text-primary font-bold">Created {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</p>
+            <p className="text-sm text-primary font-bold">{t('hr.userDetail.created')} {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</p>
           </div>
           <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-6 shadow-sm flex flex-col gap-2 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-success/5 rounded-bl-full -mr-4 -mt-4"></div>
             <div className="flex items-center gap-2 text-on-surface-variant">
               <MonitorPlay className="w-4 h-4" />
-              <h3 className="text-sm font-bold uppercase tracking-wider">Total Logins</h3>
+              <h3 className="text-sm font-bold uppercase tracking-wider">{t('hr.userDetail.totalLogins')}</h3>
             </div>
             <p className="text-3xl font-black text-on-surface tracking-tight">--</p>
-            <p className="text-sm text-on-surface-variant font-medium">Analytics pending</p>
+            <p className="text-sm text-on-surface-variant font-medium">{t('hr.userDetail.analyticsPending')}</p>
           </div>
           <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-6 shadow-sm flex flex-col gap-2 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-warning/5 rounded-bl-full -mr-4 -mt-4"></div>
             <div className="flex items-center gap-2 text-on-surface-variant">
               <History className="w-4 h-4" />
-              <h3 className="text-sm font-bold uppercase tracking-wider">Last Active</h3>
+              <h3 className="text-sm font-bold uppercase tracking-wider">{t('hr.userDetail.lastActive')}</h3>
             </div>
             <p className="text-3xl font-black text-on-surface tracking-tight">--</p>
-            <p className="text-sm text-warning font-bold">Analytics pending</p>
+            <p className="text-sm text-warning font-bold">{t('hr.userDetail.analyticsPending')}</p>
           </div>
         </div>
 
@@ -140,7 +142,7 @@ export default function UserDetailView() {
                     <User className="w-4 h-4 text-on-surface-variant" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Phone</span>
+                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">{t('hr.userDetail.phone')}</span>
                     <span className="font-semibold text-on-surface">{user.phoneNumber || 'Not provided'}</span>
                   </div>
                 </div>
@@ -150,7 +152,7 @@ export default function UserDetailView() {
                     <Mail className="w-4 h-4 text-on-surface-variant" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Email</span>
+                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">{t('hr.userDetail.email')}</span>
                     <a href={`mailto:${user.email}`} className="font-semibold text-primary hover:underline">{user.email}</a>
                   </div>
                 </div>
@@ -160,7 +162,7 @@ export default function UserDetailView() {
                     <ShieldAlert className="w-4 h-4 text-on-surface-variant" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">System Role</span>
+                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">{t('hr.userDetail.systemRole')}</span>
                     <span className="font-semibold text-on-surface">{user.role}</span>
                   </div>
                 </div>
@@ -174,12 +176,12 @@ export default function UserDetailView() {
               </h3>
               <div className="flex flex-col gap-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-on-surface-variant">2FA Auth:</span>
+                  <span className="text-sm font-medium text-on-surface-variant">{t('hr.userDetail.twoFaAuth')}</span>
                   <span className="text-sm font-bold text-success flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Enabled</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-on-surface-variant">Last Pwd Change:</span>
-                  <span className="text-sm font-bold text-on-surface">3 months ago</span>
+                  <span className="text-sm font-medium text-on-surface-variant">{t('hr.userDetail.lastPwdChange')}</span>
+                  <span className="text-sm font-bold text-on-surface">{t('hr.userDetail.threeMonthsAgo')}</span>
                 </div>
                 <Button variant="outline" className="w-full mt-2 border-outline-variant/30 text-on-surface-variant text-sm h-9">
                   Send Password Reset
@@ -201,8 +203,8 @@ export default function UserDetailView() {
                 <div className="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center mb-4">
                   <History className="w-8 h-8 text-on-surface-variant/50" />
                 </div>
-                <p className="text-lg font-bold text-on-surface mb-1">No activity recorded</p>
-                <p className="text-sm text-on-surface-variant">This user hasn't performed any actions yet.</p>
+                <p className="text-lg font-bold text-on-surface mb-1">{t('hr.userDetail.noActivityRecorded')}</p>
+                <p className="text-sm text-on-surface-variant">{t('hr.userDetail.noActivityMsg')}</p>
               </div>
             </div>
           </div>

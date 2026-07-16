@@ -9,8 +9,10 @@ import { customerSchema } from '@/utils/validations';
 import toast from 'react-hot-toast';
 
 import { customerService } from '@/lib/services/customer.services';
+import { useTranslation } from 'react-i18next';
 
 export default function CustomerForm({ editId }: { editId?: string }) {
+  const { t } = useTranslation();
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -67,7 +69,7 @@ export default function CustomerForm({ editId }: { editId?: string }) {
             }
           }
         } catch (error) {
-          toast.error('Failed to fetch customer details', { id: 'failed-to-fetch-customer-detai' });
+          toast.error(t('parties.customerForm.fetchError'), { id: 'failed-to-fetch-customer-detai' });
         } finally {
           setIsFetching(false);
         }
@@ -131,11 +133,11 @@ export default function CustomerForm({ editId }: { editId?: string }) {
         if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
       }
       setErrors(newErrors);
-      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें', { id: 'please-correct-the-errors-----' });
+      return toast.error(t('parties.customerForm.pleaseCorrectErrors'), { id: 'please-correct-the-errors-----' });
     }
 
     setLoading(true);
-    const toastId = toast.loading('Saving customer...');
+    const toastId = toast.loading(t('parties.customerForm.savingCustomer'));
 
     try {
       const apiData = {
@@ -155,13 +157,13 @@ export default function CustomerForm({ editId }: { editId?: string }) {
       }
 
       if (res.success) {
-        toast.success(editId ? 'Customer updated successfully!' : 'Customer created successfully!', { id: toastId });
+        toast.success(editId ? t('parties.customerForm.updatedSuccess') : t('parties.customerForm.createdSuccess'), { id: toastId });
         router.back();
       } else {
-        toast.error(res.message || 'Failed to save customer', { id: toastId });
+        toast.error(res.message || t('parties.customerForm.failedToSave'), { id: toastId });
       }
     } catch (error) {
-      toast.error('Failed to save customer', { id: toastId });
+      toast.error(t('parties.customerForm.failedToSave'), { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -176,8 +178,8 @@ export default function CustomerForm({ editId }: { editId?: string }) {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">{editId ? 'Edit Customer' : 'Add New Customer'} / {editId ? 'ग्राहक संपादित करें' : 'नया ग्राहक जोड़ें'}</h1>
-            <p className="text-sm text-on-surface-variant mt-1 font-medium">{editId ? 'Update the profile details of the customer / ग्राहक का प्रोफ़ाइल विवरण अपडेट करें' : 'Create a profile for a new client or customer / नए क्लाइंट या ग्राहक के लिए प्रोफ़ाइल बनाएं'}</p>
+            <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">{editId ? t('parties.customerForm.editCustomer') : t('parties.customerForm.addNewCustomer')}</h1>
+            <p className="text-sm text-on-surface-variant mt-1 font-medium">{editId ? t('parties.customerForm.updateProfileMsg') : t('parties.customerForm.createProfileMsg')}</p>
           </div>
         </div>
       </div>
@@ -189,13 +191,13 @@ export default function CustomerForm({ editId }: { editId?: string }) {
             <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
               <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
                 <User className="w-5 h-5 text-primary" />
-                <h2 className="text-lg font-bold text-on-surface">Personal Information / व्यक्तिगत जानकारी</h2>
+                <h2 className="text-lg font-bold text-on-surface">{t('parties.customerForm.personalInfo')}</h2>
               </div>
 
               <div className="grid grid-cols-1 gap-5">
                 <div>
                   <Input
-                    label="Full Name / पूरा नाम"
+                    label={t('parties.customerForm.fullName')}
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
@@ -209,7 +211,7 @@ export default function CustomerForm({ editId }: { editId?: string }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
                   <Input
-                    label="Email Address / ईमेल पता"
+                    label={t('parties.customerForm.email')}
                     name="email"
                     type="email"
                     value={formData.email}
@@ -221,7 +223,7 @@ export default function CustomerForm({ editId }: { editId?: string }) {
                 </div>
                 <div>
                   <Input
-                    label="Phone Number / फ़ोन नंबर"
+                    label={t('parties.customerForm.phone')}
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
@@ -234,22 +236,22 @@ export default function CustomerForm({ editId }: { editId?: string }) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <Input
-                  label="Company (Optional) / कंपनी (वैकल्पिक)"
+                  label={t('parties.customerForm.companyOptional')}
                   name="company"
                   value={formData.company}
                   onChange={handleInputChange}
                   placeholder="Company Name / कंपनी का नाम"
                 />
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Status / स्थिति</label>
+                  <label className="text-sm font-bold text-on-surface">{t('parties.customerForm.status')}</label>
                   <select
                     name="status"
                     value={formData.status}
                     onChange={handleInputChange}
                     className="flex w-full h-10 rounded-xl bg-surface border border-outline-variant/30 px-3 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all appearance-none"
                   >
-                    <option value="Active">Active / सक्रिय</option>
-                    <option value="Inactive">Inactive / निष्क्रिय</option>
+                    <option value="Active">{t('parties.customerForm.active')}</option>
+                    <option value="Inactive">{t('parties.customerForm.inactive')}</option>
                   </select>
                 </div>
               </div>
@@ -261,12 +263,12 @@ export default function CustomerForm({ editId }: { editId?: string }) {
             <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
               <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
                 <MapPin className="w-5 h-5 text-primary" />
-                <h2 className="text-lg font-bold text-on-surface">Address Details / पता विवरण</h2>
+                <h2 className="text-lg font-bold text-on-surface">{t('parties.customerForm.addressDetails')}</h2>
               </div>
 
               <div className="flex flex-col gap-5">
                 <Input
-                  label="Street Address / गली का पता"
+                  label={t('parties.customerForm.streetAddress')}
                   name="street"
                   value={addressData.street}
                   onChange={handleAddressChange}
@@ -275,14 +277,14 @@ export default function CustomerForm({ editId }: { editId?: string }) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <Input
-                    label="City / शहर"
+                    label={t('parties.customerForm.city')}
                     name="city"
                     value={addressData.city}
                     onChange={handleAddressChange}
                     placeholder="Jaipur / जयपुर"
                   />
                   <Input
-                    label="State/Province / राज्य/प्रांत"
+                    label={t('parties.customerForm.stateProvince')}
                     name="state"
                     value={addressData.state}
                     onChange={handleAddressChange}
@@ -292,14 +294,14 @@ export default function CustomerForm({ editId }: { editId?: string }) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <Input
-                    label="ZIP / Postal Code / पिन कोड"
+                    label={t('parties.customerForm.zipCode')}
                     name="zip"
                     value={addressData.zip}
                     onChange={handleAddressChange}
                     placeholder="400001"
                   />
                   <Input
-                    label="Country / देश"
+                    label={t('parties.customerForm.country')}
                     name="country"
                     value={addressData.country}
                     onChange={handleAddressChange}
@@ -323,7 +325,7 @@ export default function CustomerForm({ editId }: { editId?: string }) {
         </Button>
         <Button type="submit" disabled={loading} className="w-full sm:w-auto gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
           <Save className="w-4 h-4" />
-          <span className="font-bold tracking-wide">{loading ? 'Saving... / सहेजा जा रहा है...' : 'Save Customer / ग्राहक सहेजें'}</span>
+          <span className="font-bold tracking-wide">{loading ? t('parties.customerForm.saving') : t('parties.customerForm.saveCustomer')}</span>
         </Button>
       </div>
     </form>

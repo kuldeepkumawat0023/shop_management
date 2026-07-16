@@ -9,6 +9,7 @@ import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import { Plus, Download, Filter, Search, Users, ShieldAlert, MonitorPlay, MailWarning, Eye, Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { userService } from '@/lib/services/user.services';
+import { useTranslation } from 'react-i18next';
 import { AuthUser } from '@/lib/apiClient';
 import toast from 'react-hot-toast';
 import { cn } from '@/utils/cn';
@@ -48,6 +49,7 @@ const getGradient = (id?: string) => {
 };
 
 export default function UsersView() {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<AuthUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -61,7 +63,7 @@ export default function UsersView() {
         setUsers(res.data);
       }
     } catch (error) {
-      toast.error('Failed to load users', { id: 'failed-to-load-users' });
+      toast.error(t('hr.usersView.loadError'), { id: 'failed-to-load-users' });
     } finally {
       setLoading(false);
     }
@@ -72,17 +74,17 @@ export default function UsersView() {
   }, []);
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to deactivate this user?')) {
+    if (confirm(t('hr.usersView.confirmDeactivate'))) {
       try {
         const res = await userService.deleteProfile(id);
         if (res.success) {
-          toast.success('User deactivated successfully');
+          toast.success(t('hr.usersView.userDeactivated'));
           fetchUsers();
         } else {
-          toast.error(res.message || 'Failed to deactivate user');
+          toast.error(res.message || t('hr.usersView.deactivateFailed'));
         }
       } catch (error) {
-        toast.error('Failed to deactivate user', { id: 'failed-to-deactivate-user' });
+        toast.error(t('hr.usersView.deactivateFailed'), { id: 'failed-to-deactivate-user' });
       }
     }
   };
@@ -94,7 +96,7 @@ export default function UsersView() {
   );
 
   const columns = [
-    { header: 'Profile', accessorKey: 'profile', cell: (row: any) => (
+    { header: t('hr.usersView.profile'), accessorKey: 'profile', cell: (row: any) => (
       <div className="flex items-center gap-3">
         {row.profilePhoto && !brokenImages[row._id] ? (
           <img
@@ -117,13 +119,13 @@ export default function UsersView() {
         </div>
       </div>
     )},
-    { header: 'System Role', accessorKey: 'role', cell: (row: any) => (
+    { header: t('hr.usersView.systemRole'), accessorKey: 'role', cell: (row: any) => (
       <span className="text-xs font-bold text-on-surface bg-surface-container px-3 py-1 rounded-full border border-outline-variant/30 uppercase tracking-wider">{row.role}</span>
     )},
-    { header: 'Phone', accessorKey: 'phone', cell: (row: any) => <span className="text-sm font-medium text-on-surface">{row.phoneNumber || 'N/A'}</span> },
-    { header: 'Joined', accessorKey: 'joined', cell: (row: any) => <span className="text-sm font-medium text-on-surface-variant">{formatDate(row.createdAt)}</span> },
-    { header: 'Status', accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.isActive !== false ? 'Active' : 'Inactive'} /> },
-    { header: 'Actions', accessorKey: 'actions', cell: (row: any) => (
+    { header: t('hr.usersView.phone'), accessorKey: 'phone', cell: (row: any) => <span className="text-sm font-medium text-on-surface">{row.phoneNumber || 'N/A'}</span> },
+    { header: t('hr.usersView.joined'), accessorKey: 'joined', cell: (row: any) => <span className="text-sm font-medium text-on-surface-variant">{formatDate(row.createdAt)}</span> },
+    { header: t('hr.usersView.status'), accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.isActive !== false ? t('hr.usersView.active') : t('hr.usersView.inactive')} /> },
+    { header: t('hr.usersView.actions'), accessorKey: 'actions', cell: (row: any) => (
       <div className="flex items-center gap-2">
         <Link href={`/users/${row._id}`}>
           <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
@@ -149,10 +151,10 @@ export default function UsersView() {
   const pendingInvites = users.filter(u => (u as any).isPending === true).length;
 
   const userKPIs = [
-    { title: "Total Users", value: totalUsers.toString(), trend: "All registered accounts", isPositive: true, icon: Users },
-    { title: "Admin Accounts", value: adminAccounts.toString(), trend: "Managers & Admins", isPositive: true, icon: ShieldAlert },
-    { title: "Active Users", value: activeSessions.toString(), trend: "Currently active accounts", isPositive: true, icon: MonitorPlay },
-    { title: "Pending Invites", value: pendingInvites.toString(), trend: "Needs activation", isPositive: false, icon: MailWarning },
+    { title: t('hr.usersView.totalUsers'), value: totalUsers.toString(), trend: t('hr.usersView.allRegistered'), isPositive: true, icon: Users },
+    { title: t('hr.usersView.adminAccounts'), value: adminAccounts.toString(), trend: t('hr.usersView.managersAdmins'), isPositive: true, icon: ShieldAlert },
+    { title: t('hr.usersView.activeUsers'), value: activeSessions.toString(), trend: t('hr.usersView.currentlyActive'), isPositive: true, icon: MonitorPlay },
+    { title: t('hr.usersView.pendingInvites'), value: pendingInvites.toString(), trend: t('hr.usersView.needsActivation'), isPositive: false, icon: MailWarning },
   ];
 
   if (loading) return <ViewPageSkeleton />;
@@ -162,18 +164,18 @@ export default function UsersView() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
         <div>
-          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">System Users</h2>
-          <p className="text-sm font-medium text-on-surface-variant">Manage who has access to the dashboard and their roles.</p>
+          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">{t('hr.usersView.systemUsers')}</h2>
+          <p className="text-sm font-medium text-on-surface-variant">{t('hr.usersView.manageAccess')}</p>
         </div>
         <div className="flex gap-3 w-full md:w-auto">
           <Button variant="outline" className="flex-1 md:flex-none bg-surface-container-lowest border-primary text-primary px-4 py-2 rounded-lg font-bold hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2 shadow-sm">
             <Download className="w-4 h-4" />
-            Export
+            {t('hr.usersView.export')}
           </Button>
           <Link href="/users/new" className="flex-1 md:flex-none">
             <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 border-none">
               <Plus className="w-4 h-4" />
-              Invite User
+              {t('hr.usersView.inviteUser')}
             </Button>
           </Link>
         </div>
@@ -196,13 +198,13 @@ export default function UsersView() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by name, email or role..."
+              placeholder={t('hr.usersView.searchPlaceholder')}
               className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface border border-outline-variant/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm font-medium transition-all text-on-surface placeholder:text-on-surface-variant/50"
             />
           </div>
           <Button variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface bg-surface font-semibold gap-2">
             <Filter className="w-4 h-4" />
-            Filters
+            {t('hr.usersView.filters')}
           </Button>
         </div>
 

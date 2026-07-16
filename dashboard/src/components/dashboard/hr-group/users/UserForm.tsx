@@ -8,9 +8,11 @@ import { cn } from '@/utils/cn';
 import { userSchema } from '@/utils/validations';
 import toast from 'react-hot-toast';
 import { userService } from '@/lib/services/user.services';
+import { useTranslation } from 'react-i18next';
 import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 
 export default function UserForm() {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useParams();
   const id = params?.id as string;
@@ -65,7 +67,7 @@ export default function UserForm() {
         });
       }
     } catch (error) {
-      toast.error('Failed to load user data', { id: 'failed-to-load-user-data' });
+      toast.error(t('hr.userForm.loadError'), { id: 'failed-to-load-user-data' });
     } finally {
       setLoading(false);
     }
@@ -98,11 +100,11 @@ export default function UserForm() {
         if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
       }
       setErrors(newErrors);
-      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें', { id: 'please-correct-the-errors-----' });
+      return toast.error(t('hr.userForm.pleaseCorrectErrors'), { id: 'please-correct-the-errors-----' });
     }
 
     setSubmitting(true);
-    const toastId = toast.loading(isEditMode ? 'Updating user...' : 'Sending invitation...');
+    const toastId = toast.loading(isEditMode ? t('hr.userForm.updatingUser') : t('hr.userForm.sendingInvite'));
 
     try {
       const apiPayload = {
@@ -115,14 +117,14 @@ export default function UserForm() {
 
       if (isEditMode) {
         await userService.updateProfile(id, apiPayload);
-        toast.success('User updated successfully!', { id: toastId });
+        toast.success(t('hr.userForm.userUpdated'), { id: toastId });
       } else {
         await userService.createStaff(apiPayload);
-        toast.success('Invitation sent successfully!', { id: toastId });
+        toast.success(t('hr.userForm.inviteSent'), { id: toastId });
       }
       router.back();
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Failed to save user', { id: toastId });
+      toast.error(err?.response?.data?.message || t('hr.userForm.failedToSave'), { id: toastId });
     } finally {
       setSubmitting(false);
     }
@@ -140,10 +142,10 @@ export default function UserForm() {
           </Button>
           <div>
             <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">
-              {isEditMode ? 'Edit System User / सिस्टम उपयोगकर्ता संपादित करें' : 'Invite System User / सिस्टम उपयोगकर्ता आमंत्रित करें'}
+              {isEditMode ? t('hr.userForm.editUser') : t('hr.userForm.inviteUser')}
             </h1>
             <p className="text-sm text-on-surface-variant mt-1 font-medium">
-              {isEditMode ? 'Update user role and access settings' : 'Grant a new user access to the dashboard'}
+              {isEditMode ? t('hr.userForm.updateDetailsMsg') : t('hr.userForm.grantAccessMsg')}
             </p>
           </div>
         </div>
@@ -156,12 +158,12 @@ export default function UserForm() {
             <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
               <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
                 <UserCheck className="w-5 h-5 text-primary" />
-                <h2 className="text-lg font-bold text-on-surface">Account Information / खाते की जानकारी</h2>
+                <h2 className="text-lg font-bold text-on-surface">{t('hr.userForm.accountInfo')}</h2>
               </div>
 
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Full Name / पूरा नाम <span className="text-error ml-1">*</span></label>
+                  <label className="text-sm font-bold text-on-surface">{t('hr.userForm.fullName')} <span className="text-error ml-1">*</span></label>
                   <input
                     name="fullName"
                     value={formData.fullName}
@@ -176,7 +178,7 @@ export default function UserForm() {
                 </div>
 
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Email Address / ईमेल पता <span className="text-error ml-1">*</span></label>
+                  <label className="text-sm font-bold text-on-surface">{t('hr.userForm.email')} <span className="text-error ml-1">*</span></label>
                   <input
                     type="email"
                     name="email"
@@ -193,7 +195,7 @@ export default function UserForm() {
                 </div>
 
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Phone Number / फ़ोन नंबर <span className="text-error ml-1">*</span></label>
+                  <label className="text-sm font-bold text-on-surface">{t('hr.userForm.phoneNumber')} <span className="text-error ml-1">*</span></label>
                   <input
                     type="tel"
                     name="phone"
@@ -209,7 +211,7 @@ export default function UserForm() {
                 </div>
 
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Username (Optional) / उपयोगकर्ता नाम (वैकल्पिक)</label>
+                  <label className="text-sm font-bold text-on-surface">{t('hr.userForm.username')}</label>
                   <input
                     name="username"
                     value={formData.username}
@@ -225,7 +227,7 @@ export default function UserForm() {
               <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
                 <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
                   <Key className="w-5 h-5 text-primary" />
-                  <h2 className="text-lg font-bold text-on-surface">Security Settings / सुरक्षा सेटिंग्स</h2>
+                  <h2 className="text-lg font-bold text-on-surface">{t('hr.userForm.securitySettings')}</h2>
                 </div>
 
                 <div className="flex flex-col gap-4">
@@ -243,14 +245,14 @@ export default function UserForm() {
                       </svg>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">Require password reset / पासवर्ड रीसेट आवश्यक है</span>
-                      <span className="text-xs text-on-surface-variant font-medium">User must change password on their first login.</span>
+                      <span className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">{t('hr.userForm.requirePasswordReset')}</span>
+                      <span className="text-xs text-on-surface-variant font-medium">{t('hr.userForm.userMustChange')}</span>
                     </div>
                   </label>
 
                   <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 mt-2">
                     <p className="text-sm text-primary font-medium">
-                      An invitation link will be sent to the user's email address to set up their password and activate their account.
+                      {t('hr.userForm.inviteLinkMsg')}
                     </p>
                   </div>
                 </div>
@@ -263,12 +265,12 @@ export default function UserForm() {
             <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6 h-full">
               <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
                 <ShieldAlert className="w-5 h-5 text-primary" />
-                <h2 className="text-lg font-bold text-on-surface">Role & Permissions / भूमिका और अनुमतियाँ</h2>
+                <h2 className="text-lg font-bold text-on-surface">{t('hr.userForm.rolePermissions')}</h2>
               </div>
 
               <div className="flex flex-col gap-6">
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">System Role / सिस्टम भूमिका <span className="text-error ml-1">*</span></label>
+                  <label className="text-sm font-bold text-on-surface">{t('hr.userForm.systemRole')} <span className="text-error ml-1">*</span></label>
                   <select
                     name="role"
                     value={formData.role}
@@ -278,48 +280,48 @@ export default function UserForm() {
                       errors.role ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
                     )}
                   >
-                    <option value="">Select a role...</option>
-                    <option value="super_admin">Super Admin (Full Access)</option>
-                    <option value="manager">Manager (Edit Products/Sales)</option>
-                    <option value="staff">Sales Executive / Staff</option>
+                    <option value="">{t('hr.userForm.selectRole')}</option>
+                    <option value="super_admin">{t('hr.userForm.superAdmin')}</option>
+                    <option value="manager">{t('hr.userForm.manager')}</option>
+                    <option value="staff">{t('hr.userForm.staff')}</option>
                   </select>
                   {errors.role && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.role}</p>}
                 </div>
 
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Account Status / खाता स्थिति</label>
+                  <label className="text-sm font-bold text-on-surface">{t('hr.userForm.accountStatus')}</label>
                   <select
                     name="status"
                     value={formData.status}
                     onChange={handleInputChange}
                     className="flex w-full h-10 rounded-xl bg-surface border border-outline-variant/30 px-3 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all appearance-none"
                   >
-                    <option value="Pending">Pending (Wait for invite acceptance)</option>
-                    <option value="Active">Active (Force Activate)</option>
-                    <option value="Inactive">Inactive (Suspended)</option>
+                    <option value="Pending">{t('hr.userForm.pending')}</option>
+                    <option value="Active">{t('hr.userForm.active')}</option>
+                    <option value="Inactive">{t('hr.userForm.inactive')}</option>
                   </select>
                 </div>
 
                 <div className="bg-surface-container rounded-xl p-5 border border-outline-variant/10 mt-4">
-                  <h3 className="text-sm font-bold text-on-surface mb-2">Role Preview / भूमिका पूर्वावलोकन</h3>
+                  <h3 className="text-sm font-bold text-on-surface mb-2">{t('hr.userForm.rolePreview')}</h3>
                   {formData.role === 'super_admin' && (
                     <p className="text-sm text-on-surface-variant leading-relaxed">
-                      <strong>Super Admins</strong> have unrestricted access to all modules, settings, and can manage other users.
+                      <strong>{t('hr.userForm.superAdminsInfo1')}</strong> {t('hr.userForm.superAdminsInfo2')}
                     </p>
                   )}
                   {formData.role === 'manager' && (
                     <p className="text-sm text-on-surface-variant leading-relaxed">
-                      <strong>Managers</strong> can add/edit inventory, view financial reports, and process sales, but cannot change system settings or delete data permanently.
+                      <strong>{t('hr.userForm.managersInfo1')}</strong> {t('hr.userForm.managersInfo2')}
                     </p>
                   )}
                   {formData.role === 'staff' && (
                     <p className="text-sm text-on-surface-variant leading-relaxed">
-                      <strong>Staff</strong> only have access to the Point of Sale, creating bills, and viewing their own daily sales reports.
+                      <strong>{t('hr.userForm.staffInfo1')}</strong> {t('hr.userForm.staffInfo2')}
                     </p>
                   )}
                   {!formData.role && (
                     <p className="text-sm text-on-surface-variant italic">
-                      Select a role to see its permissions preview.
+                      {t('hr.userForm.selectRoleMsg')}
                     </p>
                   )}
                 </div>
@@ -339,7 +341,7 @@ export default function UserForm() {
           </Button>
           <Button type="submit" disabled={submitting} className="w-full sm:w-auto gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
             <Save className="w-4 h-4" />
-            <span className="font-bold tracking-wide">{submitting ? 'Saving...' : (isEditMode ? 'Update User' : 'Send Invite')}</span>
+            <span className="font-bold tracking-wide">{submitting ? t('hr.userForm.saving') : (isEditMode ? t('hr.userForm.updateUserBtn') : t('hr.userForm.sendInviteBtn'))}</span>
           </Button>
         </div>
       </div>
