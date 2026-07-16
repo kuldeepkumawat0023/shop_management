@@ -11,12 +11,14 @@ import Link from 'next/link';
 // We will use React state for these instead of static arrays
 
 import { supplierService } from '@/lib/services/supplier.services';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 
 export default function SuppliersView() {
   const [suppliers, setSuppliers] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [searchQuery, setSearchQuery] = React.useState('');
+  const { t } = useTranslation();
 
   const fetchSuppliers = async () => {
     try {
@@ -37,37 +39,37 @@ export default function SuppliersView() {
   }, []);
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this supplier?')) {
+    if (confirm(t('suppliers.suppliersView.confirmDelete'))) {
       try {
         const res = await supplierService.deleteSupplier(id);
         if (res.success) {
-          toast.success('Supplier deleted successfully');
+          toast.success(t('suppliers.suppliersView.deleteSuccess'));
           fetchSuppliers();
         } else {
-          toast.error(res.message || 'Failed to delete supplier');
+          toast.error(res.message || t('suppliers.suppliersView.deleteFailed'));
         }
       } catch (error) {
-        toast.error('Failed to delete supplier', { id: 'failed-to-delete-supplier' });
+        toast.error(t('suppliers.suppliersView.deleteFailed'), { id: 'failed-to-delete-supplier' });
       }
     }
   };
   const columns = [
-    { header: 'Company', accessorKey: 'name', cell: (row: any) => (
+    { header: t('suppliers.suppliersView.company'), accessorKey: 'name', cell: (row: any) => (
       <div className="flex flex-col">
         <span className="font-semibold text-primary">{row.name}</span>
-        <span className="text-xs text-on-surface-variant">Contact: {row.contactPerson}</span>
+        <span className="text-xs text-on-surface-variant">{t('suppliers.suppliersView.contact')} {row.contactPerson}</span>
       </div>
     )},
-    { header: 'Email & Phone', accessorKey: 'contact', cell: (row: any) => (
+    { header: t('suppliers.suppliersView.emailPhone'), accessorKey: 'contact', cell: (row: any) => (
       <div className="flex flex-col">
-        <span className="text-sm font-medium text-on-surface">{row.email || 'N/A'}</span>
+        <span className="text-sm font-medium text-on-surface">{row.email || t('suppliers.suppliersView.na')}</span>
         <span className="text-xs text-on-surface-variant">{row.mobile}</span>
       </div>
     )},
-    { header: 'GSTIN', accessorKey: 'gstin', cell: (row: any) => <span className="font-mono text-sm text-on-surface-variant">{row.gstin || 'N/A'}</span> },
-    { header: 'Balance', accessorKey: 'balance', cell: (row: any) => <span className="font-bold text-on-surface">₹{(row.balance || 0).toLocaleString()}</span> },
-    { header: 'Status', accessorKey: 'isActive', cell: (row: any) => <StatusBadge status={row.isActive !== false ? 'Active' : 'Inactive'} /> },
-    { header: 'Actions', accessorKey: 'actions', cell: (row: any) => (
+    { header: t('suppliers.suppliersView.gstin'), accessorKey: 'gstin', cell: (row: any) => <span className="font-mono text-sm text-on-surface-variant">{row.gstin || t('suppliers.suppliersView.na')}</span> },
+    { header: t('suppliers.suppliersView.balance'), accessorKey: 'balance', cell: (row: any) => <span className="font-bold text-on-surface">₹{(row.balance || 0).toLocaleString()}</span> },
+    { header: t('suppliers.suppliersView.status'), accessorKey: 'isActive', cell: (row: any) => <StatusBadge status={row.isActive !== false ? 'Active' : 'Inactive'} /> },
+    { header: t('suppliers.suppliersView.actions'), accessorKey: 'actions', cell: (row: any) => (
       <div className="flex items-center gap-2">
         <Link href={`/suppliers/${row._id}`}>
           <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
@@ -99,11 +101,11 @@ export default function SuppliersView() {
   const newThisMonth = suppliers.filter(s => s.createdAt ? new Date(s.createdAt).getMonth() === currentMonth : false).length;
   const totalPayables = suppliers.reduce((sum, s) => sum + (Number(s.balance) || 0), 0);
 
-  const supplierKPIs = [
-    { title: "Total Suppliers", value: totalSuppliers.toString(), trend: "All time", isPositive: true, icon: Truck },
-    { title: "Active Partners", value: activeSuppliers.toString(), trend: "Currently active", isPositive: true, icon: CheckCircle2 },
-    { title: "New This Month", value: newThisMonth.toString(), trend: "Current month", isPositive: true, icon: UserPlus },
-    { title: "Total Payables", value: `₹${totalPayables.toLocaleString()}`, trend: "Outstanding balance", isPositive: false, icon: IndianRupee },
+  const getSupplierKPIs = (t: any) => [
+    { title: t('suppliers.suppliersView.totalSuppliers'), value: totalSuppliers.toString(), trend: t('suppliers.suppliersView.allTime'), isPositive: true, icon: Truck },
+    { title: t('suppliers.suppliersView.activePartners'), value: activeSuppliers.toString(), trend: t('suppliers.suppliersView.currentlyActive'), isPositive: true, icon: CheckCircle2 },
+    { title: t('suppliers.suppliersView.newThisMonth'), value: newThisMonth.toString(), trend: t('suppliers.suppliersView.currentMonth'), isPositive: true, icon: UserPlus },
+    { title: t('suppliers.suppliersView.totalPayables'), value: `₹${totalPayables.toLocaleString()}`, trend: t('suppliers.suppliersView.outstandingBalance'), isPositive: false, icon: IndianRupee },
   ];
 
   return (
@@ -111,18 +113,18 @@ export default function SuppliersView() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
         <div>
-          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">Suppliers</h2>
-          <p className="text-sm font-medium text-on-surface-variant">Manage vendors, B2B partners, and track payables.</p>
+          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">{t('suppliers.suppliersView.suppliers')}</h2>
+          <p className="text-sm font-medium text-on-surface-variant">{t('suppliers.suppliersView.manageSuppliers')}</p>
         </div>
         <div className="flex gap-3 w-full md:w-auto">
           <Button variant="outline" className="flex-1 md:flex-none bg-surface-container-lowest border-primary text-primary px-4 py-2 rounded-lg font-bold hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2 shadow-sm">
             <Download className="w-4 h-4" />
-            Export
+            {t('suppliers.suppliersView.export')}
           </Button>
           <Link href="/suppliers/new" className="flex-1 md:flex-none">
             <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 border-none">
               <Plus className="w-4 h-4" />
-              Add Supplier
+              {t('suppliers.suppliersView.addSupplier')}
             </Button>
           </Link>
         </div>
@@ -130,7 +132,7 @@ export default function SuppliersView() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-        {supplierKPIs.map((kpi, idx) => (
+        {getSupplierKPIs(t).map((kpi, idx) => (
           <StatsCard key={idx} {...kpi} />
         ))}
       </div>
@@ -145,20 +147,20 @@ export default function SuppliersView() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search company or contact..."
+              placeholder={t('suppliers.suppliersView.searchPlaceholder')}
               className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface border border-outline-variant/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm font-medium transition-all text-on-surface placeholder:text-on-surface-variant/50"
             />
           </div>
           <Button variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface bg-surface font-semibold gap-2">
             <Filter className="w-4 h-4" />
-            Filters
+            {t('suppliers.suppliersView.filters')}
           </Button>
         </div>
 
         {/* Data Table */}
         <div className="flex-1 overflow-auto custom-scrollbar">
           {loading ? (
-            <div className="p-8 text-center text-on-surface-variant">Loading suppliers...</div>
+            <div className="p-8 text-center text-on-surface-variant">{t('suppliers.suppliersView.loadingSuppliers')}</div>
           ) : (
             <DataTable 
               columns={columns} 

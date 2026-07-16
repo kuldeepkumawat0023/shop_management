@@ -7,6 +7,7 @@ import { ArrowLeft, User, Phone, Mail, MapPin, Building, Edit, Trash2, ShoppingC
 import { useRouter } from 'next/navigation';
 import { supplierService } from '@/lib/services/supplier.services';
 import { purchaseService, PurchaseData } from '@/lib/services/purchase.services';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 
@@ -15,6 +16,7 @@ export default function SupplierDetailView({ id }: { id: string }) {
   const [supplier, setSupplier] = useState<any | null>(null);
   const [recentPOs, setRecentPOs] = useState<PurchaseData[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,8 +64,8 @@ export default function SupplierDetailView({ id }: { id: string }) {
     }
   };
 
-  if (loading) return <div className="p-8 text-center">Loading supplier details...</div>;
-  if (!supplier) return <div className="p-8 text-center">Supplier not found</div>;
+  if (loading) return <div className="p-8 text-center">{t('suppliers.supplierDetail.loading')}</div>;
+  if (!supplier) return <div className="p-8 text-center">{t('suppliers.supplierDetail.notFound')}</div>;
 
   return (
     <div className="flex flex-col h-full bg-background overflow-y-auto custom-scrollbar w-full ">
@@ -79,19 +81,19 @@ export default function SupplierDetailView({ id }: { id: string }) {
                 <h2 className="text-2xl font-black text-on-surface tracking-tight">{supplier.name}</h2>
                 <StatusBadge status={supplier.isActive !== false ? "Active" : "Inactive"} />
               </div>
-              <p className="text-sm font-medium text-on-surface-variant">Supplier ID: {supplier._id?.substring(0, 8)} • Onboarded {new Date(supplier.createdAt || Date.now()).toLocaleDateString()}</p>
+              <p className="text-sm font-medium text-on-surface-variant">{t('suppliers.supplierDetail.supplierId')} {supplier._id?.substring(0, 8)} • {t('suppliers.supplierDetail.onboarded')} {new Date(supplier.createdAt || Date.now()).toLocaleDateString()}</p>
             </div>
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <Link href={`/suppliers/${id}/edit`}>
               <Button variant="outline" className="flex-1 sm:flex-none border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-primary/10 font-semibold gap-2 rounded-xl transition-colors">
                 <Edit className="w-4 h-4" />
-                <span className="hidden sm:inline">Edit Profile</span>
+                <span className="hidden sm:inline">{t('suppliers.supplierDetail.editProfile')}</span>
               </Button>
             </Link>
             <Button onClick={handleDelete} variant="outline" className="flex-1 sm:flex-none border-outline-variant/30 text-error hover:bg-error/10 font-semibold gap-2 rounded-xl transition-colors">
               <Trash2 className="w-4 h-4" />
-              <span className="hidden sm:inline">Delete</span>
+              <span className="hidden sm:inline">{t('suppliers.supplierDetail.delete')}</span>
             </Button>
           </div>
         </div>
@@ -105,28 +107,28 @@ export default function SupplierDetailView({ id }: { id: string }) {
             <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full -mr-4 -mt-4"></div>
             <div className="flex items-center gap-2 text-on-surface-variant">
               <IndianRupee className="w-4 h-4" />
-              <h3 className="text-sm font-bold uppercase tracking-wider">Total Sourced</h3>
+              <h3 className="text-sm font-bold uppercase tracking-wider">{t('suppliers.supplierDetail.totalSourced')}</h3>
             </div>
             <p className="text-3xl font-black text-on-surface tracking-tight">₹{recentPOs.reduce((sum, po) => sum + (po.netAmount || 0), 0).toLocaleString()}</p>
-            <p className="text-sm text-primary font-bold">Lifetime Value</p>
+            <p className="text-sm text-primary font-bold">{t('suppliers.supplierDetail.lifetimeValue')}</p>
           </div>
           <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-6 shadow-sm flex flex-col gap-2 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-error/5 rounded-bl-full -mr-4 -mt-4"></div>
             <div className="flex items-center gap-2 text-on-surface-variant">
               <ShoppingCart className="w-4 h-4" />
-              <h3 className="text-sm font-bold uppercase tracking-wider">Total POs</h3>
+              <h3 className="text-sm font-bold uppercase tracking-wider">{t('suppliers.supplierDetail.totalPos')}</h3>
             </div>
             <p className="text-3xl font-black text-on-surface tracking-tight">{recentPOs.length}</p>
-            <p className="text-sm text-on-surface-variant font-medium">Last PO on {recentPOs.length > 0 ? new Date(recentPOs[0].createdAt || '').toLocaleDateString() : 'N/A'}</p>
+            <p className="text-sm text-on-surface-variant font-medium">{t('suppliers.supplierDetail.lastPoOn')} {recentPOs.length > 0 ? new Date(recentPOs[0].createdAt || '').toLocaleDateString() : t('suppliers.suppliersView.na')}</p>
           </div>
           <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-6 shadow-sm flex flex-col gap-2 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-warning/5 rounded-bl-full -mr-4 -mt-4"></div>
             <div className="flex items-center gap-2 text-on-surface-variant">
               <History className="w-4 h-4" />
-              <h3 className="text-sm font-bold uppercase tracking-wider">Outstanding Payables</h3>
+              <h3 className="text-sm font-bold uppercase tracking-wider">{t('suppliers.supplierDetail.outstandingPayables')}</h3>
             </div>
             <p className="text-3xl font-black text-on-surface tracking-tight">₹{(supplier.balance || 0).toLocaleString()}</p>
-            <p className="text-sm text-warning font-bold">Total Balance</p>
+            <p className="text-sm text-warning font-bold">{t('suppliers.supplierDetail.totalBalance')}</p>
           </div>
         </div>
 
@@ -136,7 +138,7 @@ export default function SupplierDetailView({ id }: { id: string }) {
             <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-3xl p-6 shadow-sm flex flex-col gap-6">
               <h3 className="text-lg font-bold text-on-surface flex items-center gap-2 border-b border-outline-variant/20 pb-2">
                 <Building className="w-5 h-5 text-primary" />
-                Business Details
+                {t('suppliers.supplierDetail.businessDetails')}
               </h3>
               
               <div className="flex flex-col gap-5">
@@ -145,8 +147,8 @@ export default function SupplierDetailView({ id }: { id: string }) {
                     <User className="w-4 h-4 text-on-surface-variant" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Contact Person</span>
-                    <span className="font-semibold text-on-surface">{supplier.contactPerson || 'N/A'}</span>
+                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">{t('suppliers.supplierDetail.contactPerson')}</span>
+                    <span className="font-semibold text-on-surface">{supplier.contactPerson || t('suppliers.suppliersView.na')}</span>
                   </div>
                 </div>
 
@@ -155,8 +157,8 @@ export default function SupplierDetailView({ id }: { id: string }) {
                     <Mail className="w-4 h-4 text-on-surface-variant" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Email</span>
-                    <a href={`mailto:${supplier.email || ''}`} className="font-semibold text-primary hover:underline">{supplier.email || 'N/A'}</a>
+                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">{t('suppliers.supplierDetail.email')}</span>
+                    <a href={`mailto:${supplier.email || ''}`} className="font-semibold text-primary hover:underline">{supplier.email || t('suppliers.suppliersView.na')}</a>
                   </div>
                 </div>
                 
@@ -165,8 +167,8 @@ export default function SupplierDetailView({ id }: { id: string }) {
                     <Phone className="w-4 h-4 text-on-surface-variant" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Phone</span>
-                    <a href={`tel:${supplier.mobile || ''}`} className="font-semibold text-on-surface">{supplier.mobile || 'N/A'}</a>
+                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">{t('suppliers.supplierDetail.phone')}</span>
+                    <a href={`tel:${supplier.mobile || ''}`} className="font-semibold text-on-surface">{supplier.mobile || t('suppliers.suppliersView.na')}</a>
                   </div>
                 </div>
 
@@ -175,8 +177,8 @@ export default function SupplierDetailView({ id }: { id: string }) {
                     <ReceiptText className="w-4 h-4 text-on-surface-variant" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">GSTIN</span>
-                    <span className="font-semibold text-on-surface font-mono">{supplier.gstNumber || 'N/A'}</span>
+                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">{t('suppliers.supplierDetail.gstin')}</span>
+                    <span className="font-semibold text-on-surface font-mono">{supplier.gstNumber || t('suppliers.suppliersView.na')}</span>
                   </div>
                 </div>
 
@@ -185,22 +187,22 @@ export default function SupplierDetailView({ id }: { id: string }) {
                     <MapPin className="w-4 h-4 text-on-surface-variant" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Address</span>
-                    <span className="font-semibold text-on-surface whitespace-pre-wrap">{supplier.address || 'N/A'}</span>
+                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">{t('suppliers.supplierDetail.address')}</span>
+                    <span className="font-semibold text-on-surface whitespace-pre-wrap">{supplier.address || t('suppliers.suppliersView.na')}</span>
                   </div>
                 </div>
               </div>
             </div>
             
             <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-3xl p-6 shadow-sm flex flex-col gap-4">
-              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider">Payment & Notes</h3>
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider">{t('suppliers.supplierDetail.paymentNotes')}</h3>
               <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-on-surface-variant">Payment Terms:</span>
+                  <span className="text-sm font-medium text-on-surface-variant">{t('suppliers.supplierDetail.paymentTerms')}</span>
                   <span className="text-sm font-bold text-on-surface">Net 30</span>
                 </div>
                 <p className="text-sm text-on-surface-variant leading-relaxed mt-2 border-t border-outline-variant/10 pt-2">
-                  {supplier.notes || 'N/A'}
+                  {supplier.notes || t('suppliers.suppliersView.na')}
                 </p>
               </div>
             </div>
@@ -212,9 +214,9 @@ export default function SupplierDetailView({ id }: { id: string }) {
               <div className="flex justify-between items-center mb-6 pb-2 border-b border-outline-variant/20">
                 <h3 className="text-lg font-bold text-on-surface flex items-center gap-2">
                   <ShoppingCart className="w-5 h-5 text-primary" />
-                  Recent Purchase Orders
+                  {t('suppliers.supplierDetail.recentPos')}
                 </h3>
-                <Button variant="ghost" className="text-primary font-bold hover:bg-primary/10 rounded-lg">View All</Button>
+                <Button variant="ghost" className="text-primary font-bold hover:bg-primary/10 rounded-lg">{t('suppliers.supplierDetail.viewAll')}</Button>
               </div>
 
               {recentPOs.length > 0 ? (
@@ -247,8 +249,8 @@ export default function SupplierDetailView({ id }: { id: string }) {
                   <div className="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center mb-4">
                     <ShoppingCart className="w-8 h-8 text-on-surface-variant/50" />
                   </div>
-                  <p className="text-lg font-bold text-on-surface mb-1">No recent POs</p>
-                  <p className="text-sm text-on-surface-variant">You haven't ordered anything from this supplier yet.</p>
+                  <p className="text-lg font-bold text-on-surface mb-1">{t('suppliers.supplierDetail.noRecentPos')}</p>
+                  <p className="text-sm text-on-surface-variant">{t('suppliers.supplierDetail.noOrdersYet')}</p>
                 </div>
               )}
             </div>

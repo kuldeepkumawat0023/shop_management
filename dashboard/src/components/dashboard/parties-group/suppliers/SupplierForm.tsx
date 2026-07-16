@@ -9,6 +9,7 @@ import { supplierSchema } from '@/utils/validations';
 import toast from 'react-hot-toast';
 
 import { supplierService } from '@/lib/services/supplier.services';
+import { useTranslation } from 'react-i18next';
 
 export default function SupplierForm({ editId }: { editId?: string }) {
   const router = useRouter();
@@ -36,6 +37,7 @@ export default function SupplierForm({ editId }: { editId?: string }) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(!!editId);
+  const { t } = useTranslation();
 
   React.useEffect(() => {
     if (editId) {
@@ -73,7 +75,7 @@ export default function SupplierForm({ editId }: { editId?: string }) {
             }
           }
         } catch (error) {
-          toast.error('Failed to fetch supplier details', { id: 'failed-to-fetch-supplier-detai' });
+          toast.error(t('suppliers.supplierForm.fetchFailed'), { id: 'failed-to-fetch-supplier-detai' });
         } finally {
           setIsFetching(false);
         }
@@ -187,8 +189,8 @@ export default function SupplierForm({ editId }: { editId?: string }) {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">{editId ? 'Edit Supplier' : 'Add New Supplier'} / {editId ? 'आपूर्तिकर्ता संपादित करें' : 'नया आपूर्तिकर्ता जोड़ें'}</h1>
-            <p className="text-sm text-on-surface-variant mt-1 font-medium">{editId ? 'Update supplier details / आपूर्तिकर्ता विवरण अपडेट करें' : 'Create a profile for a new vendor / नए विक्रेता के लिए प्रोफ़ाइल बनाएं'}</p>
+            <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">{editId ? t('suppliers.supplierForm.editSupplier') : t('suppliers.supplierForm.addNewSupplier')} / {editId ? 'आपूर्तिकर्ता संपादित करें' : 'नया आपूर्तिकर्ता जोड़ें'}</h1>
+            <p className="text-sm text-on-surface-variant mt-1 font-medium">{editId ? t("suppliers.supplierForm.updateSupplier") : t("suppliers.supplierForm.createProfile")}</p>
           </div>
         </div>
       </div>
@@ -200,13 +202,13 @@ export default function SupplierForm({ editId }: { editId?: string }) {
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
             <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
               <Building2 className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">Company & Contact Info / कंपनी और संपर्क जानकारी</h2>
+              <h2 className="text-lg font-bold text-on-surface">{t('suppliers.supplierForm.companyContactInfo')}</h2>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <Input
-                  label="Company Name / कंपनी का नाम"
+                  label={t('suppliers.supplierForm.companyName')}
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
@@ -217,7 +219,7 @@ export default function SupplierForm({ editId }: { editId?: string }) {
               </div>
               <div>
                 <Input
-                  label="Contact Person / संपर्क व्यक्ति"
+                  label={t('suppliers.supplierForm.contactPerson')}
                   name="contactPerson"
                   value={formData.contactPerson}
                   onChange={handleInputChange}
@@ -231,7 +233,7 @@ export default function SupplierForm({ editId }: { editId?: string }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <Input
-                  label="Email Address / ईमेल पता"
+                  label={t('suppliers.supplierForm.emailAddress')}
                   name="email"
                   type="email"
                   value={formData.email}
@@ -243,7 +245,7 @@ export default function SupplierForm({ editId }: { editId?: string }) {
               </div>
               <div>
                 <Input
-                  label="Phone Number / फ़ोन नंबर"
+                  label={t('suppliers.supplierForm.phoneNumber')}
                   name="phone"
                   value={formData.phone}
                   onChange={handleInputChange}
@@ -257,7 +259,7 @@ export default function SupplierForm({ editId }: { editId?: string }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <Input
-                  label="GSTIN / Tax ID / जीएसटी नंबर"
+                  label={t('suppliers.supplierForm.gstin')}
                   name="gstNumber"
                   value={formData.gstNumber}
                   onChange={handleInputChange}
@@ -267,15 +269,15 @@ export default function SupplierForm({ editId }: { editId?: string }) {
                 {errors.gstNumber && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.gstNumber}</p>}
               </div>
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Status / स्थिति</label>
+                <label className="text-sm font-bold text-on-surface">{t('suppliers.supplierForm.status')}</label>
                 <select 
                   name="status"
                   value={formData.status}
                   onChange={handleInputChange}
                   className="flex w-full h-10 rounded-xl bg-surface border border-outline-variant/30 px-3 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all appearance-none"
                 >
-                  <option value="Active">Active / सक्रिय</option>
-                  <option value="Inactive">Inactive / निष्क्रिय</option>
+                  <option value="Active">{t('suppliers.supplierForm.active')}</option>
+                  <option value="Inactive">{t('suppliers.supplierForm.inactive')}</option>
                 </select>
               </div>
             </div>
@@ -284,11 +286,11 @@ export default function SupplierForm({ editId }: { editId?: string }) {
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
             <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
               <ReceiptText className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">Payment & Notes / भुगतान और विवरण</h2>
+              <h2 className="text-lg font-bold text-on-surface">{t('suppliers.supplierForm.paymentNotes')}</h2>
             </div>
             
             <div className="flex flex-col gap-1.5 w-full">
-              <label className="text-sm font-bold text-on-surface">Payment Terms / भुगतान शर्तें</label>
+              <label className="text-sm font-bold text-on-surface">{t('suppliers.supplierForm.paymentTerms')}</label>
               <select 
                 name="paymentTerms"
                 value={formData.paymentTerms}
@@ -305,7 +307,7 @@ export default function SupplierForm({ editId }: { editId?: string }) {
             </div>
 
             <div className="flex flex-col gap-1.5 w-full">
-              <label className="text-sm font-bold text-on-surface">Internal Notes / आंतरिक विवरण</label>
+              <label className="text-sm font-bold text-on-surface">{t('suppliers.supplierForm.internalNotes')}</label>
               <textarea 
                 name="notes"
                 value={formData.notes}
@@ -323,12 +325,12 @@ export default function SupplierForm({ editId }: { editId?: string }) {
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
             <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
               <MapPin className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">Business Address / व्यावसायिक पता</h2>
+              <h2 className="text-lg font-bold text-on-surface">{t('suppliers.supplierForm.businessAddress')}</h2>
             </div>
             
             <div className="flex flex-col gap-5">
               <Input
-                label="Street Address / गली का पता"
+                label={t('suppliers.supplierForm.streetAddress')}
                 name="street"
                 value={addressData.street}
                 onChange={handleAddressChange}
@@ -337,14 +339,14 @@ export default function SupplierForm({ editId }: { editId?: string }) {
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <Input
-                  label="City / शहर"
+                  label={t('suppliers.supplierForm.city')}
                   name="city"
                   value={addressData.city}
                   onChange={handleAddressChange}
                   placeholder="Jaipur / जयपुर"
                 />
                 <Input
-                  label="State/Province / राज्य/प्रांत"
+                  label={t('suppliers.supplierForm.stateProvince')}
                   name="state"
                   value={addressData.state}
                   onChange={handleAddressChange}
@@ -354,14 +356,14 @@ export default function SupplierForm({ editId }: { editId?: string }) {
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <Input
-                  label="ZIP / Postal Code / पिन कोड"
+                  label={t('suppliers.supplierForm.zip')}
                   name="zip"
                   value={addressData.zip}
                   onChange={handleAddressChange}
                   placeholder="411001"
                 />
                 <Input
-                  label="Country / देश"
+                  label={t('suppliers.supplierForm.country')}
                   name="country"
                   value={addressData.country}
                   onChange={handleAddressChange}
@@ -377,14 +379,14 @@ export default function SupplierForm({ editId }: { editId?: string }) {
         <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-4 pt-6 border-t border-outline-variant/20">
           <Button type="button" onClick={handleClear} variant="ghost" className="w-full sm:w-auto text-on-surface-variant hover:text-error flex items-center justify-center gap-2">
             <RefreshCcw className="w-4 h-4" />
-            Clear Form / फ़ॉर्म साफ़ करें
+            {t('suppliers.supplierForm.clearForm')}
           </Button>
           <Button type="button" onClick={() => router.back()} variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
-            Cancel / रद्द करें
+            {t('suppliers.supplierForm.cancel')}
           </Button>
           <Button type="submit" disabled={loading} className="w-full sm:w-auto gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
             <Save className="w-4 h-4" />
-            <span className="font-bold tracking-wide">{loading ? 'Saving... / सहेजा जा रहा है...' : 'Save Supplier / आपूर्तिकर्ता सहेजें'}</span>
+            <span className="font-bold tracking-wide">{loading ? t('suppliers.supplierForm.saving') : t('suppliers.supplierForm.saveSupplier')}</span>
           </Button>
         </div>
       </div>
