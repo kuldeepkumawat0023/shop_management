@@ -9,6 +9,7 @@ import AutoScrollToTop from "@/components/common/AutoScrollToTop";
 import InstallPWAButton from "@/components/common/InstallPWAButton";
 import { Toaster } from 'react-hot-toast';
 import { buildMetadata } from "@/utils/seoConfig";
+import I18nProvider from "@/provider/I18nProvider";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -85,9 +86,11 @@ export default function RootLayout({
                   },
                 }}
               />
-              <HydrationGuard>
-                {children}
-              </HydrationGuard>
+              <I18nProvider>
+                <HydrationGuard>
+                  {children}
+                </HydrationGuard>
+              </I18nProvider>
             </GoogleAuthProvider>
           </StoreProvider>
         </ThemeProvider>

@@ -1,0 +1,52 @@
+{
+  "nav": {
+    "Dashboard": "डैशबोर्ड",
+    "POS Billing": "पीओएस बिलिंग",
+    "New Sale": "नई बिक्री",
+    "Hold Bills": "रुके हुए बिल",
+    "Today's Sales": "आज की बिक्री",
+    "Inventory & Products": "इन्वेंटरी और उत्पाद",
+    "Inventory Status": "इन्वेंटरी स्थिति",
+    "Products": "उत्पाद",
+    "Categories": "श्रेणियाँ",
+    "Brands": "ब्रांड्स",
+    "Manufacturing": "विनिर्माण",
+    "Productions": "उत्पादन",
+    "Recipes": "रेसिपीज़",
+    "Sales & Purchases": "बिक्री और खरीद",
+    "Sales": "बिक्री",
+    "Purchases": "खरीद",
+    "Expenses": "खर्च",
+    "Parties": "पार्टियाँ",
+    "Customers": "ग्राहक",
+    "Suppliers": "आपूर्तिकर्ता",
+    "HR & Team": "मानव संसाधन और टीम",
+    "Team Members": "टीम के सदस्य",
+    "System Users": "सिस्टम उपयोगकर्ता",
+    "Payroll": "पेरोल",
+    "Staff Salary": "कर्मचारी वेतन",
+    "Salary Advances": "वेतन अग्रिम",
+    "Payments": "भुगतान",
+    "Reports": "रिपोर्ट्स",
+    "GST Report": "जीएसटी रिपोर्ट",
+    "Profit & Loss": "लाभ और हानि",
+    "Settings": "सेटिंग्स",
+    "Store Profile": "स्टोर प्रोफ़ाइल",
+    "User Profile": "उपयोगकर्ता प्रोफ़ाइल",
+    "Roles & Permissions": "भूमिकाएँ और अनुमतियाँ",
+    "Tax & Billing": "कर और बिलिंग",
+    "Preferences": "प्राथमिकताएँ"
+  },
+  "topNav": {
+    "signedInAs": "इस रूप में साइन इन हैं",
+    "guest": "अतिथि",
+    "user": "उपयोगकर्ता",
+    "myProfile": "मेरी प्रोफ़ाइल",
+    "settings": "सेटिंग्स",
+    "signOut": "साइन आउट करें",
+    "newSale": "नई बिक्री"
+  },
+  "sideNav": {
+    "systemName": "प्रबंधन प्रणाली"
+  }
+}

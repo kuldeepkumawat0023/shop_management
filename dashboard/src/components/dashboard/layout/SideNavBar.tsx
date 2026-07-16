@@ -38,6 +38,7 @@ import {
 import { cn } from '@/utils/cn';
 import { Button } from '@/components/common/Button';
 import ShopSwitcher from './ShopSwitcher';
+import { useTranslation } from 'react-i18next';
 
 interface NavLink {
   name: string;
@@ -151,6 +152,7 @@ export default function SideNavBar({ isOpen, onClose }: SideNavBarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [openSubMenus, setOpenSubMenus] = useState<string[]>(['POS Billing']);
+  const { t } = useTranslation();
 
   const toggleSubMenu = (name: string) => {
     setOpenSubMenus(prev =>
@@ -191,7 +193,7 @@ export default function SideNavBar({ isOpen, onClose }: SideNavBarProps) {
             </div>
             <div className="min-w-0">
               <div className="text-sm font-black text-on-surface tracking-tight truncate max-w-[140px]">SmartShop</div>
-              <div className="text-[9px] font-bold text-primary uppercase tracking-widest">Management System</div>
+              <div className="text-[9px] font-bold text-primary uppercase tracking-widest">{t('sideNav.systemName')}</div>
             </div>
           </div>
 
@@ -246,7 +248,7 @@ export default function SideNavBar({ isOpen, onClose }: SideNavBarProps) {
                         "w-5 h-5 transition-transform duration-300",
                         isChildActive || isActive ? "text-primary" : "text-on-surface-variant group-hover:text-primary"
                       )} />
-                      <span className="text-sm font-semibold flex-1 text-left">{link.name}</span>
+                      <span className="text-sm font-semibold flex-1 text-left">{t(`nav.${link.name}`)}</span>
                       <ChevronDown className={cn(
                         "w-4 h-4 transition-transform duration-300",
                         isExpanded ? "rotate-180" : ""
@@ -269,7 +271,7 @@ export default function SideNavBar({ isOpen, onClose }: SideNavBarProps) {
                         "w-5 h-5 transition-transform duration-300 group-hover:scale-110",
                         isActive ? "text-primary" : "text-on-surface-variant group-hover:text-primary"
                       )} />
-                      <span className="text-sm font-semibold flex-1">{link.name}</span>
+                      <span className="text-sm font-semibold flex-1">{t(`nav.${link.name}`)}</span>
                     </Link>
                   )}
 
@@ -294,7 +296,7 @@ export default function SideNavBar({ isOpen, onClose }: SideNavBarProps) {
                             )}
                           >
                             <ChildIcon className="w-4 h-4" />
-                            <span>{child.name}</span>
+                            <span>{t(`nav.${child.name}`)}</span>
                           </Link>
                         );
                       })}

@@ -21,6 +21,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { authService } from '@/lib/services/auth.services';
 import { useRouter } from 'next/navigation';
 import { getBackendBaseUrl, getBackendHostUrl } from '@/lib/apiClient';
+import { useTranslation } from 'react-i18next';
 
 function getInitials(name?: string): string {
   if (!name) return 'U';
@@ -41,6 +42,12 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, logout } = useAuth();
   const router = useRouter();
+  const { t, i18n } = useTranslation();
+
+  const toggleLanguage = () => {
+    const newLang = i18n.language.startsWith('hi') ? 'en' : 'hi';
+    i18n.changeLanguage(newLang);
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -94,14 +101,24 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
         </button>
 
         {mounted && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="text-on-surface-variant hover:text-primary transition-colors"
-          >
-            {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleLanguage}
+              className="text-on-surface-variant hover:text-primary transition-colors font-bold text-xs"
+            >
+              {i18n.language?.startsWith('hi') ? 'EN' : 'HI'}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="text-on-surface-variant hover:text-primary transition-colors"
+            >
+              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </Button>
+          </div>
         )}
 
         <div className="flex items-center ml-1 sm:ml-2">
@@ -178,7 +195,7 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
 
                   <span className="relative z-10 flex items-center gap-2">
                     <ShoppingCart className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
-                    New Sale
+                    {t('topNav.newSale')}
                   </span>
                 </Button>
               </Link>
@@ -205,10 +222,10 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
             </div>
             <div className="hidden sm:block text-left">
               <div className="text-xs font-bold text-on-surface leading-tight truncate max-w-[100px]">
-                {user?.fullname || 'Guest'}
+                {user?.fullname || t('topNav.guest')}
               </div>
               <div className="text-[9px] text-on-surface-variant font-medium uppercase tracking-tighter">
-                {user?.role || 'User'}
+                {user?.role || t('topNav.user')}
               </div>
             </div>
             <ChevronDown className={cn(
@@ -227,7 +244,7 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
                 className="absolute right-0 mt-2 w-60 bg-card backdrop-blur-xl border border-outline-variant/30 rounded-2xl shadow-2xl py-2 overflow-hidden z-50 shadow-primary/10"
               >
                 <div className="px-4 py-3 border-b border-outline-variant/10 mb-1">
-                  <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Signed in as</p>
+                  <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">{t('topNav.signedInAs')}</p>
                   <p className="text-sm font-bold text-on-surface truncate">{user?.email || 'N/A'}</p>
                 </div>
 
@@ -240,7 +257,7 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
                     <div className="p-1.5 rounded-lg bg-surface-container text-on-surface-variant group-hover/item:bg-primary/20 group-hover/item:text-primary transition-colors">
                       <User size={16} />
                     </div>
-                    My Profile
+                    {t('topNav.myProfile')}
                   </Link>
 
                   <Link
@@ -251,7 +268,7 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
                     <div className="p-1.5 rounded-lg bg-surface-container text-on-surface-variant group-hover/item:bg-primary/20 group-hover/item:text-primary transition-colors">
                       <Settings size={16} />
                     </div>
-                    Settings
+                    {t('topNav.settings')}
                   </Link>
                 </div>
 
@@ -263,7 +280,7 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
                     <div className="p-1.5 rounded-lg bg-error/10 text-error">
                       <LogOut size={16} />
                     </div>
-                    Sign Out
+                    {t('topNav.signOut')}
                   </button>
                 </div>
               </motion.div>

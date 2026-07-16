@@ -1,0 +1,52 @@
+{
+  "nav": {
+    "Dashboard": "Dashboard",
+    "POS Billing": "POS Billing",
+    "New Sale": "New Sale",
+    "Hold Bills": "Hold Bills",
+    "Today's Sales": "Today's Sales",
+    "Inventory & Products": "Inventory & Products",
+    "Inventory Status": "Inventory Status",
+    "Products": "Products",
+    "Categories": "Categories",
+    "Brands": "Brands",
+    "Manufacturing": "Manufacturing",
+    "Productions": "Productions",
+    "Recipes": "Recipes",
+    "Sales & Purchases": "Sales & Purchases",
+    "Sales": "Sales",
+    "Purchases": "Purchases",
+    "Expenses": "Expenses",
+    "Parties": "Parties",
+    "Customers": "Customers",
+    "Suppliers": "Suppliers",
+    "HR & Team": "HR & Team",
+    "Team Members": "Team Members",
+    "System Users": "System Users",
+    "Payroll": "Payroll",
+    "Staff Salary": "Staff Salary",
+    "Salary Advances": "Salary Advances",
+    "Payments": "Payments",
+    "Reports": "Reports",
+    "GST Report": "GST Report",
+    "Profit & Loss": "Profit & Loss",
+    "Settings": "Settings",
+    "Store Profile": "Store Profile",
+    "User Profile": "User Profile",
+    "Roles & Permissions": "Roles & Permissions",
+    "Tax & Billing": "Tax & Billing",
+    "Preferences": "Preferences"
+  },
+  "topNav": {
+    "signedInAs": "Signed in as",
+    "guest": "Guest",
+    "user": "User",
+    "myProfile": "My Profile",
+    "settings": "Settings",
+    "signOut": "Sign Out",
+    "newSale": "New Sale"
+  },
+  "sideNav": {
+    "systemName": "Management System"
+  }
+}
