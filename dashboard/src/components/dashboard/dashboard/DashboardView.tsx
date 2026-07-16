@@ -13,8 +13,8 @@ import { StatsCard } from '@/components/common/StatsCard';
 
 export default function DashboardView() {
     return (
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 w-full bg-surface">
-            <div className="w-full space-y-6">
+        <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full min-w-0">
+            <div className="w-full space-y-6 flex-1">
 
                 {/* Main Hero Header */}
                 <div className="gradient-button p-6 md:p-8 text-on-primary relative overflow-hidden shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 rounded-2xl mb-6">
@@ -50,10 +50,9 @@ export default function DashboardView() {
                     </div>
                 </div>
 
-                {/* KPI Row (Horizontal Scroll) */}
-                <div className="flex overflow-x-auto gap-4 pb-2 snap-x [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-outline-variant/30 [&::-webkit-scrollbar-thumb]:rounded-full">
+                {/* KPI Grid (Matching TeamMembersView style) */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                     <StatsCard
-                        className="min-w-[220px] shrink-0 snap-start"
                         title="Total Revenue"
                         value="₹52,450"
                         icon={ShoppingBag}
@@ -64,7 +63,6 @@ export default function DashboardView() {
                     />
                     
                     <StatsCard
-                        className="min-w-[220px] shrink-0 snap-start"
                         title="Total Orders"
                         value="324"
                         icon={Receipt}
@@ -75,7 +73,6 @@ export default function DashboardView() {
                     />
 
                     <StatsCard
-                        className="min-w-[220px] shrink-0 snap-start"
                         title="Total Profit"
                         value="₹12,850"
                         icon={LineChart}
@@ -86,7 +83,6 @@ export default function DashboardView() {
                     />
 
                     <StatsCard
-                        className="min-w-[220px] shrink-0 snap-start"
                         title="Total Customers"
                         value="865"
                         icon={Users}
@@ -97,7 +93,6 @@ export default function DashboardView() {
                     />
 
                     <StatsCard
-                        className="min-w-[220px] shrink-0 snap-start"
                         title="Total Products"
                         value="1,240"
                         icon={Package}
@@ -108,7 +103,6 @@ export default function DashboardView() {
                     />
 
                     <StatsCard
-                        className="min-w-[220px] shrink-0 snap-start"
                         title="Low Stock Items"
                         value="15"
                         icon={AlertTriangle}
@@ -119,7 +113,6 @@ export default function DashboardView() {
                     />
 
                     <StatsCard
-                        className="min-w-[220px] shrink-0 snap-start"
                         title="Total Expenses"
                         value="₹21,400"
                         icon={Wallet}

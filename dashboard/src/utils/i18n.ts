@@ -1,25 +1,29 @@
-'use client';
+"use client";
 
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
 
-import enJSON from '../locales/en.json';
-import hiJSON from '../locales/hi.json';
+import en from "../locales/en.json";
+import hi from "../locales/hi.json";
 
-i18n
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
+// Initialize i18n instance
+const i18nInstance = i18n.use(initReactI18next);
+
+// Use language detector only in browser
+if (typeof window !== 'undefined') {
+    i18nInstance.use(LanguageDetector);
+}
+
+i18nInstance.init({
     resources: {
-      en: { translation: enJSON },
-      hi: { translation: hiJSON }
+        en: { translation: en },
+        hi: { translation: hi }
     },
-    fallbackLng: 'en',
-    supportedLngs: ['en', 'hi'],
+    fallbackLng: "en",
     interpolation: {
-      escapeValue: false // React already escapes by default
+        escapeValue: false // React already escapes values
     }
-  });
+});
 
 export default i18n;
