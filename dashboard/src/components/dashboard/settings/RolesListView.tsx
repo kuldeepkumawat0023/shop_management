@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import ActionGuard from '@/components/auth/ActionGuard';
 
 export default function RolesListView() {
   const [roles, setRoles] = useState<CustomRoleData[]>([]);
@@ -56,12 +57,14 @@ export default function RolesListView() {
           <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">Roles & Permissions</h1>
           <p className="text-sm text-on-surface-variant mt-1 font-medium">Manage access controls and administrative roles across the platform.</p>
         </div>
-        <Link href="/settings/roles/new">
-          <Button className="gradient-button text-white shadow-md gap-2">
-            <Plus className="w-4 h-4" />
-            Create Custom Role
-          </Button>
-        </Link>
+        <ActionGuard permission="roles.create">
+          <Link href="/settings/roles/new">
+            <Button className="gradient-button text-white shadow-md gap-2">
+              <Plus className="w-4 h-4" />
+              Create Custom Role
+            </Button>
+          </Link>
+        </ActionGuard>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -89,15 +92,17 @@ export default function RolesListView() {
                   <Eye className="w-4 h-4" />
                 </Button>
                 {!role.isDefault && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    title="Edit Role"
-                    onClick={() => router.push(`/settings/roles/${role._id}/edit`)}
-                    className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
+                  <ActionGuard permission="roles.update">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title="Edit Role"
+                      onClick={() => router.push(`/settings/roles/${role._id}/edit`)}
+                      className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  </ActionGuard>
                 )}
               </div>
             </div>
@@ -130,9 +135,11 @@ export default function RolesListView() {
 
               <div className="flex gap-2">
                 {!role.isDefault && (
-                  <Button onClick={() => handleDelete(role._id, role.roleName)} variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10" title="Delete Role">
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  <ActionGuard permission="roles.delete">
+                    <Button onClick={() => handleDelete(role._id, role.roleName)} variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10" title="Delete Role">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </ActionGuard>
                 )}
               </div>
             </div>
@@ -141,16 +148,18 @@ export default function RolesListView() {
         ))}
       </div>
 
-      {roles.length === 0 && (
-        <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-outline-variant/30 rounded-3xl mt-4">
-          <Shield className="w-12 h-12 text-on-surface-variant/50 mb-4" />
-          <h3 className="text-xl font-bold text-on-surface">No Roles Found</h3>
-          <p className="text-on-surface-variant mt-2 mb-6">Get started by creating a custom role to define specific access levels.</p>
-          <Link href="/settings/roles/new">
-            <Button className="gradient-button text-white px-6">Create Custom Role</Button>
-          </Link>
-        </div>
-      )}
+        {roles.length === 0 && (
+          <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-outline-variant/30 rounded-3xl mt-4">
+            <Shield className="w-12 h-12 text-on-surface-variant/50 mb-4" />
+            <h3 className="text-xl font-bold text-on-surface">No Roles Found</h3>
+            <p className="text-on-surface-variant mt-2 mb-6">Get started by creating a custom role to define specific access levels.</p>
+            <ActionGuard permission="roles.create">
+              <Link href="/settings/roles/new">
+                <Button className="gradient-button text-white px-6">Create Custom Role</Button>
+              </Link>
+            </ActionGuard>
+          </div>
+        )}
     </div>
   );
 }

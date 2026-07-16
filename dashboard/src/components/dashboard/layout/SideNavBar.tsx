@@ -39,24 +39,27 @@ import { cn } from '@/utils/cn';
 import { Button } from '@/components/common/Button';
 import ShopSwitcher from './ShopSwitcher';
 import { useTranslation } from 'react-i18next';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface NavLink {
   name: string;
   href: string;
   icon: any;
   children?: NavLink[];
+  requiredPermission?: string;
 }
 
 const erpNavLinks: NavLink[] = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Dashboard', href: '/', icon: LayoutDashboard, requiredPermission: 'dashboard.view' },
   {
     name: 'POS Billing',
     href: '/pos-group',
     icon: ReceiptText,
+    requiredPermission: 'pos.view',
     children: [
-      { name: 'New Sale', href: '/pos', icon: ShoppingCart },
-      { name: 'Hold Bills', href: '/pos/hold-bills', icon: PauseCircle },
-      { name: 'Today\'s Sales', href: '/pos/today-sales', icon: Receipt },
+      { name: 'New Sale', href: '/pos', icon: ShoppingCart, requiredPermission: 'pos.view' },
+      { name: 'Hold Bills', href: '/pos/hold-bills', icon: PauseCircle, requiredPermission: 'pos.view' },
+      { name: 'Today\'s Sales', href: '/pos/today-sales', icon: Receipt, requiredPermission: 'pos.view' },
     ]
   },
   {
@@ -64,10 +67,10 @@ const erpNavLinks: NavLink[] = [
     href: '/inventory-group',
     icon: Package,
     children: [
-      { name: 'Inventory Status', href: '/inventory', icon: Warehouse },
-      { name: 'Products', href: '/products', icon: Package },
-      { name: 'Categories', href: '/categories', icon: LayoutGrid },
-      { name: 'Brands', href: '/brands', icon: Tag },
+      { name: 'Inventory Status', href: '/inventory', icon: Warehouse, requiredPermission: 'products.view' },
+      { name: 'Products', href: '/products', icon: Package, requiredPermission: 'products.view' },
+      { name: 'Categories', href: '/categories', icon: LayoutGrid, requiredPermission: 'categories.view' },
+      { name: 'Brands', href: '/brands', icon: Tag, requiredPermission: 'brands.view' },
     ]
   },
   {
@@ -75,8 +78,8 @@ const erpNavLinks: NavLink[] = [
     href: '/manufacturing-group',
     icon: Building2,
     children: [
-      { name: 'Productions', href: '/manufacturing/productions', icon: Activity },
-      { name: 'Recipes', href: '/manufacturing/recipes', icon: BookOpen },
+      { name: 'Productions', href: '/manufacturing/productions', icon: Activity, requiredPermission: 'productions.view' },
+      { name: 'Recipes', href: '/manufacturing/recipes', icon: BookOpen, requiredPermission: 'recipes.view' },
     ]
   },
   {
@@ -84,34 +87,34 @@ const erpNavLinks: NavLink[] = [
     href: '/sales-group',
     icon: ShoppingCart,
     children: [
-      { name: 'Sales', href: '/sales', icon: CircleDollarSign },
-      { name: 'Purchases', href: '/purchases', icon: ShoppingCart },
-      { name: 'Expenses', href: '/expenses', icon: ReceiptText },
+      { name: 'Sales', href: '/sales', icon: CircleDollarSign, requiredPermission: 'sales.view' },
+      { name: 'Purchases', href: '/purchases', icon: ShoppingCart, requiredPermission: 'purchases.view' },
+      { name: 'Expenses', href: '/expenses', icon: ReceiptText, requiredPermission: 'expenses.view' },
     ]
   },
   {
     name: 'Parties', href: '/parties-group', icon: Users, children: [
-      { name: 'Customers', href: '/customers', icon: Users },
-      { name: 'Suppliers', href: '/suppliers', icon: Truck },
+      { name: 'Customers', href: '/customers', icon: Users, requiredPermission: 'customers.view' },
+      { name: 'Suppliers', href: '/suppliers', icon: Truck, requiredPermission: 'suppliers.view' },
     ]
   },
   {
     name: 'HR & Team', href: '/hr-group', icon: User, children: [
-      { name: 'Team Members', href: '/team', icon: Users },
-      { name: 'System Users', href: '/users', icon: User },
+      { name: 'Team Members', href: '/team', icon: Users, requiredPermission: 'team.view' },
+      { name: 'System Users', href: '/users', icon: User, requiredPermission: 'users.view' },
     ]
   },
   {
     name: 'Payroll', href: '/payroll-group', icon: CreditCard, children: [
-      { name: 'Staff Salary', href: '/payroll/staff', icon: Users },
-      { name: 'Salary Advances', href: '/payroll/advances', icon: Banknote },
+      { name: 'Staff Salary', href: '/payroll/staff', icon: Users, requiredPermission: 'payroll.view' },
+      { name: 'Salary Advances', href: '/payroll/advances', icon: Banknote, requiredPermission: 'payroll.view' },
     ]
   },
-  { name: 'Payments', href: '/payments', icon: Wallet },
+  { name: 'Payments', href: '/payments', icon: Wallet, requiredPermission: 'payments.view' },
   {
     name: 'Reports', href: '/reports-group', icon: BarChart3, children: [
-      { name: 'GST Report', href: '/reports/gst', icon: Receipt },
-      { name: 'Profit & Loss', href: '/reports/profit', icon: TrendingUp },
+      { name: 'GST Report', href: '/reports/gst', icon: Receipt, requiredPermission: 'reports.view' },
+      { name: 'Profit & Loss', href: '/reports/profit', icon: TrendingUp, requiredPermission: 'reports.view' },
     ]
   },
   {
@@ -119,11 +122,11 @@ const erpNavLinks: NavLink[] = [
     href: '/settings',
     icon: Settings,
     children: [
-      { name: 'Store Profile', href: '/settings/store', icon: Building2 },
-      { name: 'User Profile', href: '/settings/profile', icon: User },
-      { name: 'Roles & Permissions', href: '/settings/roles', icon: ShieldCheck },
-      { name: 'Tax & Billing', href: '/settings/billing', icon: CreditCard },
-      { name: 'Preferences', href: '/settings/preferences', icon: Sliders },
+      { name: 'Store Profile', href: '/settings/store', icon: Building2, requiredPermission: 'settings.view' },
+      { name: 'User Profile', href: '/settings/profile', icon: User, requiredPermission: 'settings.view' },
+      { name: 'Roles & Permissions', href: '/settings/roles', icon: ShieldCheck, requiredPermission: 'roles.view' },
+      { name: 'Tax & Billing', href: '/settings/billing', icon: CreditCard, requiredPermission: 'settings.view' },
+      { name: 'Preferences', href: '/settings/preferences', icon: Sliders, requiredPermission: 'settings.view' },
     ]
   },
 ];
@@ -153,6 +156,7 @@ export default function SideNavBar({ isOpen, onClose }: SideNavBarProps) {
   const router = useRouter();
   const [openSubMenus, setOpenSubMenus] = useState<string[]>(['POS Billing']);
   const { t } = useTranslation();
+  const { hasPermission } = usePermissions();
 
   const toggleSubMenu = (name: string) => {
     setOpenSubMenus(prev =>
@@ -160,14 +164,40 @@ export default function SideNavBar({ isOpen, onClose }: SideNavBarProps) {
     );
   };
 
+  // Filter links based on required permissions
+  const authorizedLinks = React.useMemo(() => {
+    return erpNavLinks.filter(link => {
+      if (link.requiredPermission && !hasPermission(link.requiredPermission)) return false;
+      return true;
+    }).map(link => {
+      if (link.children) {
+        const authChildren = link.children.filter(child => {
+          if (child.requiredPermission && !hasPermission(child.requiredPermission)) return false;
+          return true;
+        });
+        return { ...link, children: authChildren };
+      }
+      return link;
+    }).filter(link => {
+      // Hide parent if all its originally existing children were filtered out
+      const originalLink = erpNavLinks.find(l => l.name === link.name);
+      const originalHadChildren = originalLink && originalLink.children && originalLink.children.length > 0;
+      if (originalHadChildren && (!link.children || link.children.length === 0)) return false;
+      return true;
+    });
+  }, [hasPermission]);
+
   // Automatically open sub-menu if child route is active
   useEffect(() => {
-    erpNavLinks.forEach(item => {
+    authorizedLinks.forEach(item => {
       if (item.children?.some(child => pathname === child.href)) {
-        setOpenSubMenus([item.name]);
+        setOpenSubMenus(prev => {
+          if (!prev.includes(item.name)) return [item.name];
+          return prev;
+        });
       }
     });
-  }, [pathname]);
+  }, [pathname, authorizedLinks]);
 
 
   return (
@@ -213,7 +243,7 @@ export default function SideNavBar({ isOpen, onClose }: SideNavBarProps) {
 
         {/* Navigation Links */}
         <nav className="flex-1 space-y-1.5 overflow-y-auto pr-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          {erpNavLinks
+          {authorizedLinks
             .map((link) => {
               const children = link.children;
               const hasChildren = children && children.length > 0;

@@ -1,6 +1,7 @@
 import React from 'react';
 import DashboardLayout from '@/components/dashboard/layout/DashboardLayout';
 import AuthGuard from '@/components/auth/AuthGuard';
+import RoutePermissionGuard from '@/components/auth/RoutePermissionGuard';
 
 export default function RootDashboardLayout({
   children,
@@ -10,7 +11,9 @@ export default function RootDashboardLayout({
   return (
     <AuthGuard>
       <DashboardLayout>
-        {children}
+        <RoutePermissionGuard>
+          {children}
+        </RoutePermissionGuard>
       </DashboardLayout>
     </AuthGuard>
   );

@@ -8,6 +8,7 @@ import { roleService } from '@/lib/services/role.services';
 import toast from 'react-hot-toast';
 import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import Link from 'next/link';
+import ActionGuard from '@/components/auth/ActionGuard';
 
 interface PermissionModule {
   module: string;
@@ -84,12 +85,14 @@ export default function RoleDetailView({ roleId }: RoleDetailViewProps) {
             <p className="text-sm font-medium text-on-surface-variant mt-1">Review the details and exact permissions assigned to this role.</p>
           </div>
           {!isDefault && (
-            <Link href={`/settings/roles/${roleId}/edit`}>
-              <Button className="gradient-button text-white px-6 py-2.5 rounded-xl font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 border-none">
-                <Edit className="w-4 h-4" />
-                Edit Role
-              </Button>
-            </Link>
+            <ActionGuard permission="roles.update">
+              <Link href={`/settings/roles/${roleId}/edit`}>
+                <Button className="gradient-button text-white px-6 py-2.5 rounded-xl font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 border-none">
+                  <Edit className="w-4 h-4" />
+                  Edit Role
+                </Button>
+              </Link>
+            </ActionGuard>
           )}
         </div>
       </div>
