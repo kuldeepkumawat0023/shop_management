@@ -93,8 +93,6 @@ export default function PurchaseDetailView() {
             <div>
               <div className="flex items-center gap-2 mb-4 pb-2 border-b border-outline-variant/10">
                 <FileText className="w-5 h-5 text-primary" />
-              <div className="flex items-center gap-2 mb-4 pb-2 border-b border-outline-variant/10">
-                <FileText className="w-5 h-5 text-primary" />
                 <h3 className="text-lg font-bold text-on-surface">Order Info / आदेश जानकारी</h3>
               </div>
               <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-sm">
@@ -123,7 +121,6 @@ export default function PurchaseDetailView() {
 
         {/* Items Table */}
         <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl shadow-sm overflow-hidden flex flex-col">
-          <div className="p-4 border-b border-outline-variant/10 bg-surface/50">
           <div className="p-4 border-b border-outline-variant/10 bg-surface/50">
             <h3 className="text-lg font-bold text-on-surface">Purchase Items / खरीद आइटम</h3>
           </div>
@@ -156,7 +153,6 @@ export default function PurchaseDetailView() {
         {/* Billing Summary */}
         <div className="flex flex-col md:flex-row justify-end">
           <div className="w-full md:w-80 bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-6 shadow-sm">
-          <div className="w-full md:w-80 bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-6 shadow-sm">
             <div className="flex justify-between items-center mb-3 text-sm">
               <span className="text-on-surface-variant">Subtotal / उप-कुल</span>
               <span className="font-bold text-on-surface">₹{purchase.totalAmount.toLocaleString()}</span>
@@ -180,6 +176,7 @@ export default function PurchaseDetailView() {
           </div>
         </div>
 
+        </div>
       </div>
     </div>
   );

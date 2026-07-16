@@ -10,8 +10,10 @@ import {
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { StatsCard } from '@/components/common/StatsCard';
+import { useTranslation } from 'react-i18next';
 
 export default function DashboardView() {
+    const { t } = useTranslation();
     return (
         <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full min-w-0">
             <div className="w-full space-y-6 flex-1">
@@ -29,7 +31,7 @@ export default function DashboardView() {
                             Dashboard Overview <span className="text-2xl">👋</span>
                         </h2>
                         <p className="text-white/80 text-base">
-                            Welcome back, Raj! Here's what's happening with your business today.
+                            {t('dashboard.welcome')}, Raj! {t('dashboard.welcomeDesc')}
                         </p>
                     </div>
                     <div className="relative z-10 flex flex-wrap items-center gap-3">
@@ -40,7 +42,7 @@ export default function DashboardView() {
                         </div>
                         <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md border border-white/30 text-white px-4 py-2.5 rounded-xl cursor-pointer hover:bg-white/30 transition-colors">
                             <Filter className="w-5 h-5" />
-                            <span className="font-semibold text-sm">Filter</span>
+                            <span className="font-semibold text-sm">{t('dashboard.filter')}</span>
                         </div>
                         <button className="flex items-center gap-2 bg-white text-primary px-4 py-2.5 rounded-xl cursor-pointer hover:bg-surface transition-colors shadow-sm font-semibold text-sm">
                             <Download className="w-5 h-5" />
@@ -53,73 +55,73 @@ export default function DashboardView() {
                 {/* KPI Grid (Matching TeamMembersView style) */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                     <StatsCard
-                        title="Total Revenue"
+                        title={t("dashboard.totalRevenue")}
                         value="₹52,450"
                         icon={ShoppingBag}
                         colorTheme="primary"
                         trend="18.2%"
                         trendDirection="up"
-                        trendLabel="vs yesterday"
+                        trendLabel={t("dashboard.vsYesterday")}
                     />
                     
                     <StatsCard
-                        title="Total Orders"
+                        title={t("dashboard.totalOrders")}
                         value="324"
                         icon={Receipt}
                         colorTheme="secondary"
                         trend="12.5%"
                         trendDirection="up"
-                        trendLabel="vs yesterday"
+                        trendLabel={t("dashboard.vsYesterday")}
                     />
 
                     <StatsCard
-                        title="Total Profit"
+                        title={t("dashboard.totalProfit")}
                         value="₹12,850"
                         icon={LineChart}
                         colorTheme="success"
                         trend="9.3%"
                         trendDirection="up"
-                        trendLabel="vs yesterday"
+                        trendLabel={t("dashboard.vsYesterday")}
                     />
 
                     <StatsCard
-                        title="Total Customers"
+                        title={t("dashboard.totalCustomers")}
                         value="865"
                         icon={Users}
                         colorTheme="warning"
                         trend="7.6%"
                         trendDirection="up"
-                        trendLabel="vs yesterday"
+                        trendLabel={t("dashboard.vsYesterday")}
                     />
 
                     <StatsCard
-                        title="Total Products"
+                        title={t("dashboard.totalProducts")}
                         value="1,240"
                         icon={Package}
                         colorTheme="primary"
                         trend="4.3%"
                         trendDirection="up"
-                        trendLabel="vs yesterday"
+                        trendLabel={t("dashboard.vsYesterday")}
                     />
 
                     <StatsCard
-                        title="Low Stock Items"
+                        title={t("dashboard.lowStockItems")}
                         value="15"
                         icon={AlertTriangle}
                         colorTheme="error"
                         trend="3"
                         trendDirection="down"
-                        trendLabel="vs yesterday"
+                        trendLabel={t("dashboard.vsYesterday")}
                     />
 
                     <StatsCard
-                        title="Total Expenses"
+                        title={t("dashboard.totalExpenses")}
                         value="₹21,400"
                         icon={Wallet}
                         colorTheme="warning"
                         trend="11.2%"
                         trendDirection="up"
-                        trendLabel="vs yesterday"
+                        trendLabel={t("dashboard.vsYesterday")}
                     />
                 </div>
 
@@ -128,19 +130,19 @@ export default function DashboardView() {
                     {/* Sales Analytics Chart */}
                     <GlassCard className="lg:col-span-2 p-6 flex flex-col border-outline-variant/20 shadow-sm">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-base font-bold text-on-surface">Sales Analytics</h3>
+                            <h3 className="text-base font-bold text-on-surface">{t('dashboard.salesAnalytics')}</h3>
                             <div className="flex items-center gap-2 border border-outline-variant/30 rounded-lg px-3 py-1.5 cursor-pointer hover:bg-surface-container-low text-xs font-medium text-on-surface-variant">
-                                This Year <ChevronDown className="w-4 h-4" />
+                                {t('dashboard.thisYear')} <ChevronDown className="w-4 h-4" />
                             </div>
                         </div>
                         <div className="flex items-center gap-6 mb-4 text-xs font-medium">
                             <div className="flex items-center gap-2">
                                 <span className="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
-                                <span className="text-on-surface-variant">This Year</span>
+                                <span className="text-on-surface-variant">{t('dashboard.thisYear')}</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <span className="w-3 h-3 rounded-full border-2 border-dashed border-blue-300 bg-transparent"></span>
-                                <span className="text-muted-foreground text-blue-300/80">Last Year</span>
+                                <span className="text-muted-foreground text-blue-300/80">{t('dashboard.lastYear')}</span>
                             </div>
                         </div>
 
@@ -184,7 +186,7 @@ export default function DashboardView() {
 
                     {/* Revenue Breakdown */}
                     <GlassCard className="p-6 flex flex-col border-outline-variant/20 shadow-sm">
-                        <h3 className="text-base font-bold text-on-surface mb-6">Revenue Breakdown</h3>
+                        <h3 className="text-base font-bold text-on-surface mb-6">{t('dashboard.revenueBreakdown')}</h3>
                         <div className="flex-1 flex flex-col items-center justify-center">
                             <div
                                 className="w-40 h-40 rounded-full border-[12px] border-surface relative mb-6 shadow-sm"
@@ -198,7 +200,7 @@ export default function DashboardView() {
                             >
                                 <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ transform: 'rotate(45deg)' }}>
                                     <span className="font-bold text-lg text-on-surface">₹52,450</span>
-                                    <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Total</span>
+                                    <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">{t('dashboard.total')}</span>
                                 </div>
                             </div>
 
@@ -206,7 +208,7 @@ export default function DashboardView() {
                                 <div className="flex items-center justify-between text-xs">
                                     <div className="flex items-center gap-2">
                                         <span className="w-2.5 h-2.5 rounded-full bg-success"></span>
-                                        <span className="text-on-surface-variant font-medium">Cash</span>
+                                        <span className="text-on-surface-variant font-medium">{t('dashboard.cash')}</span>
                                     </div>
                                     <div className="flex gap-2 items-center">
                                         <span className="font-semibold text-on-surface">₹18,250</span>
@@ -216,7 +218,7 @@ export default function DashboardView() {
                                 <div className="flex items-center justify-between text-xs">
                                     <div className="flex items-center gap-2">
                                         <span className="w-2.5 h-2.5 rounded-full bg-primary"></span>
-                                        <span className="text-on-surface-variant font-medium">UPI</span>
+                                        <span className="text-on-surface-variant font-medium">{t('dashboard.upi')}</span>
                                     </div>
                                     <div className="flex gap-2 items-center">
                                         <span className="font-semibold text-on-surface">₹17,850</span>
@@ -226,7 +228,7 @@ export default function DashboardView() {
                                 <div className="flex items-center justify-between text-xs">
                                     <div className="flex items-center gap-2">
                                         <span className="w-2.5 h-2.5 rounded-full bg-secondary"></span>
-                                        <span className="text-on-surface-variant font-medium">Card</span>
+                                        <span className="text-on-surface-variant font-medium">{t('dashboard.card')}</span>
                                     </div>
                                     <div className="flex gap-2 items-center">
                                         <span className="font-semibold text-on-surface">₹12,400</span>
@@ -236,7 +238,7 @@ export default function DashboardView() {
                                 <div className="flex items-center justify-between text-xs">
                                     <div className="flex items-center gap-2">
                                         <span className="w-2.5 h-2.5 rounded-full bg-warning"></span>
-                                        <span className="text-on-surface-variant font-medium">Bank Transfer</span>
+                                        <span className="text-on-surface-variant font-medium">{t('dashboard.bankTransfer')}</span>
                                     </div>
                                     <div className="flex gap-2 items-center">
                                         <span className="font-semibold text-on-surface">₹4,950</span>
@@ -252,20 +254,20 @@ export default function DashboardView() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Inventory Status */}
                     <GlassCard className="p-6 border-outline-variant/20 shadow-sm flex flex-col">
-                        <h3 className="text-base font-bold text-on-surface mb-6">Inventory Status</h3>
+                        <h3 className="text-base font-bold text-on-surface mb-6">{t('dashboard.inventoryStatus')}</h3>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 h-full">
 
                             <div className="bg-surface-container/50 border border-outline-variant/20 rounded-xl p-4 flex flex-col justify-between">
                                 <div className="flex items-center gap-2 mb-3">
                                     <Package className="w-4 h-4 text-success" />
-                                    <span className="text-xs font-semibold text-on-surface-variant">In Stock</span>
+                                    <span className="text-xs font-semibold text-on-surface-variant">{t('dashboard.inStock')}</span>
                                 </div>
                                 <div>
                                     <h4 className="text-2xl font-bold text-on-surface mb-2">84%</h4>
                                     <div className="w-full h-1.5 bg-outline-variant/30 rounded-full mb-1">
                                         <div className="h-full bg-success rounded-full" style={{ width: '84%' }}></div>
                                     </div>
-                                    <span className="text-[10px] text-muted-foreground">1,041 Items</span>
+                                    <span className="text-[10px] text-muted-foreground">1,041 {t("dashboard.items")}</span>
                                 </div>
                             </div>
 
@@ -279,33 +281,33 @@ export default function DashboardView() {
                                     <div className="w-full h-1.5 bg-outline-variant/30 rounded-full mb-1">
                                         <div className="h-full bg-warning rounded-full" style={{ width: '12%' }}></div>
                                     </div>
-                                    <span className="text-[10px] text-muted-foreground">142 Items</span>
+                                    <span className="text-[10px] text-muted-foreground">142 {t("dashboard.items")}</span>
                                 </div>
                             </div>
 
                             <div className="bg-surface-container/50 border border-outline-variant/20 rounded-xl p-4 flex flex-col justify-between">
                                 <div className="flex items-center gap-2 mb-3">
                                     <ShoppingBag className="w-4 h-4 text-error" />
-                                    <span className="text-xs font-semibold text-on-surface-variant">Out of Stock</span>
+                                    <span className="text-xs font-semibold text-on-surface-variant">{t('dashboard.outOfStock')}</span>
                                 </div>
                                 <div>
                                     <h4 className="text-2xl font-bold text-on-surface mb-2">4%</h4>
                                     <div className="w-full h-1.5 bg-outline-variant/30 rounded-full mb-1">
                                         <div className="h-full bg-error rounded-full" style={{ width: '4%' }}></div>
                                     </div>
-                                    <span className="text-[10px] text-muted-foreground">57 Items</span>
+                                    <span className="text-[10px] text-muted-foreground">57 {t("dashboard.items")}</span>
                                 </div>
                             </div>
 
                             <div className="bg-surface-container/50 border border-outline-variant/20 rounded-xl p-4 flex flex-col justify-between">
                                 <div className="flex items-center gap-2 mb-3">
                                     <Package className="w-4 h-4 text-primary" />
-                                    <span className="text-xs font-semibold text-on-surface-variant">Total Items</span>
+                                    <span className="text-xs font-semibold text-on-surface-variant">{t('dashboard.totalItems')}</span>
                                 </div>
                                 <div>
                                     <h4 className="text-2xl font-bold text-on-surface mb-2">1,240</h4>
                                     <div className="w-full h-1.5 bg-transparent rounded-full mb-1"></div>
-                                    <span className="text-[10px] text-muted-foreground">All Products</span>
+                                    <span className="text-[10px] text-muted-foreground">{t('dashboard.allProducts')}</span>
                                 </div>
                             </div>
 
@@ -315,9 +317,9 @@ export default function DashboardView() {
                     {/* Top Selling Products */}
                     <GlassCard className="p-6 border-outline-variant/20 shadow-sm flex flex-col">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-base font-bold text-on-surface">Top Selling Products</h3>
+                            <h3 className="text-base font-bold text-on-surface">{t('dashboard.topSellingProducts')}</h3>
                             <div className="flex items-center gap-2 border border-outline-variant/30 rounded-lg px-3 py-1.5 cursor-pointer hover:bg-surface-container-low text-xs font-medium text-on-surface-variant">
-                                This Month <ChevronDown className="w-4 h-4" />
+                                {t('dashboard.thisMonth')} <ChevronDown className="w-4 h-4" />
                             </div>
                         </div>
                         <div className="space-y-4 flex-1 flex flex-col justify-center">
@@ -345,19 +347,19 @@ export default function DashboardView() {
                     {/* Recent Sales */}
                     <GlassCard className="p-6 border-outline-variant/20 shadow-sm overflow-hidden flex flex-col">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-base font-bold text-on-surface">Recent Sales</h3>
-                            <span className="text-xs font-semibold text-primary cursor-pointer hover:underline">View All</span>
+                            <h3 className="text-base font-bold text-on-surface">{t('dashboard.recentSales')}</h3>
+                            <span className="text-xs font-semibold text-primary cursor-pointer hover:underline">{t('dashboard.viewAll')}</span>
                         </div>
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left text-sm">
+                            <table className="w-full text-left text-sm min-w-[600px] whitespace-nowrap">
                                 <thead>
                                     <tr className="text-muted-foreground border-b border-outline-variant/20">
-                                        <th className="pb-3 font-medium text-xs">Invoice</th>
-                                        <th className="pb-3 font-medium text-xs">Customer</th>
-                                        <th className="pb-3 font-medium text-xs">Amount</th>
-                                        <th className="pb-3 font-medium text-xs">Payment</th>
-                                        <th className="pb-3 font-medium text-xs">Status</th>
-                                        <th className="pb-3 font-medium text-xs">Time</th>
+                                        <th className="pb-3 font-medium text-xs">{t('dashboard.invoice')}</th>
+                                        <th className="pb-3 font-medium text-xs">{t('dashboard.customer')}</th>
+                                        <th className="pb-3 font-medium text-xs">{t('dashboard.amount')}</th>
+                                        <th className="pb-3 font-medium text-xs">{t('dashboard.payment')}</th>
+                                        <th className="pb-3 font-medium text-xs">{t('dashboard.status')}</th>
+                                        <th className="pb-3 font-medium text-xs">{t('dashboard.time')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-outline-variant/10">
@@ -389,8 +391,8 @@ export default function DashboardView() {
                     {/* Low Stock Alerts */}
                     <GlassCard className="p-6 border-outline-variant/20 shadow-sm flex flex-col">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-base font-bold text-on-surface">Low Stock Alerts</h3>
-                            <span className="text-xs font-semibold text-primary cursor-pointer hover:underline">View All</span>
+                            <h3 className="text-base font-bold text-on-surface">{t('dashboard.lowStockAlerts')}</h3>
+                            <span className="text-xs font-semibold text-primary cursor-pointer hover:underline">{t('dashboard.viewAll')}</span>
                         </div>
                         <div className="space-y-4">
                             {[
@@ -408,7 +410,7 @@ export default function DashboardView() {
                                         <span className="text-sm font-medium text-on-surface">{item.name}</span>
                                     </div>
                                     <div className="flex items-center gap-6">
-                                        <span className="text-error text-xs font-bold">{item.left} Left</span>
+                                        <span className="text-error text-xs font-bold">{item.left} {t('dashboard.left')}</span>
                                         <button className="text-xs font-bold text-error border border-error/30 hover:bg-error/10 px-3 py-1.5 rounded-lg transition-colors">
                                             Order Now
                                         </button>
@@ -423,10 +425,10 @@ export default function DashboardView() {
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                     <GlassCard className="p-5 border-outline-variant/20 shadow-sm flex items-center justify-between">
                         <div>
-                            <h4 className="text-sm font-bold text-on-surface mb-1">Customer Due</h4>
+                            <h4 className="text-sm font-bold text-on-surface mb-1">{t('dashboard.customerDue')}</h4>
                             <p className="text-xl font-black text-on-surface mb-1">₹18,500</p>
-                            <p className="text-[10px] text-muted-foreground mb-3">Total Outstanding</p>
-                            <span className="text-xs font-semibold text-primary cursor-pointer hover:underline">View All</span>
+                            <p className="text-[10px] text-muted-foreground mb-3">{t('dashboard.totalOutstanding')}</p>
+                            <span className="text-xs font-semibold text-primary cursor-pointer hover:underline">{t('dashboard.viewAll')}</span>
                         </div>
                         <div className="w-12 h-12 rounded-xl bg-error/10 flex items-center justify-center text-error">
                             <User className="w-6 h-6" />
@@ -435,10 +437,10 @@ export default function DashboardView() {
 
                     <GlassCard className="p-5 border-outline-variant/20 shadow-sm flex items-center justify-between">
                         <div>
-                            <h4 className="text-sm font-bold text-on-surface mb-1">Supplier Due</h4>
+                            <h4 className="text-sm font-bold text-on-surface mb-1">{t('dashboard.supplierDue')}</h4>
                             <p className="text-xl font-black text-on-surface mb-1">₹27,800</p>
-                            <p className="text-[10px] text-muted-foreground mb-3">Total Outstanding</p>
-                            <span className="text-xs font-semibold text-primary cursor-pointer hover:underline">View All</span>
+                            <p className="text-[10px] text-muted-foreground mb-3">{t('dashboard.totalOutstanding')}</p>
+                            <span className="text-xs font-semibold text-primary cursor-pointer hover:underline">{t('dashboard.viewAll')}</span>
                         </div>
                         <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                             <Truck className="w-6 h-6" />
@@ -447,18 +449,18 @@ export default function DashboardView() {
 
                     <GlassCard className="p-5 border-outline-variant/20 shadow-sm flex items-center justify-between">
                         <div className="flex-1">
-                            <h4 className="text-sm font-bold text-on-surface mb-2">Payment Status</h4>
+                            <h4 className="text-sm font-bold text-on-surface mb-2">{t('dashboard.paymentStatus')}</h4>
                             <div className="space-y-1 text-xs">
                                 <div className="flex justify-between">
-                                    <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-success"></span> Paid</span>
+                                    <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-success"></span> {t('dashboard.paid')}</span>
                                     <span className="font-semibold">₹34,650</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-warning"></span> Pending</span>
+                                    <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-warning"></span> {t('dashboard.pending')}</span>
                                     <span className="font-semibold">₹18,500</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-error"></span> Overdue</span>
+                                    <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-error"></span> {t('dashboard.overdue')}</span>
                                     <span className="font-semibold text-error">₹7,250</span>
                                 </div>
                             </div>
@@ -470,10 +472,10 @@ export default function DashboardView() {
 
                     <GlassCard className="p-5 border-outline-variant/20 shadow-sm flex items-center justify-between">
                         <div>
-                            <h4 className="text-sm font-bold text-on-surface mb-1">Expense Summary</h4>
+                            <h4 className="text-sm font-bold text-on-surface mb-1">{t('dashboard.expenseSummary')}</h4>
                             <p className="text-xl font-black text-on-surface mb-1">₹21,400</p>
-                            <p className="text-[10px] text-muted-foreground mb-3">This Month</p>
-                            <span className="text-xs font-semibold text-primary cursor-pointer hover:underline">View Details</span>
+                            <p className="text-[10px] text-muted-foreground mb-3">{t('dashboard.thisMonth')}</p>
+                            <span className="text-xs font-semibold text-primary cursor-pointer hover:underline">{t('dashboard.viewDetails')}</span>
                         </div>
                         <div className="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center text-warning">
                             <Wallet className="w-6 h-6" />
@@ -486,8 +488,8 @@ export default function DashboardView() {
                     {/* Activity Timeline */}
                     <GlassCard className="p-6 border-outline-variant/20 shadow-sm">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-base font-bold text-on-surface">Activity Timeline</h3>
-                            <span className="text-xs font-semibold text-primary cursor-pointer hover:underline">View All</span>
+                            <h3 className="text-base font-bold text-on-surface">{t('dashboard.activityTimeline')}</h3>
+                            <span className="text-xs font-semibold text-primary cursor-pointer hover:underline">{t('dashboard.viewAll')}</span>
                         </div>
                         <div className="relative pl-3 space-y-6">
                             {/* Vertical line */}
@@ -496,28 +498,28 @@ export default function DashboardView() {
                             <div className="relative flex gap-4">
                                 <div className="w-2.5 h-2.5 rounded-full bg-success mt-1.5 shrink-0 z-10 ring-4 ring-surface"></div>
                                 <div className="flex-1 flex justify-between text-xs">
-                                    <span className="text-on-surface-variant font-medium">Purchase <span className="text-primary font-bold">#PUR-1045</span> added by Raj</span>
+                                    <span className="text-on-surface-variant font-medium">Purchase <span className="text-primary font-bold">#PUR-1045</span> {t('dashboard.addedBy')} Raj</span>
                                     <span className="text-muted-foreground shrink-0">10:30 AM</span>
                                 </div>
                             </div>
                             <div className="relative flex gap-4">
                                 <div className="w-2.5 h-2.5 rounded-full bg-primary mt-1.5 shrink-0 z-10 ring-4 ring-surface"></div>
                                 <div className="flex-1 flex justify-between text-xs">
-                                    <span className="text-on-surface-variant font-medium">New Product <span className="text-on-surface font-bold">Nescafe Coffee</span> added</span>
+                                    <span className="text-on-surface-variant font-medium">New Product <span className="text-on-surface font-bold">Nescafe Coffee</span> {t('dashboard.added')}</span>
                                     <span className="text-muted-foreground shrink-0">09:45 AM</span>
                                 </div>
                             </div>
                             <div className="relative flex gap-4">
                                 <div className="w-2.5 h-2.5 rounded-full bg-warning mt-1.5 shrink-0 z-10 ring-4 ring-surface"></div>
                                 <div className="flex-1 flex justify-between text-xs">
-                                    <span className="text-on-surface-variant font-medium">Payment of <span className="font-bold text-success">₹2,500</span> received from Rahul Sharma</span>
+                                    <span className="text-on-surface-variant font-medium">{t('dashboard.paymentOf')} <span className="font-bold text-success">₹2,500</span> {t('dashboard.receivedFrom')} Rahul Sharma</span>
                                     <span className="text-muted-foreground shrink-0">09:30 AM</span>
                                 </div>
                             </div>
                             <div className="relative flex gap-4">
                                 <div className="w-2.5 h-2.5 rounded-full bg-error mt-1.5 shrink-0 z-10 ring-4 ring-surface"></div>
                                 <div className="flex-1 flex justify-between text-xs">
-                                    <span className="text-on-surface-variant font-medium">Expense of <span className="font-bold text-error">₹1,200</span> added for Electricity Bill</span>
+                                    <span className="text-on-surface-variant font-medium">{t('dashboard.expenseOf')} <span className="font-bold text-error">₹1,200</span> {t('dashboard.addedFor')} Electricity Bill</span>
                                     <span className="text-muted-foreground shrink-0">09:15 AM</span>
                                 </div>
                             </div>
@@ -526,14 +528,14 @@ export default function DashboardView() {
 
                     {/* Simple Static Calendar */}
                     <GlassCard className="p-6 border-outline-variant/20 shadow-sm flex flex-col">
-                        <h3 className="text-base font-bold text-on-surface mb-4">Calendar</h3>
+                        <h3 className="text-base font-bold text-on-surface mb-4">{t('dashboard.calendar')}</h3>
                         <div className="flex items-center justify-between mb-4 px-2">
                             <ChevronDown className="w-4 h-4 text-on-surface-variant rotate-90 cursor-pointer" />
                             <span className="text-sm font-bold text-on-surface">August 2024</span>
                             <ChevronDown className="w-4 h-4 text-on-surface-variant -rotate-90 cursor-pointer" />
                         </div>
                         <div className="grid grid-cols-7 gap-1 text-center text-xs mb-2 text-muted-foreground font-medium">
-                            <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                            <div>{t('dashboard.days.sun')}</div><div>{t('dashboard.days.mon')}</div><div>{t('dashboard.days.tue')}</div><div>{t('dashboard.days.wed')}</div><div>{t('dashboard.days.thu')}</div><div>{t('dashboard.days.fri')}</div><div>{t('dashboard.days.sat')}</div>
                         </div>
                         <div className="grid grid-cols-7 gap-1 text-center text-sm">
                             <div className="text-muted-foreground/30 py-1.5">28</div>
@@ -570,8 +572,8 @@ export default function DashboardView() {
                     {/* Notifications */}
                     <GlassCard className="p-6 border-outline-variant/20 shadow-sm">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-base font-bold text-on-surface">Notifications</h3>
-                            <span className="text-xs font-semibold text-primary cursor-pointer hover:underline">View All</span>
+                            <h3 className="text-base font-bold text-on-surface">{t('dashboard.notifications')}</h3>
+                            <span className="text-xs font-semibold text-primary cursor-pointer hover:underline">{t('dashboard.viewAll')}</span>
                         </div>
                         <div className="space-y-4">
                             <div className="flex items-start gap-3">
@@ -597,7 +599,7 @@ export default function DashboardView() {
                                     <Wallet className="w-3.5 h-3.5" />
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-xs font-medium text-on-surface-variant">Payment of ₹1,250 received</p>
+                                    <p className="text-xs font-medium text-on-surface-variant">{t('dashboard.paymentOf')} ₹1,250 received</p>
                                 </div>
                                 <span className="text-[10px] text-muted-foreground shrink-0">30 min ago</span>
                             </div>
