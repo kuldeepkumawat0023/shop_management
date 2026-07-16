@@ -10,9 +10,11 @@ import { Download, Plus, Search, Filter, Tag, Handshake, Trophy, Edit, Trash2, E
 import Link from 'next/link';
 import { cn } from '@/utils/cn';
 import { brandService, BrandData } from '@/lib/services/brand.services';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 
 export default function BrandsView() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [brandsData, setBrandsData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,17 +43,17 @@ export default function BrandsView() {
   }, []);
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this brand? / क्या आप वाकई इस ब्रांड को हटाना चाहते हैं?')) {
+    if (window.confirm(t('inventory.brandsView.confirmDelete'))) {
       try {
         const res = await brandService.deleteBrand(id);
         if (res.success || (res as any).status === 200) {
-          toast.success('Brand deleted successfully');
+          toast.success(t('inventory.brandsView.brandDeleted'));
           setBrandsData(prev => prev.filter(b => b.id !== id));
         } else {
-          toast.error((res as any).message || 'Failed to delete brand');
+          toast.error((res as any).message || t('inventory.brandsView.deleteFailed'));
         }
       } catch (err) {
-        toast.error('Error deleting brand', { id: 'error-deleting-brand' });
+        toast.error(t('inventory.brandsView.deleteError'), { id: 'error-deleting-brand' });
       }
     }
   };
@@ -63,7 +65,7 @@ export default function BrandsView() {
 
   const columns = [
     {
-      header: 'Brand Name',
+      header: t('inventory.brandsView.brandName'),
       accessorKey: 'name',
       cell: (row: any) => (
         <div className="flex items-center gap-3">
@@ -78,7 +80,7 @@ export default function BrandsView() {
       )
     },
     {
-      header: 'Category Focus',
+      header: t('inventory.brandsView.categoryFocus'),
       accessorKey: 'category',
       cell: (row: any) => (
         <span className="text-sm font-medium text-on-surface-variant bg-surface-container px-2.5 py-1 rounded-md border border-outline-variant/10">
@@ -87,14 +89,14 @@ export default function BrandsView() {
       )
     },
     {
-      header: 'Total Products',
+      header: t('inventory.brandsView.totalProducts'),
       accessorKey: 'totalProducts',
       cell: (row: any) => (
-        <span className="font-bold text-on-surface">{row.totalProducts} <span className="text-xs font-medium text-on-surface-variant">Items</span></span>
+        <span className="font-bold text-on-surface">{row.totalProducts} <span className="text-xs font-medium text-on-surface-variant">{t('inventory.brandsView.items')}</span></span>
       )
     },
     {
-      header: 'Status',
+      header: t('inventory.brandsView.status'),
       accessorKey: 'status',
       cell: (row: any) => (
         <StatusBadge 
@@ -105,14 +107,14 @@ export default function BrandsView() {
       )
     },
     {
-      header: 'Last Updated',
+      header: t('inventory.brandsView.lastUpdated'),
       accessorKey: 'lastUpdated',
       cell: (row: any) => (
         <span className="text-sm font-medium text-on-surface-variant">{row.lastUpdated}</span>
       )
     },
     {
-      header: 'Actions',
+      header: t('inventory.brandsView.actions'),
       accessorKey: 'actions',
       cell: (row: any) => (
         <div className="flex items-center justify-end gap-2">
@@ -139,18 +141,18 @@ export default function BrandsView() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
         <div>
-          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">Brands Management</h2>
-          <p className="text-sm font-medium text-on-surface-variant">Oversee brand partnerships, inventory mapping, and performance.</p>
+          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">{t('inventory.brandsView.brandsManagement')}</h2>
+          <p className="text-sm font-medium text-on-surface-variant">{t('inventory.brandsView.overseePartnerships')}</p>
         </div>
         <div className="flex gap-3 w-full md:w-auto">
           <Button variant="outline" className="flex-1 md:flex-none bg-surface-container-lowest border-primary text-primary px-4 py-2 rounded-lg font-bold hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2 shadow-sm">
             <Download className="w-4 h-4" />
-            Export
+            {t('inventory.brandsView.export')}
           </Button>
           <Link href="/brands/new" className="flex-1 md:flex-none">
             <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border-none whitespace-nowrap">
               <Plus className="w-4 h-4 shrink-0" />
-              <span className="truncate">Add New Brand</span>
+              <span className="truncate">{t('inventory.brandsView.addNewBrand')}</span>
             </Button>
           </Link>
         </div>
@@ -159,33 +161,33 @@ export default function BrandsView() {
       {/* KPI Bento Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
         <StatsCard 
-          title="Total Brands"
+          title={t('inventory.brandsView.totalBrands')}
           value={brandsData.length}
           icon={Tag}
           trend="+3"
           trendDirection="up"
-          trendLabel="vs last month"
+          trendLabel={t('inventory.brandsView.vsLastMonth')}
           colorTheme="primary"
         />
         <StatsCard 
-          title="Active Partnerships"
+          title={t('inventory.brandsView.activePartnerships')}
           value={brandsData.filter(b => b.status === 'Active').length}
           icon={Handshake}
-          trendLabel="87.5% Active Rate"
+          trendLabel={t('inventory.brandsView.activeRate')}
           colorTheme="success"
         />
         <StatsCard 
-          title="Top Revenue Brand"
+          title={t('inventory.brandsView.topRevenueBrand')}
           value="SonicAudio"
           icon={Trophy}
-          trendLabel="₹124,500 MTD"
+          trendLabel={t('inventory.brandsView.mtd')}
           colorTheme="yellow"
         />
         <StatsCard 
-          title="Inactive Brands"
+          title={t('inventory.brandsView.inactiveBrands')}
           value={brandsData.filter(b => b.status === 'Inactive').length}
           icon={AlertCircle}
-          trendLabel="Needs Action"
+          trendLabel={t('inventory.brandsView.needsAction')}
           colorTheme="error"
         />
       </div>
@@ -197,13 +199,13 @@ export default function BrandsView() {
           columns={columns}
           headerContent={
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full gap-4">
-              <h3 className="text-xl font-black text-on-surface">Brand Directory</h3>
+              <h3 className="text-xl font-black text-on-surface">{t('inventory.brandsView.brandDirectory')}</h3>
               <div className="flex items-center gap-3 w-full sm:w-auto">
                 <div className="relative focus-within:ring-2 focus-within:ring-primary-container rounded-lg w-full sm:w-48">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant w-4 h-4" />
                   <input 
                     className="w-full bg-surface-container-low border border-outline-variant/20 rounded-xl pl-9 pr-4 py-2 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:ring-0 transition-colors placeholder:text-on-surface-variant/50" 
-                    placeholder="Filter brands..." 
+                    placeholder={t('inventory.brandsView.filterBrands')} 
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}

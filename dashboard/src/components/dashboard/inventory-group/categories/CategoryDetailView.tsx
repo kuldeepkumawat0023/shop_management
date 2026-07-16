@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { cn } from '@/utils/cn';
 import { categoryService } from '@/lib/services/category.services';
 import { productService } from '@/lib/services/product.services';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 
 interface CategoryDetailViewProps {
@@ -18,8 +19,12 @@ interface CategoryDetailViewProps {
 }
 
 export default function CategoryDetailView({ categoryId }: CategoryDetailViewProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('Overview');
+  React.useEffect(() => {
+    setActiveTab(t('inventory.categoryDetail.overview'));
+  }, [t]);
   const [categoryData, setCategoryData] = useState<any>(null);
   const [categoryProducts, setCategoryProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,17 +65,17 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
   }, [categoryId]);
 
   const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this category? / क्या आप वाकई इस श्रेणी को हटाना चाहते हैं?')) {
+    if (window.confirm(t('inventory.categoryDetail.confirmDelete'))) {
       try {
         const res = await categoryService.deleteCategory(categoryId);
         if (res.success || (res as any).status === 200) {
-          toast.success('Category deleted successfully');
+          toast.success(t('inventory.categoryDetail.categoryDeleted'));
           router.push('/categories');
         } else {
-          toast.error(res.message || 'Failed to delete category');
+          toast.error(res.message || t('inventory.categoryDetail.deleteFailed'));
         }
       } catch (err) {
-        toast.error('Error deleting category', { id: 'error-deleting-category' });
+        toast.error(t('inventory.categoryDetail.deleteError'), { id: 'error-deleting-category' });
       }
     }
   };
@@ -78,7 +83,7 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
   // Product Table columns
   const columns = [
     { 
-      header: 'Product Info', 
+      header: t('inventory.categoryDetail.productInfo'), 
       accessorKey: 'name',
       cell: (row: any) => (
         <div className="flex items-center gap-3">
@@ -95,35 +100,35 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
       )
     },
     { 
-      header: 'SKU', 
+      header: t('inventory.categoryDetail.sku'), 
       accessorKey: 'sku',
       cell: (row: any) => (
         <span className="text-xs font-mono font-medium text-on-surface-variant bg-surface-container px-2 py-1 rounded-md border border-outline-variant/10">
-          {row.sku || 'N/A'}
+          {row.sku || t('inventory.categoryDetail.na')}
         </span>
       )
     },
     { 
-      header: 'Price', 
+      header: t('inventory.categoryDetail.price'), 
       accessorKey: 'price',
       cell: (row: any) => (
         <span className="font-bold text-on-surface">₹{row.price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
       )
     },
     { 
-      header: 'Stock', 
+      header: t('inventory.categoryDetail.stock'), 
       accessorKey: 'stock',
       cell: (row: any) => {
-        let stockStatus = 'In Stock';
-        if (row.stock === 0) stockStatus = 'Out of Stock';
-        else if (row.stock < 20) stockStatus = 'Low Stock';
+        let stockStatus = t('inventory.categoryDetail.inStock');
+        if (row.stock === 0) stockStatus = t('inventory.categoryDetail.outOfStock');
+        else if (row.stock < 20) stockStatus = t('inventory.categoryDetail.lowStock');
         
         return (
           <div className="flex flex-col gap-1">
-            <span className="font-bold text-on-surface">{row.stock} <span className="text-xs text-on-surface-variant font-medium">units</span></span>
+            <span className="font-bold text-on-surface">{row.stock} <span className="text-xs text-on-surface-variant font-medium">{t('inventory.categoryDetail.units')}</span></span>
             <span className={cn(
               "text-[10px] uppercase tracking-widest font-bold",
-              stockStatus === 'Out of Stock' ? 'text-error' : stockStatus === 'Low Stock' ? 'text-warning' : 'text-success'
+              stockStatus === t('inventory.categoryDetail.outOfStock') ? 'text-error' : stockStatus === t('inventory.categoryDetail.lowStock') ? 'text-warning' : 'text-success'
             )}>
               {stockStatus}
             </span>
@@ -132,7 +137,7 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
       }
     },
     {
-      header: 'Status',
+      header: t('inventory.categoryDetail.status'),
       accessorKey: 'status',
       cell: (row: any) => (
         <StatusBadge 
@@ -143,7 +148,7 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
       )
     },
     {
-      header: 'Actions',
+      header: t('inventory.categoryDetail.actions'),
       accessorKey: 'id',
       cell: (row: any) => (
         <div className="flex items-center gap-2">
@@ -166,9 +171,9 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
     return (
       <div className="p-8 flex flex-col items-center justify-center h-full text-center">
         <FolderTree className="w-16 h-16 text-outline-variant mb-4" />
-        <h2 className="text-2xl font-bold text-on-surface">Category Not Found</h2>
-        <p className="text-on-surface-variant mt-2 mb-6">The category you are looking for does not exist or has been removed.</p>
-        <Button onClick={() => router.back()}>Go Back</Button>
+        <h2 className="text-2xl font-bold text-on-surface">{t('inventory.categoryDetail.categoryNotFound')}</h2>
+        <p className="text-on-surface-variant mt-2 mb-6">{t('inventory.categoryDetail.categoryNotFoundMsg')}</p>
+        <Button onClick={() => router.back()}>{t('inventory.categoryDetail.goBack')}</Button>
       </div>
     );
   }
@@ -198,7 +203,7 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
               </div>
               <p className="text-sm font-medium text-on-surface-variant mt-1 flex items-center gap-2">
                 <FolderTree className="w-4 h-4" /> 
-                {categoryData.parentCategory?.name || 'Top Level Category'}
+                {categoryData.parentCategory?.name || t('inventory.categoryDetail.topLevelCategory')}
               </p>
             </div>
           </div>
@@ -207,18 +212,18 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
         <div className="flex items-center gap-2 w-full sm:w-auto mt-4 sm:mt-0 ml-14 sm:ml-0">
           <Link href={`/categories/${categoryId}/edit`} className="flex-1 sm:flex-none">
             <Button variant="outline" className="w-full shadow-sm rounded-xl">
-              <Edit className="w-4 h-4 mr-2" /> Edit
+              <Edit className="w-4 h-4 mr-2" /> {t('inventory.categoryDetail.edit')}
             </Button>
           </Link>
           <Button onClick={handleDelete} variant="outline" className="flex-1 sm:flex-none text-error hover:bg-error/10 hover:border-error/30 shadow-sm rounded-xl">
-            <Trash2 className="w-4 h-4 mr-2" /> Delete
+            <Trash2 className="w-4 h-4 mr-2" /> {t('inventory.categoryDetail.delete')}
           </Button>
         </div>
       </div>
 
       {/* Tabs */}
       <div className="flex space-x-1 bg-surface-container-low p-1 rounded-xl w-fit mb-6">
-        {['Overview', 'Products', 'Settings'].map((tab) => (
+        {[t('inventory.categoryDetail.overview'), t('inventory.categoryDetail.products'), t('inventory.categoryDetail.settings')].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -235,25 +240,25 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
       </div>
 
       {/* Tab Content */}
-      {activeTab === 'Overview' && (
+      {activeTab === t('inventory.categoryDetail.overview') && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2 flex flex-col gap-6">
             <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6">
               <h2 className="text-lg font-bold text-on-surface mb-4 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-primary" /> Category Description
+                <FileText className="w-5 h-5 text-primary" /> {t('inventory.categoryDetail.categoryDescription')}
               </h2>
               <p className="text-sm text-on-surface-variant leading-relaxed">
-                {categoryData.description || 'No description provided.'}
+                {categoryData.description || t('inventory.categoryDetail.noDescription')}
               </p>
             </div>
 
             <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-bold text-on-surface flex items-center gap-2">
-                  <Package className="w-5 h-5 text-primary" /> Products in Category
+                  <Package className="w-5 h-5 text-primary" /> {t('inventory.categoryDetail.productsInCategory')}
                 </h2>
                 <Link href={`/products?category=${categoryData._id}`}>
-                  <Button variant="ghost" className="text-sm font-bold text-primary">View All</Button>
+                  <Button variant="ghost" className="text-sm font-bold text-primary">{t('inventory.categoryDetail.viewAll')}</Button>
                 </Link>
               </div>
               
@@ -266,17 +271,17 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
                       </div>
                       <div>
                         <div className="font-bold text-sm text-on-surface">{product.name}</div>
-                        <div className="text-xs text-on-surface-variant mt-0.5">{product.sku || 'N/A'}</div>
+                        <div className="text-xs text-on-surface-variant mt-0.5">{product.sku || t('inventory.categoryDetail.na')}</div>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="font-bold text-sm text-on-surface">₹{product.price.toLocaleString('en-IN')}</div>
-                      <div className="text-xs text-on-surface-variant mt-0.5">{product.stock} units</div>
+                      <div className="text-xs text-on-surface-variant mt-0.5">{product.stock} {t('inventory.categoryDetail.units')}</div>
                     </div>
                   </div>
                 ))}
                 {categoryProducts.length === 0 && (
-                  <div className="text-center py-6 text-on-surface-variant text-sm">No products in this category yet.</div>
+                  <div className="text-center py-6 text-on-surface-variant text-sm">{t('inventory.categoryDetail.noProductsYet')}</div>
                 )}
               </div>
             </div>
@@ -284,32 +289,32 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
 
           <div className="flex flex-col gap-6">
             <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6">
-              <h2 className="text-lg font-bold text-on-surface mb-4">Category Stats</h2>
+              <h2 className="text-lg font-bold text-on-surface mb-4">{t('inventory.categoryDetail.categoryStats')}</h2>
               <div className="space-y-6">
                 <div>
-                  <div className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1">Total Products</div>
+                  <div className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1">{t('inventory.categoryDetail.totalProducts')}</div>
                   <div className="text-2xl font-black text-on-surface">{categoryProducts.length}</div>
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1">Active Products</div>
+                  <div className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1">{t('inventory.categoryDetail.activeProducts')}</div>
                   <div className="text-2xl font-black text-primary">{categoryProducts.filter(p => p.status === 'Published').length}</div>
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1">Low/Out of Stock</div>
+                  <div className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1">{t('inventory.categoryDetail.lowOutStock')}</div>
                   <div className="text-2xl font-black text-error">{categoryProducts.filter(p => p.stock < 10).length}</div>
                 </div>
               </div>
             </div>
 
             <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6">
-              <h2 className="text-lg font-bold text-on-surface mb-4">Details</h2>
+              <h2 className="text-lg font-bold text-on-surface mb-4">{t('inventory.categoryDetail.details')}</h2>
               <div className="space-y-4">
                 <div>
-                  <div className="text-xs font-medium text-on-surface-variant mb-1">Created</div>
+                  <div className="text-xs font-medium text-on-surface-variant mb-1">{t('inventory.categoryDetail.created')}</div>
                   <div className="text-sm font-bold text-on-surface">{new Date(categoryData.createdAt).toLocaleDateString()}</div>
                 </div>
                 <div>
-                  <div className="text-xs font-medium text-on-surface-variant mb-1">Last Updated</div>
+                  <div className="text-xs font-medium text-on-surface-variant mb-1">{t('inventory.categoryDetail.lastUpdated')}</div>
                   <div className="text-sm font-bold text-on-surface">{new Date(categoryData.updatedAt).toLocaleDateString()}</div>
                 </div>
               </div>
@@ -318,21 +323,21 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
         </div>
       )}
 
-      {activeTab === 'Products' && (
+      {activeTab === t('inventory.categoryDetail.products') && (
         <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl shadow-sm overflow-hidden flex flex-col min-h-[400px]">
           <DataTable 
             data={categoryProducts}
             columns={columns}
-            searchPlaceholder="Search category products..."
+            searchPlaceholder={t('inventory.categoryDetail.searchPlaceholder')}
             itemsPerPage={10}
             headerContent={
               <div className="flex items-center justify-between gap-4 mb-2">
                 <h2 className="text-lg font-bold text-on-surface flex items-center gap-2">
-                  <Package className="w-5 h-5 text-primary" /> Products List
+                  <Package className="w-5 h-5 text-primary" /> {t('inventory.categoryDetail.productsList')}
                 </h2>
                 <Link href="/products/new">
                   <Button size="sm" className="shadow-sm">
-                    <Plus className="w-4 h-4 mr-1.5" /> Add Product
+                    <Plus className="w-4 h-4 mr-1.5" /> {t('inventory.categoryDetail.addProduct')}
                   </Button>
                 </Link>
               </div>
@@ -341,14 +346,14 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
         </div>
       )}
 
-      {activeTab === 'Settings' && (
+      {activeTab === t('inventory.categoryDetail.settings') && (
         <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl shadow-sm p-6 text-center py-20">
           <AlertCircle className="w-12 h-12 text-on-surface-variant/50 mb-4" />
-          <h2 className="text-xl font-bold text-on-surface mb-2">Category Settings</h2>
+          <h2 className="text-xl font-bold text-on-surface mb-2">{t('inventory.categoryDetail.categorySettings')}</h2>
           <p className="text-on-surface-variant max-w-md mb-6">
-            Configure SEO settings, default product templates, and visibility rules for this category.
+            {t('inventory.categoryDetail.categorySettingsMsg')}
           </p>
-          <Button variant="outline">Edit Configuration</Button>
+          <Button variant="outline">{t('inventory.categoryDetail.editConfig')}</Button>
         </div>
       )}
 

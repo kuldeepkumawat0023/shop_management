@@ -10,15 +10,20 @@ import { Plus, Download, Factory, CheckCircle2, Eye, Trash2, Activity, Clipboard
 import Link from 'next/link';
 import { cn } from '@/utils/cn';
 import { productionService } from '@/lib/services/production.services';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 
 export default function ProductionsView() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [productionsData, setProductionsData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const tabs = ['All Runs', 'Completed'];
+  const tabs = [t('manufacturing.productionsView.allRuns'), t('manufacturing.productionsView.completed')];
   const [activeTab, setActiveTab] = useState('All Runs');
+  React.useEffect(() => {
+    setActiveTab(t('manufacturing.productionsView.allRuns'));
+  }, [t]);
 
   useEffect(() => {
     fetchProductions();
@@ -34,7 +39,7 @@ export default function ProductionsView() {
           startDate: new Date(prod.productionDate || prod.createdAt).toLocaleDateString('en-IN'),
           quantityProduced: prod.quantityProduced,
           cost: prod.totalCost || 0,
-          status: 'Completed',
+          status: t('manufacturing.productionsView.completed'),
           loggedBy: prod.userId?.name || 'Unknown',
         })));
       }
@@ -46,17 +51,17 @@ export default function ProductionsView() {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('WARNING: Deleting this production log will REVERSE stock changes. Final product stock will decrease, and raw materials will be restored. Are you sure?')) {
+    if (window.confirm(t('manufacturing.productionsView.confirmDelete'))) {
       try {
         const res = await productionService.deleteProduction(id);
         if (res.success) {
-          toast.success('Production log deleted & stock reversed');
+          toast.success(t('manufacturing.productionsView.productionDeleted'));
           setProductionsData(prev => prev.filter(p => p.id !== id));
         } else {
-          toast.error(res.message || 'Failed to delete production');
+          toast.error(res.message || t('manufacturing.productionsView.deleteFailed'));
         }
       } catch (err) {
-        toast.error('Error deleting production log', { id: 'error-deleting-production-log' });
+        toast.error(t('manufacturing.productionsView.deleteError'), { id: 'error-deleting-production-log' });
       }
     }
   };
@@ -64,7 +69,7 @@ export default function ProductionsView() {
   const filteredData = productionsData.filter(p => {
     const matchesSearch = p.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.recipe.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesTab = activeTab === 'All Runs' ? true : p.status === activeTab;
+    const matchesTab = activeTab === t('manufacturing.productionsView.allRuns') ? true : p.status === activeTab;
     return matchesSearch && matchesTab;
   });
 
@@ -74,15 +79,15 @@ export default function ProductionsView() {
   const totalProduced = productionsData.reduce((sum, p) => sum + p.quantityProduced, 0);
 
   const columns = [
-    { header: 'Run ID', accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface font-mono text-xs">{row.id.slice(-6).toUpperCase()}</span> },
-    { header: 'Product', accessorKey: 'recipe', cell: (row: any) => <span className="font-semibold text-primary">{row.recipe}</span> },
-    { header: 'Date', accessorKey: 'startDate' },
-    { header: 'Qty Produced', accessorKey: 'quantityProduced', cell: (row: any) => <span className="font-medium text-on-surface">{row.quantityProduced} Units</span> },
-    { header: 'Total Cost', accessorKey: 'cost', cell: (row: any) => `₹${row.cost.toLocaleString()}` },
-    { header: 'Logged By', accessorKey: 'loggedBy' },
-    { header: 'Status', accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
+    { header: t('manufacturing.productionsView.runId'), accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface font-mono text-xs">{row.id.slice(-6).toUpperCase()}</span> },
+    { header: t('manufacturing.productionsView.product'), accessorKey: 'recipe', cell: (row: any) => <span className="font-semibold text-primary">{row.recipe}</span> },
+    { header: t('manufacturing.productionsView.date'), accessorKey: 'startDate' },
+    { header: t('manufacturing.productionsView.qtyProduced'), accessorKey: 'quantityProduced', cell: (row: any) => <span className="font-medium text-on-surface">{row.quantityProduced} {t('manufacturing.productionsView.units')}</span> },
+    { header: t('manufacturing.productionsView.totalCost'), accessorKey: 'cost', cell: (row: any) => `₹${row.cost.toLocaleString()}` },
+    { header: t('manufacturing.productionsView.loggedBy'), accessorKey: 'loggedBy' },
+    { header: t('manufacturing.productionsView.status'), accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
     {
-      header: 'Actions', accessorKey: 'actions', cell: (row: any) => (
+      header: t('manufacturing.productionsView.actions'), accessorKey: 'actions', cell: (row: any) => (
         <div className="flex items-center gap-2">
           <Link href={`/manufacturing/productions/${row.id}`}>
             <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
@@ -123,18 +128,18 @@ export default function ProductionsView() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">Production Runs</h2>
-          <p className="text-sm font-medium text-on-surface-variant">Track manufacturing progress, yields, and associated costs.</p>
+          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">{t('manufacturing.productionsView.productionRuns')}</h2>
+          <p className="text-sm font-medium text-on-surface-variant">{t('manufacturing.productionsView.trackProgress')}</p>
         </div>
         <div className="flex gap-3 w-full sm:w-auto">
           <Button variant="outline" className="flex-1 sm:flex-none bg-surface-container-lowest border-primary text-primary px-4 py-2 rounded-lg font-bold hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2 shadow-sm">
             <Download className="w-4 h-4" />
-            Export Log
+            {t('manufacturing.productionsView.exportLog')}
           </Button>
           <Link href="/manufacturing/productions/new" className="flex-1 sm:flex-none w-full sm:w-auto">
             <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border-none whitespace-nowrap">
               <Plus className="w-4 h-4 shrink-0" />
-              <span className="truncate">New Production</span>
+              <span className="truncate">{t('manufacturing.productionsView.newProduction')}</span>
             </Button>
           </Link>
         </div>
@@ -143,31 +148,31 @@ export default function ProductionsView() {
       {/* KPI Stats */}
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 shrink-0">
         <StatsCard
-          title="Total Runs"
+          title={t('manufacturing.productionsView.totalRunsStat')}
           value={totalRuns}
           icon={Factory}
-          trendLabel="ALL TIME"
+          trendLabel={t('manufacturing.productionsView.allTime')}
           colorTheme="primary"
         />
         <StatsCard
-          title="Units Produced"
+          title={t('manufacturing.productionsView.unitsProducedStat')}
           value={totalProduced.toLocaleString()}
           icon={Activity}
-          trendLabel="TOTAL OUTPUT"
+          trendLabel={t('manufacturing.productionsView.totalOutput')}
           colorTheme="blue"
         />
         <StatsCard
-          title="Success Rate"
+          title={t('manufacturing.productionsView.successRate')}
           value={`${totalRuns > 0 ? '100' : '0'}%`}
           icon={CheckCircle2}
-          trendLabel="Completed Runs"
+          trendLabel={t('manufacturing.productionsView.completedRuns')}
           colorTheme="success"
         />
         <StatsCard
-          title="Total Prod. Cost"
+          title={t('manufacturing.productionsView.totalProdCost')}
           value={`₹${totalCost >= 100000 ? (totalCost / 100000).toFixed(1) + 'L' : totalCost.toLocaleString()}`}
           icon={ClipboardList}
-          trendLabel="ALL TIME EXPENSE"
+          trendLabel={t('manufacturing.productionsView.allTimeExpense')}
           colorTheme="yellow"
         />
       </div>
@@ -177,13 +182,13 @@ export default function ProductionsView() {
         <DataTable
           data={filteredData}
           columns={columns}
-          searchPlaceholder="Search runs by ID or Product..."
+          searchPlaceholder={t('manufacturing.productionsView.searchPlaceholder')}
           itemsPerPage={10}
           headerContent={
             <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 mb-2">
               <div className="flex items-center gap-2">
                 <Factory className="w-5 h-5 text-primary" />
-                <h3 className="text-lg font-bold text-on-surface">Production Log</h3>
+                <h3 className="text-lg font-bold text-on-surface">{t('manufacturing.productionsView.productionLog')}</h3>
               </div>
               {TabsComponent}
             </div>

@@ -9,6 +9,7 @@ import { useRef } from 'react';
 import { cn } from '@/utils/cn';
 import { brandSchema } from '@/utils/validations';
 import { brandService } from '@/lib/services/brand.services';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 
 interface BrandFormProps {
@@ -16,6 +17,7 @@ interface BrandFormProps {
 }
 
 export default function BrandForm({ editId }: BrandFormProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -103,7 +105,7 @@ export default function BrandForm({ editId }: BrandFormProps) {
       if (file.size <= 5 * 1024 * 1024) { // 5MB limit
         setSelectedFile(file);
       } else {
-        toast.error('File size should not exceed 5MB / फ़ाइल का आकार 5MB से अधिक नहीं होना चाहिए', { id: 'file-size-should-not-exceed-5m' });
+        toast.error(t('inventory.categoryForm.fileSizeError'), { id: 'file-size-should-not-exceed-5m' });
       }
     }
   };
@@ -114,7 +116,7 @@ export default function BrandForm({ editId }: BrandFormProps) {
       if (file.size <= 5 * 1024 * 1024) { // 5MB limit
         setSelectedFile(file);
       } else {
-        toast.error('File size should not exceed 5MB / फ़ाइल का आकार 5MB से अधिक नहीं होना चाहिए', { id: 'file-size-should-not-exceed-5m' });
+        toast.error(t('inventory.categoryForm.fileSizeError'), { id: 'file-size-should-not-exceed-5m' });
       }
     }
   };
@@ -129,11 +131,11 @@ export default function BrandForm({ editId }: BrandFormProps) {
         if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
       }
       setErrors(newErrors);
-      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें', { id: 'please-correct-the-errors-----' });
+      return toast.error(t('inventory.categoryForm.pleaseCorrectErrors'), { id: 'please-correct-the-errors-----' });
     }
 
     setLoading(true);
-    const toastId = toast.loading(editId ? 'Updating brand...' : 'Saving brand...');
+    const toastId = toast.loading(editId ? t('inventory.categoryForm.updatingCategory') : t('inventory.categoryForm.savingCategory'));
 
     try {
       const res = editId 
@@ -141,13 +143,13 @@ export default function BrandForm({ editId }: BrandFormProps) {
         : await brandService.createBrand(formData);
         
       if (res.success || (res as any).status === 200) {
-        toast.success(editId ? 'Brand updated successfully!' : 'Brand saved successfully! / ब्रांड सफलतापूर्वक सहेजा गया!', { id: toastId });
+        toast.success(editId ? t('inventory.brandForm.brandUpdated') : t('inventory.brandForm.brandSaved'), { id: toastId });
         router.push(editId ? `/brands/${editId}` : '/brands');
       } else {
-        toast.error((res as any).error || 'Failed to save brand', { id: toastId });
+        toast.error((res as any).error || t('inventory.brandForm.failedToSave'), { id: toastId });
       }
     } catch (error) {
-      toast.error('An unexpected error occurred', { id: toastId });
+      toast.error(t('inventory.brandForm.unexpectedError'), { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -166,10 +168,10 @@ export default function BrandForm({ editId }: BrandFormProps) {
           </Button>
           <div>
             <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">
-              {editId ? 'Edit Brand / ब्रांड संपादित करें' : 'Add New Brand / नया ब्रांड जोड़ें'}
+              {editId ? t('inventory.brandForm.editBrand') : t('inventory.brandForm.addNewBrand')}
             </h1>
             <p className="text-sm text-on-surface-variant mt-1 font-medium">
-              {editId ? 'Update brand details' : 'Onboard a new brand partner to the catalog'}
+              {editId ? t('inventory.brandForm.updateBrandDetails') : t('inventory.brandForm.onboardNewBrand')}
             </p>
           </div>
         </div>
@@ -180,12 +182,12 @@ export default function BrandForm({ editId }: BrandFormProps) {
         <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
           <div className="flex items-center gap-2 mb-2">
             <Tag className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-bold text-on-surface">Brand Details</h2>
+            <h2 className="text-lg font-bold text-on-surface">{t('inventory.brandForm.brandDetails')}</h2>
           </div>
           
           <div className="space-y-2">
             <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-              <Tag className="w-3.5 h-3.5" /> Brand Name / ब्रांड का नाम <span className="text-error">*</span>
+              <Tag className="w-3.5 h-3.5" /> {t('inventory.brandForm.brandName')} <span className="text-error">*</span>
             </label>
             <input 
               type="text" 
@@ -205,7 +207,7 @@ export default function BrandForm({ editId }: BrandFormProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                <Globe className="w-3.5 h-3.5" /> Website URL / वेबसाइट <span className="text-error">*</span>
+                <Globe className="w-3.5 h-3.5" /> {t('inventory.brandForm.websiteUrl')} <span className="text-error">*</span>
               </label>
               <input 
                 type="text" 
@@ -224,7 +226,7 @@ export default function BrandForm({ editId }: BrandFormProps) {
             
             <div className="space-y-2">
               <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                <User className="w-3.5 h-3.5" /> Primary Contact / संपर्क व्यक्ति <span className="text-error">*</span>
+                <User className="w-3.5 h-3.5" /> {t('inventory.brandForm.primaryContact')} <span className="text-error">*</span>
               </label>
               <input 
                 type="text" 
@@ -244,7 +246,7 @@ export default function BrandForm({ editId }: BrandFormProps) {
 
           <div className="space-y-2">
             <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-              <Tag className="w-3.5 h-3.5" /> Category Focus / श्रेणी <span className="text-error">*</span>
+              <Tag className="w-3.5 h-3.5" /> {t('inventory.brandForm.categoryFocus')} <span className="text-error">*</span>
             </label>
             <select 
               name="category"
@@ -255,7 +257,7 @@ export default function BrandForm({ editId }: BrandFormProps) {
                 errors.category ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
               )}
             >
-              <option value="">Select a category</option>
+              <option value="">{t('inventory.brandForm.selectCategory')}</option>
               <option value="Electronics">Electronics</option>
               <option value="Fashion">Fashion</option>
               <option value="Groceries">Groceries</option>
@@ -266,7 +268,7 @@ export default function BrandForm({ editId }: BrandFormProps) {
 
           <div className="space-y-2">
             <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-              <FileText className="w-3.5 h-3.5" /> Brand Notes / विवरण
+              <FileText className="w-3.5 h-3.5" /> {t('inventory.brandForm.brandNotes')}
             </label>
             <textarea 
               name="description"
@@ -285,7 +287,7 @@ export default function BrandForm({ editId }: BrandFormProps) {
         <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6">
           <div className="flex items-center gap-2 mb-6">
             <UploadCloud className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-bold text-on-surface">Brand Logo / लोगो</h2>
+            <h2 className="text-lg font-bold text-on-surface">{t('inventory.brandForm.brandLogo')}</h2>
           </div>
           
           <input
@@ -310,16 +312,16 @@ export default function BrandForm({ editId }: BrandFormProps) {
               <UploadCloud className="w-6 h-6" />
             </div>
             <p className="text-sm font-bold text-on-surface text-center mb-1">
-              {selectedFile ? selectedFile.name : 'Upload Brand Logo'}
+              {selectedFile ? selectedFile.name : t('inventory.brandForm.uploadBrandLogo')}
             </p>
             <p className="text-xs text-on-surface-variant text-center">
-              {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB` : 'PNG or JPG (MAX. 5MB) / (अधिकतम 5MB)'}
+              {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB` : t('inventory.brandForm.max5mb')}
             </p>
           </div>
         </div>
 
         <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6">
-          <h2 className="text-lg font-bold text-on-surface mb-6">Partnership Status / स्थिति</h2>
+          <h2 className="text-lg font-bold text-on-surface mb-6">{t('inventory.brandForm.partnershipStatus')}</h2>
           
           <div className="flex gap-4">
             <label className="flex-1 cursor-pointer group">
@@ -332,7 +334,7 @@ export default function BrandForm({ editId }: BrandFormProps) {
                 className="peer sr-only" 
               />
               <div className="flex items-center justify-center py-2.5 rounded-xl border-2 border-outline-variant/20 text-sm font-bold text-on-surface-variant peer-checked:border-success peer-checked:text-success peer-checked:bg-success/5 transition-all group-hover:border-outline-variant/40">
-                Active / सक्रिय
+                {t('inventory.brandForm.active')}
               </div>
             </label>
             
@@ -346,12 +348,12 @@ export default function BrandForm({ editId }: BrandFormProps) {
                 className="peer sr-only" 
               />
               <div className="flex items-center justify-center py-2.5 rounded-xl border-2 border-outline-variant/20 text-sm font-bold text-on-surface-variant peer-checked:border-error peer-checked:text-error peer-checked:bg-error/5 transition-all group-hover:border-outline-variant/40">
-                Inactive / निष्क्रिय
+                {t('inventory.brandForm.inactive')}
               </div>
             </label>
           </div>
           <p className="text-xs text-on-surface-variant mt-3 text-center">
-            Inactive brands will be hidden from product catalogs and PO generation.
+            {t('inventory.brandForm.inactiveMsg')}
           </p>
         </div>
 
@@ -359,14 +361,14 @@ export default function BrandForm({ editId }: BrandFormProps) {
         <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-4 pt-6 border-t border-outline-variant/20">
           <Button type="button" onClick={handleClear} variant="ghost" className="w-full sm:w-auto text-on-surface-variant hover:text-error flex items-center justify-center gap-2">
             <RefreshCcw className="w-4 h-4" />
-            Clear Form
+            {t('inventory.brandForm.clearForm')}
           </Button>
           <Button type="button" onClick={() => router.back()} variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
-            Cancel
+            {t('inventory.brandForm.cancel')}
           </Button>
           <Button type="submit" disabled={loading} className="w-full sm:w-auto gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
             <Save className="w-4 h-4 shrink-0" />
-            <span className="font-bold tracking-wide truncate">{loading ? 'Saving...' : (editId ? 'Update Brand' : 'Save Brand')}</span>
+            <span className="font-bold tracking-wide truncate">{loading ? t('inventory.brandForm.saving') : (editId ? t('inventory.brandForm.updateBrand') : t('inventory.brandForm.saveBrand'))}</span>
           </Button>
         </div>
       </div>

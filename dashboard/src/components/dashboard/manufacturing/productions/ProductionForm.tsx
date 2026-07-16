@@ -7,10 +7,12 @@ import { useRouter } from 'next/navigation';
 import { cn } from '@/utils/cn';
 import { recipeService } from '@/lib/services/recipe.services';
 import { productionService } from '@/lib/services/production.services';
+import { useTranslation } from 'react-i18next';
 import { productionSchema } from '@/utils/validations';
 import toast from 'react-hot-toast';
 
 export default function ProductionForm() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [recipes, setRecipes] = useState<any[]>([]);
   const [loadingRecipes, setLoadingRecipes] = useState(true);
@@ -98,15 +100,15 @@ export default function ProductionForm() {
         if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
       }
       setErrors(newErrors);
-      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें', { id: 'please-correct-the-errors-----' });
+      return toast.error(t('manufacturing.productionForm.pleaseCorrectErrors'), { id: 'please-correct-the-errors-----' });
     }
 
     if (!allStockAvailable) {
-      return toast.error('Insufficient stock for one or more raw materials / एक या अधिक कच्चे माल के लिए अपर्याप्त स्टॉक', { id: 'insufficient-stock-for-one-or-' });
+      return toast.error(t('manufacturing.productionForm.insufficientStock'), { id: 'insufficient-stock-for-one-or-' });
     }
 
     setSubmitting(true);
-    const toastId = toast.loading('Logging production... / उत्पादन लॉग कर रहे हैं...');
+    const toastId = toast.loading(t('manufacturing.productionForm.loggingProduction'));
 
     try {
       const res = await productionService.logProduction(submissionData);
@@ -114,10 +116,10 @@ export default function ProductionForm() {
         toast.success('Production logged successfully! Stock updated. / उत्पादन सफलतापूर्वक लॉग किया गया! स्टॉक अपडेट हो गया।', { id: toastId });
         router.push('/manufacturing/productions');
       } else {
-        toast.error((res as any).message || 'Failed to log production', { id: toastId });
+        toast.error((res as any).message || t('manufacturing.productionForm.failedToLog'), { id: toastId });
       }
     } catch (err: any) {
-      toast.error(err.message || 'An unexpected error occurred', { id: toastId });
+      toast.error(err.message || t('manufacturing.productionForm.unexpectedError'), { id: toastId });
     } finally {
       setSubmitting(false);
     }
@@ -133,10 +135,10 @@ export default function ProductionForm() {
           </Button>
           <div>
             <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">
-              New Production Run / नया उत्पादन शुरू करें
+              {t('manufacturing.productionForm.newProductionRun')}
             </h1>
             <p className="text-sm text-on-surface-variant mt-1 font-medium">
-              Log a new manufacturing process / एक नई निर्माण प्रक्रिया दर्ज करें
+              {t('manufacturing.productionForm.logNewProcess')}
             </p>
           </div>
         </div>
@@ -149,13 +151,13 @@ export default function ProductionForm() {
         <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
           <div className="flex items-center gap-2 mb-2">
             <ClipboardList className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-bold text-on-surface">Run Details / रन विवरण</h2>
+            <h2 className="text-lg font-bold text-on-surface">{t('manufacturing.productionForm.runDetails')}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                <ClipboardList className="w-3.5 h-3.5" /> Recipe / Formula / रेसिपी / फॉर्मूला <span className="text-error">*</span>
+                <ClipboardList className="w-3.5 h-3.5" /> {t('manufacturing.productionForm.recipeFormula')} <span className="text-error">*</span>
               </label>
               <select
                 value={selectedRecipeId}
@@ -165,10 +167,10 @@ export default function ProductionForm() {
                   errors.recipeId ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
                 )}
               >
-                <option value="">Select a recipe to produce... / उत्पादित करने के लिए एक रेसिपी चुनें...</option>
+                <option value="">{t('manufacturing.productionForm.selectRecipe')}</option>
                 {recipes.map((r: any) => (
                   <option key={r._id} value={r._id}>
-                    {r.finalProductId?.name || 'Unknown'} ({r.ingredients?.length || 0} ingredients)
+                    {r.finalProductId?.name || 'Unknown'} ({r.ingredients?.length || 0} {t('manufacturing.productionForm.ingredients')})
                   </option>
                 ))}
               </select>
@@ -177,7 +179,7 @@ export default function ProductionForm() {
 
             <div className="space-y-2">
               <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                Quantity to Produce / उत्पादन की मात्रा <span className="text-error">*</span>
+                {t('manufacturing.productionForm.quantityToProduce')} <span className="text-error">*</span>
               </label>
               <input
                 type="number"
@@ -198,18 +200,18 @@ export default function ProductionForm() {
         <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle2 className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-bold text-on-surface">Expected Deductions & Yield / अपेक्षित कटौती और उपज</h2>
+            <h2 className="text-lg font-bold text-on-surface">{t('manufacturing.productionForm.expectedDeductions')}</h2>
           </div>
 
           <div className="bg-surface-container-low/50 p-6 rounded-2xl border border-outline-variant/20 flex flex-col gap-4 text-sm">
             <div className="flex justify-between items-center text-on-surface-variant">
-              <span>Selected Recipe / चयनित रेसिपी:</span>
+              <span>{t('manufacturing.productionForm.selectedRecipe')}</span>
               <span className="font-bold text-on-surface">{selectedRecipe?.finalProductId?.name || 'None'}</span>
             </div>
 
             {expectedDeductions.length > 0 && (
               <div className="border-t border-outline-variant/20 pt-4 space-y-3">
-                <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Raw Materials Required / कच्चा माल आवश्यक:</p>
+                <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">{t('manufacturing.productionForm.rawMaterialsRequired')}</p>
                 {expectedDeductions.map((d: any, i: number) => (
                   <div key={i} className={`flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-xl border ${d.hasEnoughStock ? 'border-outline-variant/10 bg-surface' : 'border-error/30 bg-error/5'}`}>
                     <div>
@@ -218,8 +220,8 @@ export default function ProductionForm() {
                     </div>
                     <div className="sm:text-right mt-2 sm:mt-0">
                       <p className={`font-bold ${d.hasEnoughStock ? 'text-on-surface' : 'text-error'}`}>-{d.totalRequired} {d.unit}</p>
-                      <p className="text-xs text-on-surface-variant">Cost: ₹{d.totalCost.toFixed(2)}</p>
-                      {!d.hasEnoughStock && <p className="text-xs font-bold text-error">⚠ Insufficient stock! / अपर्याप्त स्टॉक!</p>}
+                      <p className="text-xs text-on-surface-variant">{t('manufacturing.productionForm.cost')}{d.totalCost.toFixed(2)}</p>
+                      {!d.hasEnoughStock && <p className="text-xs font-bold text-error">{t('manufacturing.productionForm.insufficientStockWarning')}</p>}
                     </div>
                   </div>
                 ))}
@@ -227,12 +229,12 @@ export default function ProductionForm() {
             )}
 
             <div className="flex justify-between items-center text-on-surface-variant">
-              <span>Expected Yield / अपेक्षित उपज:</span>
+              <span>{t('manufacturing.productionForm.expectedYield')}</span>
               <span className="font-bold text-on-surface">{qty > 0 ? `${qty} Units` : '-'}</span>
             </div>
 
             <div className="flex justify-between items-center text-on-surface-variant border-t border-outline-variant/20 pt-4 mt-2">
-              <span className="font-bold">Estimated Cost / अनुमानित लागत:</span>
+              <span className="font-bold">{t('manufacturing.productionForm.estimatedCost')}</span>
               <span className="font-black text-primary text-lg">₹{estimatedTotalCost.toFixed(2)}</span>
             </div>
           </div>
@@ -246,10 +248,10 @@ export default function ProductionForm() {
         <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-4 pt-6 border-t border-outline-variant/20">
           <Button type="button" onClick={handleClear} variant="ghost" className="w-full sm:w-auto text-on-surface-variant hover:text-error flex items-center justify-center gap-2">
             <RefreshCcw className="w-4 h-4" />
-            Clear Form / फ़ॉर्म साफ़ करें
+            {t('manufacturing.productionForm.clearForm')}
           </Button>
           <Button type="button" onClick={() => router.back()} variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
-            Cancel / रद्द करें
+            {t('manufacturing.productionForm.cancel')}
           </Button>
           <Button
             type="submit"
@@ -257,7 +259,7 @@ export default function ProductionForm() {
             className="w-full sm:w-auto gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50"
           >
             <PlayCircle className="w-4 h-4 shrink-0" />
-            <span className="font-bold tracking-wide truncate">{submitting ? 'Processing...' : 'Start Production / उत्पादन शुरू करें'}</span>
+            <span className="font-bold tracking-wide truncate">{submitting ? t('manufacturing.productionForm.processing') : t('manufacturing.productionForm.startProduction')}</span>
           </Button>
         </div>
       </div>
