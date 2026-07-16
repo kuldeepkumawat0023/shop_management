@@ -5,6 +5,7 @@ import { X, PauseCircle } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
 import { usePOS } from '@/contexts/POSContext';
+import { useTranslation } from 'react-i18next';
 
 interface HoldBillModalProps {
   onClose: () => void;
@@ -13,6 +14,7 @@ interface HoldBillModalProps {
 export default function HoldBillModal({ onClose }: HoldBillModalProps) {
   const { holdBill, cart } = usePOS();
   const [note, setNote] = useState('');
+  const { t } = useTranslation();
 
   const handleHold = () => {
     holdBill(note);
@@ -36,7 +38,7 @@ export default function HoldBillModal({ onClose }: HoldBillModalProps) {
             <div className="w-8 h-8 rounded-full bg-warning/10 flex items-center justify-center text-warning">
               <PauseCircle className="w-4 h-4" />
             </div>
-            <h2 className="text-lg font-bold text-on-surface">Hold Current Bill</h2>
+            <h2 className="text-lg font-bold text-on-surface">{t('pos.holdBillModal.holdCurrentBill')}</h2>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10">
             <X className="w-4 h-4" />
@@ -46,19 +48,19 @@ export default function HoldBillModal({ onClose }: HoldBillModalProps) {
         {/* Content */}
         <div className="p-5 space-y-4">
           <p className="text-sm font-medium text-on-surface-variant leading-relaxed">
-            Are you sure you want to pause this order? You can resume it later from the Hold Bills page.
+            {t('pos.holdBillModal.areYouSurePause')}
             <br/>
             <span className="text-xs text-on-surface-variant/70">
-              Cart items: {cart.length} / कार्ट आइटम: {cart.length}
+              {t('pos.holdBillModal.cartItems')} {cart.length}
             </span>
           </p>
 
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-              Reference Note (Optional)
+              {t('pos.holdBillModal.referenceNote')}
             </label>
             <Input 
-              placeholder="e.g. Customer went to get wallet" 
+              placeholder={t('pos.holdBillModal.egCustomerWallet')} 
               value={note}
               onChange={(e) => setNote(e.target.value)}
               autoFocus
@@ -69,14 +71,14 @@ export default function HoldBillModal({ onClose }: HoldBillModalProps) {
         {/* Footer */}
         <div className="p-4 border-t border-outline-variant/20 flex items-center gap-3 bg-surface-container-low/30">
           <Button variant="outline" className="flex-1" onClick={onClose}>
-            Cancel
+            {t('pos.holdBillModal.cancel')}
           </Button>
           <Button 
             className="flex-1 bg-warning hover:bg-warning/90 text-on-primary shadow-lg shadow-warning/20"
             onClick={handleHold}
             disabled={cart.length === 0}
           >
-            Confirm Hold
+            {t('pos.holdBillModal.confirmHold')}
           </Button>
         </div>
       </div>

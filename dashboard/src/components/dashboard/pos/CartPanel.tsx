@@ -6,6 +6,7 @@ import { Button } from '@/components/common/Button';
 import CustomerSelection from './CustomerSelection';
 import { usePOS } from '@/contexts/POSContext';
 import { formatCurrency } from '@/utils/formatCurrency';
+import { useTranslation } from 'react-i18next';
 
 interface CartPanelProps {
   onClose?: () => void;
@@ -15,6 +16,7 @@ interface CartPanelProps {
 
 export default function CartPanel({ onClose, onPay, onHold }: CartPanelProps) {
   const { cart, removeFromCart, updateQuantity, subtotal, discount, tax, netAmount, selectedCustomer, setSelectedCustomer } = usePOS();
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-col h-full w-full bg-surface">
@@ -25,9 +27,9 @@ export default function CartPanel({ onClose, onPay, onHold }: CartPanelProps) {
           <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
             <ShoppingCart className="w-4 h-4" />
           </div>
-          <h2 className="text-base font-bold text-on-surface">Current Order</h2>
+          <h2 className="text-base font-bold text-on-surface">{t('pos.cartPanel.currentOrder')}</h2>
           <span className="ml-2 text-xs font-bold bg-surface-container-high text-on-surface-variant px-2 py-0.5 rounded-md">
-            Order #0045
+            {t('pos.cartPanel.orderNum')} #0045
           </span>
         </div>
         {onClose && (
@@ -119,25 +121,25 @@ export default function CartPanel({ onClose, onPay, onHold }: CartPanelProps) {
       <div className="p-4 bg-surface border-t border-outline-variant/30 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.05)]">
         <div className="space-y-2 mb-4">
           <div className="flex justify-between text-on-surface-variant text-sm font-medium">
-            <span>Subtotal</span>
+            <span>{t('pos.cartPanel.subtotal')}</span>
             <span>{formatCurrency(subtotal)}</span>
           </div>
           {discount > 0 && (
             <div className="flex justify-between text-error text-sm font-medium">
-              <span>Discount</span>
+              <span>{t('pos.cartPanel.discount')}</span>
               <span>-{formatCurrency(discount)}</span>
             </div>
           )}
           {tax > 0 && (
             <div className="flex justify-between text-on-surface-variant text-sm font-medium">
-              <span>Tax</span>
+              <span>{t('pos.cartPanel.tax')}</span>
               <span>+{formatCurrency(tax)}</span>
             </div>
           )}
         </div>
         
         <div className="flex items-end justify-between border-t border-dashed border-outline-variant/30 pt-3 mb-4">
-          <span className="text-sm font-bold text-on-surface-variant">Total Amount</span>
+          <span className="text-sm font-bold text-on-surface-variant">{t('pos.cartPanel.totalAmount')}</span>
           <span className="text-3xl font-black text-primary leading-none tracking-tight">
             {formatCurrency(netAmount)}
           </span>
@@ -151,14 +153,14 @@ export default function CartPanel({ onClose, onPay, onHold }: CartPanelProps) {
             onClick={onHold}
           >
             <PauseCircle className="w-4 h-4 mr-2" />
-            Hold Bill
+            {t('pos.cartPanel.holdBill')}
           </Button>
           <Button 
             className="w-full h-12 gradient-button text-white shadow-lg shadow-primary/25 border-none"
             onClick={onPay}
           >
             <Banknote className="w-4 h-4 mr-2" />
-            Pay Now
+            {t('pos.cartPanel.payNow')}
           </Button>
         </div>
       </div>

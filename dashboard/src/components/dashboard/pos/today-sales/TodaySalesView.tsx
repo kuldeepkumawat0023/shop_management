@@ -14,10 +14,12 @@ import toast from 'react-hot-toast';
 import InvoiceModal from '@/components/dashboard/pos/today-sales/InvoiceModal';
 import { useRouter } from 'next/navigation';
 import { usePOS } from '@/contexts/POSContext';
+import { useTranslation } from 'react-i18next';
 
 export default function TodaySalesView() {
   const router = useRouter();
   const { setCart, setDiscount, setTax, setEditSaleId } = usePOS();
+  const { t } = useTranslation();
 
   const [sales, setSales] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,14 +41,14 @@ export default function TodaySalesView() {
         setSales(res.data);
       }
     } catch (error) {
-      toast.error('Failed to load sales / बिक्री लोड करने में विफल', { id: 'failed-to-load-sales----------' });
+      toast.error(t('pos.todaySales.failedToLoadSales'), { id: 'failed-to-load-sales----------' });
     } finally {
       setLoading(false);
     }
   };
 
   const handleView = async (sale: any) => {
-    const toastId = toast.loading('Loading invoice...');
+    const toastId = toast.loading(t('pos.todaySales.loadingInvoice'));
     try {
       const res = await saleService.getSaleById(sale._id);
       if (res.success) {
@@ -56,27 +58,27 @@ export default function TodaySalesView() {
         toast.dismiss(toastId);
       }
     } catch (error) {
-      toast.error('Failed to load invoice details / चालान विवरण लोड करने में विफल', { id: toastId });
+      toast.error(t('pos.todaySales.failedToLoadSaleData'), { id: toastId });
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this sale? This will revert stock. / क्या आप सुनिश्चित हैं कि आप इस बिक्री को हटाना चाहते हैं? यह स्टॉक वापस कर देगा।')) return;
+    if (!window.confirm(t('pos.todaySales.confirmDeleteSale'))) return;
 
-    const toastId = toast.loading('Deleting sale... / बिक्री हटाई जा रही है...');
+    const toastId = toast.loading(t('pos.todaySales.deletingSale'));
     try {
       const res = await saleService.deleteSale(id);
       if (res.success) {
-        toast.success('Sale deleted successfully / बिक्री सफलतापूर्वक हटा दी गई', { id: toastId });
+        toast.success(t('pos.todaySales.saleDeleted'), { id: toastId });
         setSales(sales.filter(s => s._id !== id));
       }
     } catch (error) {
-      toast.error('Failed to delete sale / बिक्री हटाने में विफल', { id: toastId });
+      toast.error(t('pos.todaySales.deleteSaleFailed'), { id: toastId });
     }
   };
 
   const handleEdit = async (sale: any) => {
-    const toastId = toast.loading('Loading sale for edit...');
+    const toastId = toast.loading(t('pos.todaySales.loadingSaleForEdit'));
     try {
       const res = await saleService.getSaleById(sale._id);
       if (res.success) {
@@ -98,47 +100,47 @@ export default function TodaySalesView() {
         router.push('/pos'); // Go back to POS terminal
       }
     } catch (error) {
-      toast.error('Failed to load sale data / बिक्री डेटा लोड करने में विफल', { id: toastId });
+      toast.error(t('pos.todaySales.failedToLoadSaleData'), { id: toastId });
     }
   };
   const columns = [
     {
-      header: 'Invoice ID',
+      header: t('pos.todaySales.invoiceId'),
       accessorKey: 'invoiceNumber',
       cell: (row: any) => (
         <span className="font-bold text-primary">{row.invoiceNumber}</span>
       )
     },
     {
-      header: 'Customer',
+      header: t('pos.todaySales.customer'),
       accessorKey: 'customer',
       cell: (row: any) => (
-        <span className="font-semibold text-on-surface">{row.customerId?.name || 'Walk-in Customer'}</span>
+        <span className="font-semibold text-on-surface">{row.customerId?.name || t('pos.todaySales.walkInCustomer')}</span>
       )
     },
     {
-      header: 'Date',
+      header: t('pos.todaySales.date'),
       accessorKey: 'saleDate',
       cell: (row: any) => (
         <span className="text-sm font-medium text-on-surface-variant">{new Date(row.saleDate).toLocaleDateString()}</span>
       )
     },
     {
-      header: 'Payment Mode',
+      header: t('pos.todaySales.paymentMode'),
       accessorKey: 'paymentMethod',
       cell: (row: any) => (
         <StatusBadge status={row.paymentMethod} />
       )
     },
     {
-      header: 'Total',
+      header: t('pos.todaySales.total'),
       accessorKey: 'netAmount',
       cell: (row: any) => (
         <span className="font-black text-on-surface">{formatCurrency(row.netAmount)}</span>
       )
     },
     {
-      header: 'Actions',
+      header: t('pos.todaySales.actions'),
       accessorKey: 'actions',
       cell: (row: any) => (
         <div className="flex items-center gap-2">
@@ -164,9 +166,9 @@ export default function TodaySalesView() {
     <div className="flex flex-col h-full bg-background p-4 md:p-6 overflow-y-auto custom-scrollbar">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-black text-on-surface tracking-tight">Today's Sales</h1>
+          <h1 className="text-3xl font-black text-on-surface tracking-tight">{t('pos.todaySales.todaysSales')}</h1>
           <p className="text-sm font-medium text-on-surface-variant mt-1">
-            Review invoices generated today, track revenue, and monitor average order value.
+            {t('pos.todaySales.todaysSalesDesc')}
           </p>
         </div>
       </div>
@@ -174,26 +176,26 @@ export default function TodaySalesView() {
       {/* KPI Stats */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8 shrink-0">
         <StatsCard
-          title="Total Revenue"
+          title={t('pos.todaySales.totalRevenue')}
           value={formatCurrency(totalRevenue)}
           icon={TrendingUp}
           trend="+12.5%"
           trendDirection="up"
-          trendLabel="vs yesterday"
+          trendLabel={t('pos.todaySales.vsYesterday')}
           colorTheme="primary"
         />
         <StatsCard
-          title="Total Invoices"
+          title={t('pos.todaySales.totalInvoices')}
           value={sales.length.toString()}
           icon={CheckCircle2}
-          trendLabel="COMPLETED TODAY"
+          trendLabel={t('pos.todaySales.completedToday')}
           colorTheme="success"
         />
         <StatsCard
-          title="Avg Order Value"
+          title={t('pos.todaySales.avgOrderValue')}
           value="₹1,002.10"
           icon={TrendingUp}
-          trendLabel="HIGHER THAN USUAL"
+          trendLabel={t('pos.todaySales.higherThanUsual')}
           colorTheme="purple"
         />
       </div>
@@ -204,11 +206,11 @@ export default function TodaySalesView() {
           columns={columns}
           headerContent={
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-on-surface">Recent Transactions</h2>
+              <h2 className="text-lg font-bold text-on-surface">{t('pos.todaySales.recentTransactions')}</h2>
               <StatusBadge status="Live Sync" variant="dot" colorTheme="success" className="ml-2 bg-success/10 text-success border-success/20" />
             </div>
           }
-          searchPlaceholder="Search by receipt or customer..."
+          searchPlaceholder={t('pos.todaySales.searchReceiptCustomer')}
           className="border-none shadow-none bg-transparent"
           itemsPerPage={10}
         />

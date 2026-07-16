@@ -11,6 +11,7 @@ import { ShoppingCart, Search, ScanBarcode, Plus, PackagePlus } from 'lucide-rea
 import { usePOS } from '@/contexts/POSContext';
 import { Button } from '@/components/common/Button';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 export default function NewSaleView() {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -19,6 +20,7 @@ export default function NewSaleView() {
   const [isCustomItemOpen, setIsCustomItemOpen] = useState(false);
   const [barcodeInput, setBarcodeInput] = useState('');
   const barcodeRef = useRef<HTMLInputElement>(null);
+  const { t } = useTranslation();
 
   const { searchQuery, setSearchQuery, cart, products, addToCart } = usePOS();
 
@@ -33,7 +35,7 @@ export default function NewSaleView() {
     
     if (matched) {
       addToCart(matched);
-      toast.success(`Added: ${matched.name} / जोड़ा गया`);
+      toast.success(`${t('pos.newSale.added')} ${matched.name}`);
     } else {
       // Try backend barcode API
       try {
@@ -41,12 +43,12 @@ export default function NewSaleView() {
         const res = await productService.getProductByBarcode(query);
         if (res.success && res.data) {
           addToCart(res.data);
-          toast.success(`Scanned: ${res.data.name}`);
+          toast.success(`${t('pos.newSale.scanned')} ${res.data.name}`);
         } else {
-          toast.error(`Not found: ${query} / नहीं मिला`, { id: 'not-found----query------------' });
+          toast.error(`${t('pos.newSale.notFound')} ${query}`, { id: 'not-found----query------------' });
         }
       } catch {
-        toast.error(`Not found: ${query} / नहीं मिला`, { id: 'not-found----query------------' });
+        toast.error(`${t('pos.newSale.notFound')} ${query}`, { id: 'not-found----query------------' });
       }
     }
     setBarcodeInput('');
@@ -78,7 +80,7 @@ export default function NewSaleView() {
               </div>
               <input
                 type="text"
-                placeholder="Search products by name... / उत्पाद खोजें..."
+                placeholder={t('pos.newSale.searchProducts')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="block w-full pl-9 pr-3 py-2.5 text-sm rounded-xl border border-outline-variant/30 bg-surface-container-low text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-on-surface-variant/50"
@@ -93,7 +95,7 @@ export default function NewSaleView() {
               <input
                 ref={barcodeRef}
                 type="text"
-                placeholder="Scan / Enter SKU..."
+                placeholder={t('pos.newSale.scanSku')}
                 value={barcodeInput}
                 onChange={(e) => setBarcodeInput(e.target.value)}
                 onKeyDown={handleBarcodeKeyDown}
@@ -106,7 +108,7 @@ export default function NewSaleView() {
               className="shrink-0 h-10 px-4 gradient-button text-white border-none shadow-md shadow-primary/20 gap-1.5 rounded-xl"
             >
               <Plus className="w-4 h-4" />
-              <span className="text-sm font-bold hidden sm:inline">Add</span>
+              <span className="text-sm font-bold hidden sm:inline">{t('pos.newSale.add')}</span>
             </Button>
             <div className="w-px h-6 bg-outline-variant/30 shrink-0 mx-1"></div>
             <Button 
@@ -116,7 +118,7 @@ export default function NewSaleView() {
               className="shrink-0 h-10 px-4 border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-primary/5 gap-1.5 rounded-xl"
             >
               <PackagePlus className="w-4 h-4" />
-              <span className="text-sm font-bold hidden md:inline">Custom Item</span>
+              <span className="text-sm font-bold hidden md:inline">{t('pos.newSale.customItem')}</span>
             </Button>
           </div>
         </div>

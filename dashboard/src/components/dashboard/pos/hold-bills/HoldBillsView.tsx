@@ -9,10 +9,12 @@ import { StatusBadge } from '@/components/common/StatusBadge';
 import { usePOS } from '@/contexts/POSContext';
 import { useRouter } from 'next/navigation';
 import { formatCurrency } from '@/utils/formatCurrency';
+import { useTranslation } from 'react-i18next';
 
 export default function HoldBillsView() {
   const { heldBills, resumeBill } = usePOS();
   const router = useRouter();
+  const { t } = useTranslation();
 
   const totalValue = heldBills.reduce((sum, bill) => 
     sum + bill.cart.reduce((s, item) => s + (item.sellingPrice * item.quantity), 0), 0
@@ -28,7 +30,7 @@ export default function HoldBillsView() {
 
   const columns = [
     { 
-      header: 'Customer', 
+      header: t('pos.holdBills.customer'), 
       accessorKey: 'customer',
       cell: (row: any) => (
         <div className="flex items-center gap-3">
@@ -43,14 +45,14 @@ export default function HoldBillsView() {
       )
     },
     { 
-      header: 'Items', 
+      header: t('pos.holdBills.items'), 
       accessorKey: 'cart',
       cell: (row: any) => (
         <span className="font-semibold text-on-surface">{row.cart.reduce((s: number, i: any) => s + i.quantity, 0)} Items</span>
       )
     },
     { 
-      header: 'Amount', 
+      header: t('pos.holdBills.amount'), 
       accessorKey: 'id',
       cell: (row: any) => (
         <span className="font-black text-primary">
@@ -59,14 +61,14 @@ export default function HoldBillsView() {
       )
     },
     { 
-      header: 'Note', 
+      header: t('pos.holdBills.note'), 
       accessorKey: 'note',
       cell: (row: any) => (
         <span className="text-sm text-on-surface-variant italic">{row.note || '-'}</span>
       )
     },
     { 
-      header: 'Time', 
+      header: t('pos.holdBills.time'), 
       accessorKey: 'heldAt',
       cell: (row: any) => (
         <div className="flex items-center gap-1.5 text-xs font-medium text-on-surface-variant">
@@ -76,7 +78,7 @@ export default function HoldBillsView() {
       )
     },
     {
-      header: 'Actions',
+      header: t('pos.holdBills.actions'),
       accessorKey: 'id',
       cell: (row: any) => (
         <div className="flex items-center gap-2">
@@ -97,9 +99,9 @@ export default function HoldBillsView() {
     <div className="flex flex-col h-full bg-background p-4 md:p-6 overflow-y-auto custom-scrollbar">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-black text-on-surface tracking-tight">Hold Bills Management</h1>
+          <h1 className="text-3xl font-black text-on-surface tracking-tight">{t('pos.holdBills.holdBillsManagement')}</h1>
           <p className="text-sm font-medium text-on-surface-variant mt-1">
-            Review paused orders, resume transactions. / रुके हुए ऑर्डर देखें।
+            {t('pos.holdBills.holdBillsDesc')}
           </p>
         </div>
       </div>
@@ -107,31 +109,31 @@ export default function HoldBillsView() {
       {/* Stats Cards Row */}
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 shrink-0">
         <StatsCard 
-          title="Total Hold Bills"
+          title={t('pos.holdBills.totalHoldBills')}
           value={heldBills.length.toString()}
           icon={Users}
-          trendLabel="ACTIVE HOLDS"
+          trendLabel={t('pos.holdBills.activeHolds')}
           colorTheme="primary"
         />
         <StatsCard 
-          title="Today's Paused"
+          title={t('pos.holdBills.todaysPaused')}
           value={heldBills.length.toString()}
           icon={Clock}
-          trendLabel="TODAY"
+          trendLabel={t('pos.holdBills.today')}
           colorTheme="warning"
         />
         <StatsCard 
-          title="Total Value Held"
+          title={t('pos.holdBills.totalValueHeld')}
           value={formatCurrency(totalValue)}
           icon={Banknote}
-          trendLabel="POTENTIAL REVENUE"
+          trendLabel={t('pos.holdBills.potentialRevenue')}
           colorTheme="purple"
         />
         <StatsCard 
-          title="Total Items"
+          title={t('pos.holdBills.totalItems')}
           value={totalItems.toString()}
           icon={ListPlus}
-          trendLabel="AWAITING CHECKOUT"
+          trendLabel={t('pos.holdBills.awaitingCheckout')}
           colorTheme="success"
         />
       </div>
@@ -140,8 +142,8 @@ export default function HoldBillsView() {
         {heldBills.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-16 text-on-surface-variant/50 gap-3">
             <Clock size={48} strokeWidth={1} />
-            <p className="text-lg font-bold">No held bills / कोई रुका हुआ बिल नहीं</p>
-            <p className="text-sm">When you hold a bill from the POS, it will appear here.</p>
+            <p className="text-lg font-bold">{t('pos.holdBills.noHeldBills')}</p>
+            <p className="text-sm">{t('pos.holdBills.noHeldBillsDesc')}</p>
           </div>
         ) : (
           <DataTable 
@@ -149,11 +151,11 @@ export default function HoldBillsView() {
             columns={columns}
             headerContent={
               <div className="flex items-center gap-2 shrink-0">
-                <h2 className="text-lg font-bold text-on-surface">Active Holds</h2>
+                <h2 className="text-lg font-bold text-on-surface">{t('pos.holdBills.activeHoldsTable')}</h2>
                 <StatusBadge status="Live Status" variant="dot" colorTheme="success" className="ml-2 bg-success/10 text-success border-success/20" />
               </div>
             }
-            searchPlaceholder="Search by customer name..."
+            searchPlaceholder={t('pos.holdBills.searchHoldBills')}
             className="border-none shadow-none bg-transparent"
             itemsPerPage={10}
           />

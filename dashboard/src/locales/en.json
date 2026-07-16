@@ -118,5 +118,86 @@
       "fri": "Fri",
       "sat": "Sat"
     }
+  },
+  "pos": {
+    "newSale": {
+      "added": "Added:",
+      "scanned": "Scanned:",
+      "notFound": "Not found:",
+      "searchProducts": "Search products by name...",
+      "scanSku": "Scan / Enter SKU...",
+      "add": "Add",
+      "customItem": "Custom Item"
+    },
+    "cartPanel": {
+      "currentOrder": "Current Order",
+      "orderNum": "Order",
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "tax": "Tax",
+      "totalAmount": "Total Amount",
+      "holdBill": "Hold Bill",
+      "payNow": "Pay Now"
+    },
+    "holdBills": {
+      "holdBillsManagement": "Hold Bills Management",
+      "holdBillsDesc": "Review paused orders, resume transactions.",
+      "totalHoldBills": "Total Hold Bills",
+      "activeHolds": "ACTIVE HOLDS",
+      "todaysPaused": "Today's Paused",
+      "today": "TODAY",
+      "totalValueHeld": "Total Value Held",
+      "potentialRevenue": "POTENTIAL REVENUE",
+      "totalItems": "Total Items",
+      "awaitingCheckout": "AWAITING CHECKOUT",
+      "noHeldBills": "No held bills",
+      "noHeldBillsDesc": "When you hold a bill from the POS, it will appear here.",
+      "activeHoldsTable": "Active Holds",
+      "searchHoldBills": "Search by customer name...",
+      "customer": "Customer",
+      "items": "Items",
+      "amount": "Amount",
+      "note": "Note",
+      "time": "Time",
+      "actions": "Actions"
+    },
+    "holdBillModal": {
+      "holdCurrentBill": "Hold Current Bill",
+      "holdBillModalDesc": "Add a note to help you identify this order later.",
+      "addNoteOptional": "Add a note (optional)",
+      "cancel": "Cancel",
+      "areYouSurePause": "Are you sure you want to pause this order? You can resume it later from the Hold Bills page.",
+      "cartItems": "Cart items:",
+      "referenceNote": "Reference Note (Optional)",
+      "egCustomerWallet": "e.g. Customer went to get wallet",
+      "confirmHold": "Confirm Hold"
+    },
+    "todaySales": {
+      "failedToLoadSales": "Failed to load sales / बिक्री लोड करने में विफल",
+      "loadingInvoice": "Loading invoice...",
+      "confirmDeleteSale": "Are you sure you want to delete this sale? This will revert stock. / क्या आप सुनिश्चित हैं कि आप इस बिक्री को हटाना चाहते हैं? यह स्टॉक वापस कर देगा।",
+      "deletingSale": "Deleting sale... / बिक्री हटाई जा रही है...",
+      "saleDeleted": "Sale deleted successfully / बिक्री सफलतापूर्वक हटा दी गई",
+      "deleteSaleFailed": "Failed to delete sale / बिक्री हटाने में विफल",
+      "loadingSaleForEdit": "Loading sale for edit...",
+      "failedToLoadSaleData": "Failed to load sale data / बिक्री डेटा लोड करने में विफल",
+      "invoiceId": "Invoice ID",
+      "customer": "Customer",
+      "walkInCustomer": "Walk-in Customer",
+      "date": "Date",
+      "paymentMode": "Payment Mode",
+      "total": "Total",
+      "actions": "Actions",
+      "todaysSales": "Today's Sales",
+      "todaysSalesDesc": "Review invoices generated today, track revenue, and monitor average order value.",
+      "totalRevenue": "Total Revenue",
+      "vsYesterday": "vs yesterday",
+      "totalInvoices": "Total Invoices",
+      "completedToday": "COMPLETED TODAY",
+      "avgOrderValue": "Avg Order Value",
+      "higherThanUsual": "HIGHER THAN USUAL",
+      "recentTransactions": "Recent Transactions",
+      "searchReceiptCustomer": "Search by receipt or customer..."
+    }
   }
 }
