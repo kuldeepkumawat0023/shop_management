@@ -6,11 +6,13 @@ import { ArrowLeft, Save, Plus, Trash2, BookOpen, FileText, Layers, RefreshCcw }
 import { useRouter } from 'next/navigation';
 import { cn } from '@/utils/cn';
 import { recipeService } from '@/lib/services/recipe.services';
+import { useTranslation } from 'react-i18next';
 import { productService } from '@/lib/services/product.services';
 import { recipeSchema } from '@/utils/validations';
 import toast from 'react-hot-toast';
 
 export default function RecipeForm() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [products, setProducts] = useState<any[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
@@ -112,27 +114,27 @@ export default function RecipeForm() {
       });
       
       setErrors(newErrors);
-      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें', { id: 'please-correct-the-errors-----' });
+      return toast.error(t('manufacturing.recipeForm.pleaseCorrectErrors'), { id: 'please-correct-the-errors-----' });
     }
 
     if (ingredients.some(ing => ing.productId === finalProductId)) {
-      setErrors(prev => ({ ...prev, ingredients: 'An ingredient cannot be the same as the final product / सामग्री अंतिम उत्पाद जैसी नहीं हो सकती' }));
-      return toast.error('An ingredient cannot be the same as the final product', { id: 'an-ingredient-cannot-be-the-sa' });
+      setErrors(prev => ({ ...prev, ingredients: t('manufacturing.recipeForm.sameIngredientError') }));
+      return toast.error(t('manufacturing.recipeForm.sameIngredientError'), { id: 'an-ingredient-cannot-be-the-sa' });
     }
 
     setSubmitting(true);
-    const toastId = toast.loading('Saving recipe... / रेसिपी सहेज रहे हैं...');
+    const toastId = toast.loading(t('manufacturing.recipeForm.savingRecipe'));
 
     try {
       const res = await recipeService.createRecipe(submissionData);
       if (res.success) {
-        toast.success('Recipe created successfully! / रेसिपी सफलतापूर्वक बनाई गई!', { id: toastId });
+        toast.success(t('manufacturing.recipeForm.recipeCreated'), { id: toastId });
         router.push('/manufacturing/recipes');
       } else {
-        toast.error((res as any).message || 'Failed to create recipe', { id: toastId });
+        toast.error((res as any).message || t('manufacturing.recipeForm.failedToCreate'), { id: toastId });
       }
     } catch (err: any) {
-      toast.error(err.message || 'An unexpected error occurred', { id: toastId });
+      toast.error(err.message || t('manufacturing.recipeForm.unexpectedError'), { id: toastId });
     } finally {
       setSubmitting(false);
     }
@@ -157,10 +159,10 @@ export default function RecipeForm() {
           </Button>
           <div>
             <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">
-              Create New Recipe / नई रेसिपी बनाएं
+              {t('manufacturing.recipeForm.createNewRecipe')}
             </h1>
             <p className="text-sm text-on-surface-variant mt-1 font-medium">
-              Define formula and raw materials / फॉर्मूला और कच्चा माल निर्धारित करें
+              {t('manufacturing.recipeForm.defineFormula')}
             </p>
           </div>
         </div>
@@ -173,12 +175,12 @@ export default function RecipeForm() {
         <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
           <div className="flex items-center gap-2 mb-2">
             <BookOpen className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-bold text-on-surface">General Information / सामान्य जानकारी</h2>
+            <h2 className="text-lg font-bold text-on-surface">{t('manufacturing.recipeForm.generalInfo')}</h2>
           </div>
 
           <div className="space-y-2">
             <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-              <BookOpen className="w-3.5 h-3.5" /> Output Product / आउटपुट उत्पाद <span className="text-error">*</span>
+              <BookOpen className="w-3.5 h-3.5" /> {t('manufacturing.recipeForm.outputProduct')} <span className="text-error">*</span>
             </label>
             <select
               value={finalProductId}
@@ -188,7 +190,7 @@ export default function RecipeForm() {
                 errors.finalProductId ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
               )}
             >
-              <option value="">Select Final Product / अंतिम उत्पाद चुनें</option>
+              <option value="">{t('manufacturing.recipeForm.selectFinalProduct')}</option>
               {products.map((p: any) => (
                 <option key={p._id} value={p._id}>{p.name} ({p.sku})</option>
               ))}
@@ -199,19 +201,19 @@ export default function RecipeForm() {
           {finalProductId && (
             <div className="p-4 bg-primary/5 border border-primary/10 rounded-xl">
               <h3 className="text-sm font-bold text-on-surface mb-2 flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-primary" /> Selected Product / चयनित उत्पाद
+                <BookOpen className="w-4 h-4 text-primary" /> {t('manufacturing.recipeForm.selectedProduct')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <div>
-                  <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">Name / नाम</p>
+                  <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">{t('manufacturing.recipeForm.name')}</p>
                   <p className="font-bold text-primary">{products.find(p => p._id === finalProductId)?.name}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">SKU / बारकोड</p>
+                  <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">{t('manufacturing.recipeForm.sku')}</p>
                   <p className="font-medium text-on-surface">{products.find(p => p._id === finalProductId)?.sku || 'N/A'}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">Current Stock / मौजूदा स्टॉक</p>
+                  <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">{t('manufacturing.recipeForm.currentStock')}</p>
                   <p className="font-medium text-on-surface">{products.find(p => p._id === finalProductId)?.currentStock || 0}</p>
                 </div>
               </div>
@@ -224,7 +226,7 @@ export default function RecipeForm() {
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <Layers className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">Bill of Materials / सामग्री सूची</h2>
+              <h2 className="text-lg font-bold text-on-surface">{t('manufacturing.recipeForm.billOfMaterials')}</h2>
             </div>
             <Button type="button" variant="outline" onClick={addIngredient} className="h-8 px-3 text-xs font-bold gap-1.5 border-primary/30 text-primary hover:bg-primary/5 rounded-xl">
               <Plus className="w-3.5 h-3.5" />
@@ -244,7 +246,7 @@ export default function RecipeForm() {
                 <div className="w-full sm:flex-1 space-y-1.5">
                   {index === 0 && (
                     <label className="text-sm font-bold text-on-surface">
-                      Raw Material / कच्चा माल <span className="text-error ml-1">*</span>
+                      {t('manufacturing.recipeForm.rawMaterial')} <span className="text-error ml-1">*</span>
                     </label>
                   )}
                   <select
@@ -255,11 +257,11 @@ export default function RecipeForm() {
                       prodError ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
                     )}
                   >
-                    <option value="">Select material / सामग्री चुनें</option>
+                    <option value="">{t('manufacturing.recipeForm.selectMaterial')}</option>
                     {products
                       .filter(p => p._id !== finalProductId)
                       .map((p: any) => (
-                        <option key={p._id} value={p._id}>{p.name} (Stock: {p.currentStock || 0})</option>
+                        <option key={p._id} value={p._id}>{p.name} ({t('manufacturing.recipeForm.stock')} {p.currentStock || 0})</option>
                       ))
                     }
                   </select>
@@ -268,7 +270,7 @@ export default function RecipeForm() {
                 <div className="w-full sm:w-36">
                   {index === 0 && (
                     <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">
-                      Qty Required / मात्रा <span className="text-error">*</span>
+                      {t('manufacturing.recipeForm.qtyRequired')} <span className="text-error">*</span>
                     </label>
                   )}
                   <input
@@ -308,7 +310,7 @@ export default function RecipeForm() {
             <div className="p-4 bg-surface-container-low rounded-xl border border-outline-variant/10 mt-2">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-bold text-on-surface flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-primary" /> Estimated Cost / अनुमानित लागत (per 1 unit)
+                  <Layers className="w-4 h-4 text-primary" /> {t('manufacturing.recipeForm.estimatedCost')} (per 1 unit)
                 </span>
                 <span className="font-black text-primary text-lg">₹{estimatedCost.toFixed(2)}</span>
               </div>
@@ -320,17 +322,17 @@ export default function RecipeForm() {
         <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6">
           <div className="flex items-center gap-2 mb-6">
             <FileText className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-bold text-on-surface">Instructions / निर्देश</h2>
+            <h2 className="text-lg font-bold text-on-surface">{t('manufacturing.recipeForm.instructions')}</h2>
           </div>
 
           <div className="space-y-2">
             <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-              <FileText className="w-3.5 h-3.5" /> Production Notes / उत्पादन नोट्स
+              <FileText className="w-3.5 h-3.5" /> {t('manufacturing.recipeForm.productionNotes')}
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Add step-by-step production instructions, safety guidelines, or notes here... / यहाँ उत्पादन के निर्देश, सुरक्षा दिशानिर्देश या नोट्स जोड़ें..."
+              placeholder={t('manufacturing.recipeForm.addNotesPlaceholder')}
               className="w-full h-32 p-4 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:border-primary/50 focus:ring-primary/20 transition-all resize-none"
             ></textarea>
           </div>
@@ -347,7 +349,7 @@ export default function RecipeForm() {
           </Button>
           <Button type="submit" disabled={submitting} className="w-full sm:w-auto gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
             <Save className="w-4 h-4 shrink-0" />
-            <span className="font-bold tracking-wide truncate">{submitting ? 'Saving...' : 'Save Recipe / रेसिपी सहेजें'}</span>
+            <span className="font-bold tracking-wide truncate">{submitting ? t('manufacturing.recipeForm.saving') : t('manufacturing.recipeForm.saveRecipe')}</span>
           </Button>
         </div>
       </div>

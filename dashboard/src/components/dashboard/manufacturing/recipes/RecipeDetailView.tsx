@@ -7,6 +7,7 @@ import { ArrowLeft, Edit, Trash2, BookOpen, Layers } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { recipeService } from '@/lib/services/recipe.services';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 
 interface RecipeDetailViewProps {
@@ -14,6 +15,7 @@ interface RecipeDetailViewProps {
 }
 
 export default function RecipeDetailView({ recipeId }: RecipeDetailViewProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [recipeData, setRecipeData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -35,17 +37,17 @@ export default function RecipeDetailView({ recipeId }: RecipeDetailViewProps) {
   }, [recipeId]);
 
   const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this recipe? / क्या आप वाकई इस रेसिपी को हटाना चाहते हैं?')) {
+    if (window.confirm(t('manufacturing.recipeDetail.confirmDelete'))) {
       try {
         const res = await recipeService.deleteRecipe(recipeId);
         if (res.success) {
-          toast.success('Recipe deleted successfully');
+          toast.success(t('manufacturing.recipeDetail.recipeDeleted'));
           router.push('/manufacturing/recipes');
         } else {
-          toast.error(res.message || 'Failed to delete recipe');
+          toast.error(res.message || t('manufacturing.recipeDetail.deleteFailed'));
         }
       } catch (err) {
-        toast.error('Error deleting recipe', { id: 'error-deleting-recipe' });
+        toast.error(t('manufacturing.recipeDetail.deleteError'), { id: 'error-deleting-recipe' });
       }
     }
   };
@@ -56,9 +58,9 @@ export default function RecipeDetailView({ recipeId }: RecipeDetailViewProps) {
     return (
       <div className="p-8 flex flex-col items-center justify-center h-full text-center">
         <BookOpen className="w-16 h-16 text-outline-variant mb-4" />
-        <h2 className="text-2xl font-bold text-on-surface">Recipe Not Found</h2>
-        <p className="text-on-surface-variant mt-2 mb-6">The recipe you are looking for does not exist or has been removed.</p>
-        <Button onClick={() => router.back()}>Go Back</Button>
+        <h2 className="text-2xl font-bold text-on-surface">{t('manufacturing.recipeDetail.notFound')}</h2>
+        <p className="text-on-surface-variant mt-2 mb-6">{t('manufacturing.recipeDetail.notFoundMsg')}</p>
+        <Button onClick={() => router.back()}>{t('manufacturing.recipeDetail.goBack')}</Button>
       </div>
     );
   }
@@ -75,19 +77,19 @@ export default function RecipeDetailView({ recipeId }: RecipeDetailViewProps) {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-2xl font-black text-on-surface tracking-tight">Recipe Details</h1>
+            <h1 className="text-2xl font-black text-on-surface tracking-tight">{t('manufacturing.recipeDetail.recipeDetails')}</h1>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <Link href={`/manufacturing/recipes/${recipeId}/edit`}>
             <Button variant="ghost" className="text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-xl">
               <Edit className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Edit</span>
+              <span className="hidden sm:inline">{t('manufacturing.recipeDetail.edit')}</span>
             </Button>
           </Link>
           <Button onClick={handleDelete} variant="ghost" className="text-on-surface-variant hover:bg-error/10 hover:text-error rounded-xl">
             <Trash2 className="w-4 h-4 sm:mr-2" />
-            <span className="hidden sm:inline">Delete</span>
+            <span className="hidden sm:inline">{t('manufacturing.recipeDetail.delete')}</span>
           </Button>
         </div>
       </div>
@@ -113,11 +115,11 @@ export default function RecipeDetailView({ recipeId }: RecipeDetailViewProps) {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-outline-variant/10">
               <div>
-                <p className="text-xs font-bold text-on-surface-variant tracking-wider uppercase mb-1">Final Product SKU</p>
+                <p className="text-xs font-bold text-on-surface-variant tracking-wider uppercase mb-1">{t('manufacturing.recipeDetail.finalProductSku')}</p>
                 <p className="font-semibold text-on-surface">{finalProduct.sku || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-xs font-bold text-on-surface-variant tracking-wider uppercase mb-1">Current Stock</p>
+                <p className="text-xs font-bold text-on-surface-variant tracking-wider uppercase mb-1">{t('manufacturing.recipeDetail.currentStock')}</p>
                 <p className="font-semibold text-on-surface">{finalProduct.currentStock || 0} {finalProduct.unit}</p>
               </div>
             </div>
@@ -130,7 +132,8 @@ export default function RecipeDetailView({ recipeId }: RecipeDetailViewProps) {
             <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-3xl p-6 shadow-sm">
               <h3 className="text-lg font-bold text-on-surface mb-6 flex items-center gap-2">
                 <Layers className="w-5 h-5 text-primary" />
-                Raw Materials / Ingredients
+                <Layers className="w-5 h-5 text-primary" />
+                {t('manufacturing.recipeDetail.rawMaterials')}
               </h3>
               
               <div className="space-y-4">
@@ -143,7 +146,7 @@ export default function RecipeDetailView({ recipeId }: RecipeDetailViewProps) {
                     <div className="text-right">
                       <p className="font-bold text-primary">{ing.quantityRequired} {ing.productId?.unit}</p>
                       <p className="text-xs text-on-surface-variant mt-1">
-                        Est. Cost: ₹{((ing.productId?.purchasePrice || 0) * ing.quantityRequired).toFixed(2)}
+                        {t('manufacturing.recipeDetail.estCost')}{((ing.productId?.purchasePrice || 0) * ing.quantityRequired).toFixed(2)}
                       </p>
                     </div>
                   </div>
@@ -154,9 +157,9 @@ export default function RecipeDetailView({ recipeId }: RecipeDetailViewProps) {
           
           <div className="space-y-6">
             <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-3xl p-6 shadow-sm">
-              <h3 className="text-lg font-bold text-on-surface mb-4">Production Notes</h3>
+              <h3 className="text-lg font-bold text-on-surface mb-4">{t('manufacturing.recipeDetail.productionNotes')}</h3>
               <div className="text-sm text-on-surface-variant whitespace-pre-wrap">
-                {recipeData.notes || 'No special instructions provided for this recipe.'}
+                {recipeData.notes || t('manufacturing.recipeDetail.noInstructions')}
               </div>
             </div>
           </div>

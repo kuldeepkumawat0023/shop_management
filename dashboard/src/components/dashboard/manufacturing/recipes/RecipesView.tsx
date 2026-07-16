@@ -10,15 +10,20 @@ import { Plus, Download, BookOpen, Activity, Beaker, FileText, Eye, Edit, Trash2
 import Link from 'next/link';
 import { cn } from '@/utils/cn';
 import { recipeService } from '@/lib/services/recipe.services';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 
 export default function RecipesView() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [recipesData, setRecipesData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const tabs = ['All Recipes', 'Active', 'Archived'];
+  const tabs = [t('manufacturing.recipesView.allRecipes'), t('manufacturing.recipesView.active'), t('manufacturing.recipesView.archived')];
   const [activeTab, setActiveTab] = useState('All Recipes');
+  React.useEffect(() => {
+    setActiveTab(t('manufacturing.recipesView.allRecipes'));
+  }, [t]);
 
   useEffect(() => {
     fetchRecipes();
@@ -39,7 +44,7 @@ export default function RecipesView() {
             ingredientsCount: recipe.ingredients?.length || 0,
             baseCost,
             currentStock: recipe.finalProductId?.currentStock || 0,
-            status: 'Active',
+            status: t('manufacturing.recipesView.active'),
             notes: recipe.notes || '',
           };
         }));
@@ -52,17 +57,17 @@ export default function RecipesView() {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this recipe?')) {
+    if (window.confirm(t('manufacturing.recipesView.confirmDelete'))) {
       try {
         const res = await recipeService.deleteRecipe(id);
         if (res.success) {
-          toast.success('Recipe deleted successfully');
+          toast.success(t('manufacturing.recipesView.recipeDeleted'));
           setRecipesData(prev => prev.filter(r => r.id !== id));
         } else {
-          toast.error(res.message || 'Failed to delete recipe');
+          toast.error(res.message || t('manufacturing.recipesView.deleteFailed'));
         }
       } catch (err) {
-        toast.error('Error deleting recipe', { id: 'error-deleting-recipe' });
+        toast.error(t('manufacturing.recipesView.deleteError'), { id: 'error-deleting-recipe' });
       }
     }
   };
@@ -71,27 +76,27 @@ export default function RecipesView() {
     const matchesSearch = r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           r.outputProduct.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           r.id.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesTab = activeTab === 'All Recipes' ? true : r.status === activeTab;
+    const matchesTab = activeTab === t('manufacturing.recipesView.allRecipes') ? true : r.status === activeTab;
     return matchesSearch && matchesTab;
   });
 
   // Dynamic stats
   const totalRecipes = recipesData.length;
-  const activeRecipes = recipesData.filter(r => r.status === 'Active').length;
+  const activeRecipes = recipesData.filter(r => r.status === t('manufacturing.recipesView.active')).length;
   const avgBaseCost = totalRecipes > 0
     ? (recipesData.reduce((sum, r) => sum + r.baseCost, 0) / totalRecipes)
     : 0;
 
   const columns = [
-    { header: 'Recipe ID', accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface font-mono text-xs">{row.id.slice(-6).toUpperCase()}</span> },
-    { header: 'Output Product', accessorKey: 'name', cell: (row: any) => <span className="font-semibold text-primary">{row.name}</span> },
-    { header: 'SKU', accessorKey: 'outputProduct' },
-    { header: 'Ingredients', accessorKey: 'ingredientsCount', cell: (row: any) => `${row.ingredientsCount} Items` },
-    { header: 'Base Cost', accessorKey: 'baseCost', cell: (row: any) => `₹${row.baseCost.toFixed(2)}` },
-    { header: 'Current Stock', accessorKey: 'expectedYield', cell: (row: any) => <span className="font-medium text-on-surface">{row.expectedYield} Units</span> },
-    { header: 'Status', accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
+    { header: t('manufacturing.recipesView.recipeId'), accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface font-mono text-xs">{row.id.slice(-6).toUpperCase()}</span> },
+    { header: t('manufacturing.recipesView.outputProduct'), accessorKey: 'name', cell: (row: any) => <span className="font-semibold text-primary">{row.name}</span> },
+    { header: t('manufacturing.recipesView.sku'), accessorKey: 'outputProduct' },
+    { header: t('manufacturing.recipesView.ingredients'), accessorKey: 'ingredientsCount', cell: (row: any) => `${row.ingredientsCount} {t('manufacturing.recipesView.items')}` },
+    { header: t('manufacturing.recipesView.baseCost'), accessorKey: 'baseCost', cell: (row: any) => `₹${row.baseCost.toFixed(2)}` },
+    { header: t('manufacturing.recipesView.currentStock'), accessorKey: 'expectedYield', cell: (row: any) => <span className="font-medium text-on-surface">{row.expectedYield} {t('manufacturing.recipesView.units')}</span> },
+    { header: t('manufacturing.recipesView.status'), accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
     {
-      header: 'Actions', accessorKey: 'actions', cell: (row: any) => (
+      header: t('manufacturing.recipesView.actions'), accessorKey: 'actions', cell: (row: any) => (
         <div className="flex items-center gap-2">
           <Link href={`/manufacturing/recipes/${row.id}`}>
             <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
@@ -132,18 +137,18 @@ export default function RecipesView() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">Manufacturing Recipes</h2>
-          <p className="text-sm font-medium text-on-surface-variant">Manage formulas, bills of materials (BOM), and expected yields.</p>
+          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">{t('manufacturing.recipesView.manufacturingRecipes')}</h2>
+          <p className="text-sm font-medium text-on-surface-variant">{t('manufacturing.recipesView.manageFormulas')}</p>
         </div>
         <div className="flex gap-3 w-full sm:w-auto">
           <Button variant="outline" className="flex-1 sm:flex-none bg-surface-container-lowest border-primary text-primary px-4 py-2 rounded-lg font-bold hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2 shadow-sm">
             <Download className="w-4 h-4" />
-            Export
+            {t('manufacturing.recipesView.export')}
           </Button>
           <Link href="/manufacturing/recipes/new" className="flex-1 sm:flex-none w-full sm:w-auto">
             <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border-none whitespace-nowrap">
               <Plus className="w-4 h-4 shrink-0" />
-              <span className="truncate">Add Recipe</span>
+              <span className="truncate">{t('manufacturing.recipesView.addRecipe')}</span>
             </Button>
           </Link>
         </div>
@@ -152,31 +157,31 @@ export default function RecipesView() {
       {/* KPI Stats */}
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 shrink-0">
         <StatsCard
-          title="Total Recipes"
+          title={t('manufacturing.recipesView.totalRecipes')}
           value={totalRecipes}
           icon={BookOpen}
-          trendLabel="ALL FORMULAS"
+          trendLabel={t('manufacturing.recipesView.allFormulas')}
           colorTheme="primary"
         />
         <StatsCard
-          title="Active Formulas"
+          title={t('manufacturing.recipesView.activeFormulas')}
           value={activeRecipes}
           icon={Activity}
-          trendLabel={`${totalRecipes > 0 ? Math.round((activeRecipes / totalRecipes) * 100) : 0}% Active Rate`}
+          trendLabel={`${totalRecipes > 0 ? Math.round((activeRecipes / totalRecipes) * 100) : 0}% ${t('manufacturing.recipesView.activeRate')}`}
           colorTheme="success"
         />
         <StatsCard
-          title="Avg Base Cost"
+          title={t('manufacturing.recipesView.avgBaseCost')}
           value={`₹${avgBaseCost.toFixed(2)}`}
           icon={FileText}
-          trendLabel="Per Unit Yield"
+          trendLabel={t('manufacturing.recipesView.perUnitYield')}
           colorTheme="yellow"
         />
         <StatsCard
-          title="Total Ingredients"
+          title={t('manufacturing.recipesView.totalIngredients')}
           value={recipesData.reduce((sum, r) => sum + r.ingredientsCount, 0)}
           icon={Beaker}
-          trendLabel="RAW MATERIALS USED"
+          trendLabel={t('manufacturing.recipesView.rawMaterialsUsed')}
           colorTheme="purple"
         />
       </div>
@@ -186,13 +191,13 @@ export default function RecipesView() {
         <DataTable
           data={filteredData}
           columns={columns}
-          searchPlaceholder="Search recipes by name or ID..."
+          searchPlaceholder={t('manufacturing.recipesView.searchPlaceholder')}
           itemsPerPage={10}
           headerContent={
             <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 mb-2">
               <div className="flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-primary" />
-                <h3 className="text-lg font-bold text-on-surface">Recipe Master List</h3>
+                <h3 className="text-lg font-bold text-on-surface">{t('manufacturing.recipesView.recipeMasterList')}</h3>
               </div>
               {TabsComponent}
             </div>

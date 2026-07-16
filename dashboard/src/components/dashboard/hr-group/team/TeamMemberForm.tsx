@@ -8,9 +8,11 @@ import { cn } from '@/utils/cn';
 import { teamMemberSchema } from '@/utils/validations';
 import toast from 'react-hot-toast';
 import { teamService } from '@/lib/services/team.services';
+import { useTranslation } from 'react-i18next';
 import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 
 export default function TeamMemberForm() {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useParams();
   const id = params?.id as string;
@@ -86,7 +88,7 @@ export default function TeamMemberForm() {
         });
       }
     } catch (error) {
-      toast.error('Failed to load team member data', { id: 'failed-to-load-team-member-dat' });
+      toast.error(t('hr.teamMemberForm.loadError'), { id: 'failed-to-load-team-member-dat' });
     } finally {
       setLoading(false);
     }
@@ -111,11 +113,11 @@ export default function TeamMemberForm() {
         if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
       }
       setErrors(newErrors);
-      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें', { id: 'please-correct-the-errors-----' });
+      return toast.error(t('hr.teamMemberForm.pleaseCorrectErrors'), { id: 'please-correct-the-errors-----' });
     }
 
     setSubmitting(true);
-    const toastId = toast.loading(isEditMode ? 'Updating team member...' : 'Saving team member...');
+    const toastId = toast.loading(isEditMode ? t('hr.teamMemberForm.updatingMember') : t('hr.teamMemberForm.savingMember'));
     
     try {
       const apiPayload = {
@@ -137,14 +139,14 @@ export default function TeamMemberForm() {
 
       if (isEditMode) {
         await teamService.updateStaff(id, apiPayload);
-        toast.success('Team member updated successfully!', { id: toastId });
+        toast.success(t('hr.teamMemberForm.memberUpdated'), { id: toastId });
       } else {
         await teamService.addStaff(apiPayload);
-        toast.success('Team member added successfully!', { id: toastId });
+        toast.success(t('hr.teamMemberForm.memberAdded'), { id: toastId });
       }
       router.back();
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Failed to save team member', { id: toastId });
+      toast.error(err?.response?.data?.message || t('hr.teamMemberForm.failedToSave'), { id: toastId });
     } finally {
       setSubmitting(false);
     }
@@ -162,10 +164,10 @@ export default function TeamMemberForm() {
           </Button>
           <div>
             <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">
-              {isEditMode ? 'Edit Team Member / टीम सदस्य संपादित करें' : 'Add Team Member / टीम सदस्य जोड़ें'}
+              {isEditMode ? t('hr.teamMemberForm.editMember') : t('hr.teamMemberForm.addMember')}
             </h1>
             <p className="text-sm text-on-surface-variant mt-1 font-medium">
-              {isEditMode ? 'Update employee details and job information' : 'Onboard a new employee to your organization'}
+              {isEditMode ? t('hr.teamMemberForm.updateDetailsMsg') : t('hr.teamMemberForm.onboardMsg')}
             </p>
           </div>
         </div>
@@ -178,12 +180,12 @@ export default function TeamMemberForm() {
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
             <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
               <User className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">Personal Information / व्यक्तिगत जानकारी</h2>
+              <h2 className="text-lg font-bold text-on-surface">{t('hr.teamMemberForm.personalInfo')}</h2>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1.5 w-full col-span-1 sm:col-span-2">
-                <label className="text-sm font-bold text-on-surface">Full Name / पूरा नाम <span className="text-error ml-1">*</span></label>
+                <label className="text-sm font-bold text-on-surface">{t('hr.teamMemberForm.fullName')} <span className="text-error ml-1">*</span></label>
                 <input
                   name="name"
                   value={formData.name}
@@ -200,7 +202,7 @@ export default function TeamMemberForm() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Email Address / ईमेल पता</label>
+                <label className="text-sm font-bold text-on-surface">{t('hr.teamMemberForm.email')}</label>
                 <input
                   type="email"
                   name="email"
@@ -211,7 +213,7 @@ export default function TeamMemberForm() {
                 />
               </div>
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Phone Number / फ़ोन नंबर</label>
+                <label className="text-sm font-bold text-on-surface">{t('hr.teamMemberForm.phoneNumber')}</label>
                 <input
                   type="tel"
                   name="phone"
@@ -225,7 +227,7 @@ export default function TeamMemberForm() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Date of Birth / जन्म तिथि</label>
+                <label className="text-sm font-bold text-on-surface">{t('hr.teamMemberForm.dob')}</label>
                 <input
                   type="date"
                   name="dob"
@@ -240,12 +242,12 @@ export default function TeamMemberForm() {
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
             <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
               <PhoneCall className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">Emergency Contact / आपातकालीन संपर्क</h2>
+              <h2 className="text-lg font-bold text-on-surface">{t('hr.teamMemberForm.emergencyContact')}</h2>
             </div>
             
             <div className="flex flex-col gap-5">
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Contact Name / संपर्क नाम</label>
+                <label className="text-sm font-bold text-on-surface">{t('hr.teamMemberForm.contactName')}</label>
                 <input
                   name="emergencyName"
                   value={formData.emergencyName}
@@ -256,7 +258,7 @@ export default function TeamMemberForm() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Relationship / संबंध</label>
+                  <label className="text-sm font-bold text-on-surface">{t('hr.teamMemberForm.relation')}</label>
                   <input
                     name="emergencyRelation"
                     value={formData.emergencyRelation}
@@ -266,7 +268,7 @@ export default function TeamMemberForm() {
                   />
                 </div>
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Contact Phone / संपर्क फ़ोन</label>
+                  <label className="text-sm font-bold text-on-surface">{t('hr.teamMemberForm.contactPhone')}</label>
                   <input
                     type="tel"
                     name="emergencyPhone"
@@ -286,13 +288,13 @@ export default function TeamMemberForm() {
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
             <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
               <Briefcase className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">Job Details / नौकरी का विवरण</h2>
+              <h2 className="text-lg font-bold text-on-surface">{t('hr.teamMemberForm.jobDetails')}</h2>
             </div>
             
             <div className="flex flex-col gap-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Role / Designation / पद <span className="text-error ml-1">*</span></label>
+                  <label className="text-sm font-bold text-on-surface">{t('hr.teamMemberForm.roleDesignation')} <span className="text-error ml-1">*</span></label>
                   <select 
                     name="position"
                     value={formData.position}
@@ -302,7 +304,7 @@ export default function TeamMemberForm() {
                       errors.position ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
                     )}
                   >
-                    <option value="">Select role...</option>
+                    <option value="">{t('hr.teamMemberForm.selectRole')}</option>
                     <option value="Store Manager">Store Manager</option>
                     <option value="Sales Executive">Sales Executive</option>
                     <option value="Cashier">Cashier</option>
@@ -313,14 +315,14 @@ export default function TeamMemberForm() {
                 </div>
                 
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Department / विभाग</label>
+                  <label className="text-sm font-bold text-on-surface">{t('hr.teamMemberForm.department')}</label>
                   <select 
                     name="department"
                     value={formData.department}
                     onChange={handleInputChange}
                     className="flex w-full h-10 rounded-xl bg-surface border border-outline-variant/30 px-3 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all appearance-none"
                   >
-                    <option value="">Select department...</option>
+                    <option value="">{t('hr.teamMemberForm.selectDepartment')}</option>
                     <option value="Management">Management</option>
                     <option value="Sales">Sales</option>
                     <option value="Finance">Finance</option>
@@ -332,7 +334,7 @@ export default function TeamMemberForm() {
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Joining Date / कार्यभार ग्रहण तिथि <span className="text-error ml-1">*</span></label>
+                  <label className="text-sm font-bold text-on-surface">{t('hr.teamMemberForm.joiningDate')} <span className="text-error ml-1">*</span></label>
                   <input
                     type="date"
                     name="joinDate"
@@ -347,7 +349,7 @@ export default function TeamMemberForm() {
                 </div>
                 
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Base Salary (₹) / मूल वेतन <span className="text-error ml-1">*</span></label>
+                  <label className="text-sm font-bold text-on-surface">{t('hr.teamMemberForm.baseSalary')} <span className="text-error ml-1">*</span></label>
                   <input
                     type="number"
                     name="salary"
@@ -365,16 +367,16 @@ export default function TeamMemberForm() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Employee Status / कर्मचारी की स्थिति</label>
+                  <label className="text-sm font-bold text-on-surface">{t('hr.teamMemberForm.employeeStatus')}</label>
                   <select 
                     name="status"
                     value={formData.status}
                     onChange={handleInputChange}
                     className="flex w-full h-10 rounded-xl bg-surface border border-outline-variant/30 px-3 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all appearance-none"
                   >
-                    <option value="Active">Active</option>
-                    <option value="On Leave">On Leave</option>
-                    <option value="Inactive">Inactive</option>
+                    <option value="Active">{t('hr.teamMemberForm.active')}</option>
+                    <option value="On Leave">{t('hr.teamMemberForm.onLeave')}</option>
+                    <option value="Inactive">{t('hr.teamMemberForm.inactive')}</option>
                   </select>
                 </div>
             </div>
@@ -394,7 +396,7 @@ export default function TeamMemberForm() {
           </Button>
           <Button type="submit" disabled={submitting} className="w-full sm:w-auto gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
             <Save className="w-4 h-4" />
-            <span className="font-bold tracking-wide">{submitting ? 'Saving...' : 'Save Member'}</span>
+            <span className="font-bold tracking-wide">{submitting ? t('hr.teamMemberForm.saving') : t('hr.teamMemberForm.saveMember')}</span>
           </Button>
         </div>
       </div>

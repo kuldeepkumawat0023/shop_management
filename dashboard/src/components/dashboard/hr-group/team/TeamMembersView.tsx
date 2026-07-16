@@ -9,6 +9,7 @@ import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import { Plus, Download, Filter, Search, Users, UserCheck, CalendarOff, UserPlus, Eye, Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { teamService, StaffData } from '@/lib/services/team.services';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { cn } from '@/utils/cn';
 
@@ -47,6 +48,7 @@ const getGradient = (id?: string) => {
 };
 
 export default function TeamMembersView() {
+  const { t } = useTranslation();
   const [staffList, setStaffList] = useState<StaffData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -59,7 +61,7 @@ export default function TeamMembersView() {
         setStaffList(res.data);
       }
     } catch (error) {
-      toast.error('Failed to load team members', { id: 'failed-to-load-team-members' });
+      toast.error(t('hr.teamMembersView.loadError'), { id: 'failed-to-load-team-members' });
     } finally {
       setLoading(false);
     }
@@ -70,17 +72,17 @@ export default function TeamMembersView() {
   }, []);
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to remove this staff member?')) {
+    if (confirm(t('hr.teamMembersView.confirmDelete'))) {
       try {
         const res = await teamService.deleteStaff(id);
         if (res.success) {
-          toast.success('Staff member removed successfully');
+          toast.success(t('hr.teamMembersView.memberDeleted'));
           fetchStaff();
         } else {
-          toast.error(res.message || 'Failed to remove staff member');
+          toast.error(res.message || t('hr.teamMembersView.deleteFailed'));
         }
       } catch (error) {
-        toast.error('Failed to remove staff member', { id: 'failed-to-remove-staff-member' });
+        toast.error(t('hr.teamMembersView.deleteFailed'), { id: 'failed-to-remove-staff-member' });
       }
     }
   };
@@ -92,7 +94,7 @@ export default function TeamMembersView() {
   );
 
   const columns = [
-    { header: 'Profile', accessorKey: 'profile', cell: (row: any) => (
+    { header: t('hr.teamMembersView.profile'), accessorKey: 'profile', cell: (row: any) => (
       <div className="flex items-center gap-3">
         <div className={cn(
           "w-10 h-10 rounded-full flex items-center justify-center font-black text-xs uppercase shrink-0 bg-gradient-to-br text-white",
@@ -102,17 +104,17 @@ export default function TeamMembersView() {
         </div>
         <div className="flex flex-col">
           <span className="font-bold text-on-surface truncate max-w-[150px] sm:max-w-xs">{row.name || '—'}</span>
-          <span className="text-xs font-semibold text-on-surface-variant truncate max-w-[150px] sm:max-w-xs">{row.userId?.email || 'No email linked'}</span>
+          <span className="text-xs font-semibold text-on-surface-variant truncate max-w-[150px] sm:max-w-xs">{row.userId?.email || t('hr.teamMembersView.noEmail')}</span>
         </div>
       </div>
     )},
-    { header: 'Role', accessorKey: 'role', cell: (row: any) => (
+    { header: t('hr.teamMembersView.role'), accessorKey: 'role', cell: (row: any) => (
       <span className="text-sm font-medium text-on-surface">{row.role}</span>
     )},
-    { header: 'Phone', accessorKey: 'phone', cell: (row: any) => <span className="text-sm font-medium text-on-surface">{row.mobile || 'N/A'}</span> },
-    { header: 'Join Date', accessorKey: 'joinDate', cell: (row: any) => <span className="text-sm text-on-surface-variant">{formatDate(row.joiningDate)}</span> },
-    { header: 'Status', accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.isActive !== false ? 'Active' : 'Inactive'} /> },
-    { header: 'Actions', accessorKey: 'actions', cell: (row: any) => (
+    { header: t('hr.teamMembersView.phone'), accessorKey: 'phone', cell: (row: any) => <span className="text-sm font-medium text-on-surface">{row.mobile || 'N/A'}</span> },
+    { header: t('hr.teamMembersView.joinDate'), accessorKey: 'joinDate', cell: (row: any) => <span className="text-sm text-on-surface-variant">{formatDate(row.joiningDate)}</span> },
+    { header: t('hr.teamMembersView.status'), accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.isActive !== false ? t('hr.teamMembersView.active') : t('hr.teamMembersView.inactive')} /> },
+    { header: t('hr.teamMembersView.actions'), accessorKey: 'actions', cell: (row: any) => (
       <div className="flex items-center gap-2">
         <Link href={`/team/${row._id}`}>
           <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
@@ -144,10 +146,10 @@ export default function TeamMembersView() {
   }).length;
 
   const teamKPIs = [
-    { title: "Total Employees", value: totalEmployees.toString(), trend: "Registered staff", isPositive: true, icon: Users },
-    { title: "Active Staff", value: activeStaff.toString(), trend: "Currently working", isPositive: true, icon: UserCheck },
-    { title: "On Leave", value: onLeave.toString(), trend: "Coming soon", isPositive: false, icon: CalendarOff },
-    { title: "New Hires", value: newHires.toString(), trend: "In last 30 days", isPositive: true, icon: UserPlus },
+    { title: t('hr.teamMembersView.totalEmployees'), value: totalEmployees.toString(), trend: t('hr.teamMembersView.registeredStaff'), isPositive: true, icon: Users },
+    { title: t('hr.teamMembersView.activeStaff'), value: activeStaff.toString(), trend: t('hr.teamMembersView.currentlyWorking'), isPositive: true, icon: UserCheck },
+    { title: t('hr.teamMembersView.onLeave'), value: onLeave.toString(), trend: t('hr.teamMembersView.comingSoon'), isPositive: false, icon: CalendarOff },
+    { title: t('hr.teamMembersView.newHires'), value: newHires.toString(), trend: t('hr.teamMembersView.inLast30Days'), isPositive: true, icon: UserPlus },
   ];
 
   if (loading) return <ViewPageSkeleton />;
@@ -157,18 +159,18 @@ export default function TeamMembersView() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
         <div>
-          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">Team Members</h2>
-          <p className="text-sm font-medium text-on-surface-variant">Manage your employees, roles, and HR details.</p>
+          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">{t('hr.teamMembersView.teamMembers')}</h2>
+          <p className="text-sm font-medium text-on-surface-variant">{t('hr.teamMembersView.manageEmployees')}</p>
         </div>
         <div className="flex gap-3 w-full md:w-auto">
           <Button variant="outline" className="flex-1 md:flex-none bg-surface-container-lowest border-primary text-primary px-4 py-2 rounded-lg font-bold hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2 shadow-sm">
             <Download className="w-4 h-4" />
-            Export
+            {t('hr.teamMembersView.export')}
           </Button>
           <Link href="/team/new" className="flex-1 md:flex-none">
             <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 border-none">
               <Plus className="w-4 h-4" />
-              Add Member
+              {t('hr.teamMembersView.addMember')}
             </Button>
           </Link>
         </div>
@@ -191,13 +193,13 @@ export default function TeamMembersView() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by name, role, or phone..."
+              placeholder={t('hr.teamMembersView.searchPlaceholder')}
               className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface border border-outline-variant/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm font-medium transition-all text-on-surface placeholder:text-on-surface-variant/50"
             />
           </div>
           <Button variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface bg-surface font-semibold gap-2">
             <Filter className="w-4 h-4" />
-            Filters
+            {t('hr.teamMembersView.filters')}
           </Button>
         </div>
 
