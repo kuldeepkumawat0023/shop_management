@@ -15,7 +15,6 @@ export default function ProfitReportView() {
     { title: t('finance.profitReportView.netProfit'), value: "₹1,70,000", trend: t('finance.profitReportView.vsLastMonth'), isPositive: true, icon: IndianRupee },
     { title: t('finance.profitReportView.profitMargin'), value: "37.7%", trend: t('finance.profitReportView.healthy'), isPositive: true, icon: Activity },
   ];
-  const { t } = useTranslation();
   return (
     <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full ">
       {/* Page Header */}

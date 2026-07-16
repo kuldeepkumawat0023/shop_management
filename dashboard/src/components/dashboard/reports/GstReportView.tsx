@@ -23,7 +23,6 @@ export default function GstReportView() {
     { title: t('finance.gstReportView.totalItc'), value: "₹12,400", trend: t('finance.gstReportView.paidOnPurchases'), isPositive: true, icon: ArrowDownRight },
     { title: t('finance.gstReportView.netGstPayable'), value: "₹32,800", trend: t('finance.gstReportView.outputMinusItc'), isPositive: false, icon: Calculator },
   ];
-  const { t } = useTranslation();
   const columns = [
     { header: t('finance.gstReportView.date'), accessorKey: 'date', cell: (row: any) => <span className="text-sm font-medium text-on-surface-variant">{row.date}</span> },
     { header: t('finance.gstReportView.docNo'), accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id}</span> },

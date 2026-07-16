@@ -47,7 +47,7 @@ export const saleService = {
    * Get sale by ID
    * GET /sales/get/:id
    */
-  getSaleById: async (id: string): Promise<ApiResponse<SaleData>> => {
+  getSaleById: async (id: string): Promise<ApiResponse<any>> => {
     const response = await apiClient.get(`/sales/get/${id}`);
     return response.data;
   },

@@ -1520,5 +1520,99 @@
       "totalExpensesC": "कुल व्यय (C)",
       "netProfitMsg": "सकल लाभ - कुल व्यय"
     }
+  },
+  "settings": {
+    "storeProfile": {
+      "title": "स्टोर प्रोफ़ाइल",
+      "description": "अपने व्यवसाय के विवरण और लोगो को अपडेट करें।",
+      "saveChanges": "परिवर्तन सहेजें",
+      "storeLogo": "स्टोर लोगो",
+      "logoRecommendedSize": "अनुशंसित आकार: 512x512px (PNG, JPG)",
+      "uploadLogo": "लोगो अपलोड करें",
+      "storeName": "स्टोर का नाम",
+      "tagline": "टैगलाइन / स्लोगन",
+      "contactEmail": "संपर्क ईमेल",
+      "phoneNumber": "फ़ोन नंबर",
+      "storeAddress": "स्टोर का पता"
+    },
+    "userProfile": {
+      "title": "उपयोगकर्ता प्रोफ़ाइल",
+      "description": "अपने व्यक्तिगत खाता विवरण अपडेट करें।",
+      "saveChanges": "परिवर्तन सहेजें",
+      "adminUser": "एडमिन उपयोगकर्ता",
+      "administrator": "प्रशासक (एडमिनिस्ट्रेटर)",
+      "changePhoto": "फ़ोटो बदलें",
+      "fullName": "पूरा नाम",
+      "emailAddress": "ईमेल पता",
+      "phoneNumber": "फ़ोन नंबर",
+      "role": "भूमिका"
+    },
+    "rolesPermissions": {
+      "title": "भूमिकाएँ और अनुमतियाँ",
+      "description": "प्रबंधित करें कि प्रत्येक भूमिका क्या एक्सेस कर सकती है और क्या कर सकती है।",
+      "saveChanges": "परिवर्तन सहेजें",
+      "selectRoleToEdit": "संपादित करने के लिए भूमिका चुनें",
+      "roles": {
+        "admin": "प्रशासक (पूर्ण एक्सेस)",
+        "manager": "स्टोर प्रबंधक",
+        "cashier": "कैशियर",
+        "staff": "सामान्य कर्मचारी"
+      },
+      "columns": {
+        "module": "मॉड्यूल",
+        "viewRead": "देखें / पढ़ें",
+        "createEdit": "बनाएं / संपादित करें",
+        "delete": "हटाएं"
+      },
+      "modules": {
+        "dashboard": "डैशबोर्ड",
+        "inventory": "इन्वेंटरी",
+        "salesPos": "बिक्री और पीओएस",
+        "purchases": "खरीद",
+        "reports": "रिपोर्ट",
+        "settings": "सेटिंग्स"
+      }
+    },
+    "preferences": {
+      "title": "प्राथमिकताएं",
+      "description": "एप्लिकेशन आपके लिए कैसे काम करता है, इसे कस्टमाइज़ करें।",
+      "saveChanges": "परिवर्तन सहेजें",
+      "currency": "मुद्रा",
+      "currencies": {
+        "inr": "₹ भारतीय रुपया (INR)",
+        "usd": "$ अमेरिकी डॉलर (USD)",
+        "eur": "€ यूरो (EUR)"
+      },
+      "timezone": "समय क्षेत्र (टाइमज़ोन)",
+      "timezones": {
+        "ist": "(GMT+05:30) चेन्नई, कोलकाता, मुंबई, नई दिल्ली",
+        "utc": "(UTC) समन्वित सार्वभौमिक समय"
+      },
+      "defaultReceiptFormat": "डिफ़ॉल्ट रसीद प्रिंटर प्रारूप",
+      "receiptFormats": {
+        "a4": "A4 आकार (PDF)",
+        "thermal80": "थर्मल 80 मिमी",
+        "thermal58": "थर्मल 58 मिमी"
+      },
+      "enableEmailNotifications": "ईमेल सूचनाएं सक्षम करें"
+    },
+    "taxBilling": {
+      "title": "टैक्स और बिलिंग",
+      "description": "जीएसटी सेटिंग्स और चालान प्रारूप कॉन्फ़िगर करें।",
+      "saveChanges": "परिवर्तन सहेजें",
+      "gstinNumber": "GSTIN नंबर",
+      "defaultGstRate": "डिफ़ॉल्ट जीएसटी दर (%)",
+      "gstRates": {
+        "exempt": "0% (छूट)",
+        "gst5": "5%",
+        "gst12": "12%",
+        "gst18": "18%",
+        "gst28": "28%"
+      },
+      "invoicePrefix": "चालान (इनवॉइस) उपसर्ग",
+      "nextInvoiceSequence": "अगला चालान क्रम",
+      "invoiceTerms": "चालान नियम और शर्तें",
+      "defaultTerms": "1. एक बार बेचा गया माल वापस नहीं लिया जाएगा।\\n2. स्थानीय अधिकार क्षेत्र के अधीन।\\n3. 30 दिनों के भीतर भुगतान न करने पर 18% प्रति वर्ष की दर से ब्याज लिया जाएगा।"
+    }
   }
 }

@@ -26,7 +26,6 @@ export default function PaymentsView() {
     { title: t('finance.paymentsView.pendingReceivables'), value: "₹45,000", trend: t('finance.paymentsView.toCollect'), isPositive: true, icon: Clock },
     { title: t('finance.paymentsView.pendingPayables'), value: "₹12,000", trend: t('finance.paymentsView.toPay'), isPositive: false, icon: AlertCircle },
   ];
-  const { t } = useTranslation();
   const columns = [
     { header: t('finance.paymentsView.date'), accessorKey: 'date', cell: (row: any) => <span className="text-sm font-medium text-on-surface-variant">{row.date}</span> },
     { header: t('finance.paymentsView.refId'), accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id}</span> },

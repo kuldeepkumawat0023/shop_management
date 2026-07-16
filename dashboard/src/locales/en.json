@@ -1520,5 +1520,99 @@
       "totalExpensesC": "Total Expenses (C)",
       "netProfitMsg": "Gross Profit - Total Expenses"
     }
+  },
+  "settings": {
+    "storeProfile": {
+      "title": "Store Profile",
+      "description": "Update your business details and logo.",
+      "saveChanges": "Save Changes",
+      "storeLogo": "Store Logo",
+      "logoRecommendedSize": "Recommended size: 512x512px (PNG, JPG)",
+      "uploadLogo": "Upload Logo",
+      "storeName": "Store Name",
+      "tagline": "Tagline / Slogan",
+      "contactEmail": "Contact Email",
+      "phoneNumber": "Phone Number",
+      "storeAddress": "Store Address"
+    },
+    "userProfile": {
+      "title": "User Profile",
+      "description": "Update your personal account details.",
+      "saveChanges": "Save Changes",
+      "adminUser": "Admin User",
+      "administrator": "Administrator",
+      "changePhoto": "Change Photo",
+      "fullName": "Full Name",
+      "emailAddress": "Email Address",
+      "phoneNumber": "Phone Number",
+      "role": "Role"
+    },
+    "rolesPermissions": {
+      "title": "Roles & Permissions",
+      "description": "Manage what each role can access and do.",
+      "saveChanges": "Save Changes",
+      "selectRoleToEdit": "Select Role to Edit",
+      "roles": {
+        "admin": "Administrator (Full Access)",
+        "manager": "Store Manager",
+        "cashier": "Cashier",
+        "staff": "General Staff"
+      },
+      "columns": {
+        "module": "Module",
+        "viewRead": "View / Read",
+        "createEdit": "Create / Edit",
+        "delete": "Delete"
+      },
+      "modules": {
+        "dashboard": "Dashboard",
+        "inventory": "Inventory",
+        "salesPos": "Sales & POS",
+        "purchases": "Purchases",
+        "reports": "Reports",
+        "settings": "Settings"
+      }
+    },
+    "preferences": {
+      "title": "Preferences",
+      "description": "Customize how the application behaves for you.",
+      "saveChanges": "Save Changes",
+      "currency": "Currency",
+      "currencies": {
+        "inr": "₹ Indian Rupee (INR)",
+        "usd": "$ US Dollar (USD)",
+        "eur": "€ Euro (EUR)"
+      },
+      "timezone": "Timezone",
+      "timezones": {
+        "ist": "(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi",
+        "utc": "(UTC) Coordinated Universal Time"
+      },
+      "defaultReceiptFormat": "Default Receipt Printer Format",
+      "receiptFormats": {
+        "a4": "A4 Size (PDF)",
+        "thermal80": "Thermal 80mm",
+        "thermal58": "Thermal 58mm"
+      },
+      "enableEmailNotifications": "Enable Email Notifications"
+    },
+    "taxBilling": {
+      "title": "Tax & Billing",
+      "description": "Configure GST settings and invoice formats.",
+      "saveChanges": "Save Changes",
+      "gstinNumber": "GSTIN Number",
+      "defaultGstRate": "Default GST Rate (%)",
+      "gstRates": {
+        "exempt": "0% (Exempt)",
+        "gst5": "5%",
+        "gst12": "12%",
+        "gst18": "18%",
+        "gst28": "28%"
+      },
+      "invoicePrefix": "Invoice Prefix",
+      "nextInvoiceSequence": "Next Invoice Sequence",
+      "invoiceTerms": "Invoice Terms & Conditions",
+      "defaultTerms": "1. Goods once sold will not be taken back.\\n2. Subject to local jurisdiction.\\n3. Interest @18% p.a. will be charged if not paid within 30 days."
+    }
   }
 }
