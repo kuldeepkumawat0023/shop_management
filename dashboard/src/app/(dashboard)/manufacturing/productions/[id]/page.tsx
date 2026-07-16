@@ -1,5 +1,6 @@
 import ProductionDetailView from '@/components/dashboard/manufacturing/productions/ProductionDetailView';
 
-export default function ProductionDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  return <ProductionDetailView productionId={params.id} />;
+export default async function ProductionDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  return <ProductionDetailView productionId={resolvedParams.id} />;
 }
