@@ -9,16 +9,18 @@ import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import { Plus, Download, Receipt, Users, Banknote, FileText, ChevronRight, Eye, Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { saleService } from '@/lib/services/sale.services';
-
-// Dynamic KPIs will be calculated
-const initialKPIs = [
-  { title: "Total Revenue", value: "₹0", trend: "-", isPositive: true, icon: Banknote },
-  { title: "Total Invoices", value: "0", trend: "-", isPositive: true, icon: Receipt },
-  { title: "Pending Payments", value: "₹0", trend: "0 invoices", isPositive: false, icon: FileText },
-  { title: "Avg Order Value", value: "₹0", trend: "-", isPositive: true, icon: Users },
-];
+import { useTranslation } from 'react-i18next';
 
 export default function SalesHistoryView() {
+  const { t } = useTranslation();
+
+  // Dynamic KPIs will be calculated
+  const initialKPIs = [
+    { title: t('sales.salesHistory.totalRevenue'), value: "₹0", trend: "-", isPositive: true, icon: Banknote },
+    { title: t('sales.salesHistory.totalInvoices'), value: "0", trend: "-", isPositive: true, icon: Receipt },
+    { title: t('sales.salesHistory.pendingPayments'), value: "₹0", trend: "0 invoices", isPositive: false, icon: FileText },
+    { title: t('sales.salesHistory.avgOrderValue'), value: "₹0", trend: "-", isPositive: true, icon: Users },
+  ];
   const [searchQuery, setSearchQuery] = useState('');
   const [salesList, setSalesList] = useState<any[]>([]);
   const [kpis, setKpis] = useState(initialKPIs);
@@ -32,7 +34,7 @@ export default function SalesHistoryView() {
           const mapped = response.data.map((s: any) => ({
             id: s.invoiceNumber,
             date: new Date(s.saleDate).toLocaleDateString(),
-            customer: s.customerId?.name || 'Walk-in Customer',
+            customer: s.customerId?.name || t('sales.salesHistory.walkInCustomer'),
             status: s.paymentStatus,
             amount: s.netAmount,
             items: '-', // Not available directly in sale model unless populated/joined
@@ -47,14 +49,14 @@ export default function SalesHistoryView() {
           const avgOrderValue = response.data.length ? totalRevenue / response.data.length : 0;
 
           setKpis([
-            { title: "Total Revenue", value: `₹${totalRevenue.toLocaleString()}`, trend: "Overall", isPositive: true, icon: Banknote },
-            { title: "Total Invoices", value: `${response.data.length}`, trend: "All time", isPositive: true, icon: Receipt },
-            { title: "Pending Payments", value: `₹${pendingAmount.toLocaleString()}`, trend: `From ${pendingSales.length} invoices`, isPositive: false, icon: FileText },
-            { title: "Avg Order Value", value: `₹${Math.round(avgOrderValue).toLocaleString()}`, trend: "Per invoice", isPositive: true, icon: Users },
+            { title: t('sales.salesHistory.totalRevenue'), value: `₹${totalRevenue.toLocaleString()}`, trend: t('sales.salesHistory.overall'), isPositive: true, icon: Banknote },
+            { title: t('sales.salesHistory.totalInvoices'), value: `${response.data.length}`, trend: t('sales.salesHistory.allTime'), isPositive: true, icon: Receipt },
+            { title: t('sales.salesHistory.pendingPayments'), value: `₹${pendingAmount.toLocaleString()}`, trend: t('sales.salesHistory.fromInvoices').replace('{{count}}', pendingSales.length.toString()), isPositive: false, icon: FileText },
+            { title: t('sales.salesHistory.avgOrderValue'), value: `₹${Math.round(avgOrderValue).toLocaleString()}`, trend: t('sales.salesHistory.perInvoice'), isPositive: true, icon: Users },
           ]);
         }
       } catch (error) {
-        console.error('Failed to fetch sales', error);
+        console.error(t('sales.salesHistory.failedToFetch'), error);
       } finally {
         setLoading(false);
       }
@@ -70,13 +72,13 @@ export default function SalesHistoryView() {
   if (loading) return <ViewPageSkeleton />;
 
   const columns = [
-    { header: 'Invoice No.', accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id}</span> },
-    { header: 'Date', accessorKey: 'date' },
-    { header: 'Customer', accessorKey: 'customer', cell: (row: any) => <span className="font-semibold text-primary">{row.customer}</span> },
-    { header: 'Items', accessorKey: 'items', cell: (row: any) => `${row.items} Items` },
-    { header: 'Total Amount', accessorKey: 'amount', cell: (row: any) => <span className="font-bold">₹{row.amount.toLocaleString()}</span> },
-    { header: 'Payment Status', accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
-    { header: 'Actions', accessorKey: 'actions', cell: (row: any) => (
+    { header: t('sales.salesHistory.invoiceNo'), accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id}</span> },
+    { header: t('sales.salesHistory.date'), accessorKey: 'date' },
+    { header: t('sales.salesHistory.customer'), accessorKey: 'customer', cell: (row: any) => <span className="font-semibold text-primary">{row.customer}</span> },
+    { header: t('sales.salesHistory.items'), accessorKey: 'items', cell: (row: any) => `${row.items} ${t('sales.salesHistory.items')}` },
+    { header: t('sales.salesHistory.totalAmount'), accessorKey: 'amount', cell: (row: any) => <span className="font-bold">₹{row.amount.toLocaleString()}</span> },
+    { header: t('sales.salesHistory.paymentStatus'), accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
+    { header: t('sales.salesHistory.actions'), accessorKey: 'actions', cell: (row: any) => (
       <div className="flex items-center gap-2">
         <Link href={`/sales/${row._id}`}>
           <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
@@ -98,18 +100,18 @@ export default function SalesHistoryView() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
         <div>
-          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">Sales History</h2>
-          <p className="text-sm font-medium text-on-surface-variant">View all invoices, track payments, and manage customer orders.</p>
+          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">{t('sales.salesHistory.salesHistoryTitle')}</h2>
+          <p className="text-sm font-medium text-on-surface-variant">{t('sales.salesHistory.salesHistoryDesc')}</p>
         </div>
         <div className="flex gap-3 w-full md:w-auto">
           <Button variant="outline" className="flex-1 md:flex-none bg-surface-container-lowest border-primary text-primary px-4 py-2 rounded-lg font-bold hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2 shadow-sm">
             <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Export</span>
+            <span className="hidden sm:inline">{t('sales.salesHistory.export')}</span>
           </Button>
           <Link href="/pos" className="flex-1 md:flex-none">
             <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border-none whitespace-nowrap">
               <Plus className="w-4 h-4 shrink-0" />
-              <span className="truncate">New Sale</span>
+              <span className="truncate">{t('sales.salesHistory.newSale')}</span>
             </Button>
           </Link>
         </div>
@@ -127,12 +129,12 @@ export default function SalesHistoryView() {
         <DataTable 
           data={filteredData}
           columns={columns}
-          searchPlaceholder="Search by invoice no. or customer..."
+          searchPlaceholder={t('sales.salesHistory.searchPlaceholder')}
           itemsPerPage={10}
           headerContent={
             <div className="flex items-center gap-2">
               <Receipt className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-bold text-on-surface">All Invoices</h3>
+              <h3 className="text-lg font-bold text-on-surface">{t('sales.salesHistory.allInvoices')}</h3>
             </div>
           }
           className="border-none shadow-none"

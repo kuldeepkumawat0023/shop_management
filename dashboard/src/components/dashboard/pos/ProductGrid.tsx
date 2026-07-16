@@ -6,9 +6,11 @@ import { Package, Plus } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
 import { usePOS } from '@/contexts/POSContext';
+import { useTranslation } from 'react-i18next';
 
 export default function ProductGrid() {
   const { products, loadingProducts, addToCart, searchQuery, selectedCategory } = usePOS();
+  const { t } = useTranslation();
 
   const filteredProducts = products.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -18,11 +20,11 @@ export default function ProductGrid() {
   });
 
   if (loadingProducts) {
-    return <div className="h-full flex items-center justify-center text-on-surface-variant font-medium">Loading products...</div>;
+    return <div className="h-full flex items-center justify-center text-on-surface-variant font-medium">{t('pos.productGrid.loadingProducts')}</div>;
   }
 
   if (filteredProducts.length === 0) {
-    return <div className="h-full flex items-center justify-center text-on-surface-variant font-medium">No products found.</div>;
+    return <div className="h-full flex items-center justify-center text-on-surface-variant font-medium">{t('pos.productGrid.noProducts')}</div>;
   }
 
   return (
@@ -58,7 +60,7 @@ export default function ProductGrid() {
                 {/* Discount Badge on Image (Optional visual flair) */}
                 {hasDiscount && product.mrp && !isOutOfStock && (
                   <div className="absolute top-2 right-2 bg-error text-white text-[9px] font-black px-1.5 py-0.5 rounded-sm shadow-sm">
-                    {Math.round(((product.mrp - product.sellingPrice) / product.mrp) * 100)}% OFF
+                    {Math.round(((product.mrp - product.sellingPrice) / product.mrp) * 100)}% {t('pos.productGrid.off')}
                   </div>
                 )}
               </div>
@@ -88,7 +90,7 @@ export default function ProductGrid() {
                         ? "bg-warning/10 text-warning-dark"
                         : "bg-surface-container-high text-on-surface-variant"
                   )}>
-                    {isOutOfStock ? 'Empty' : `${product.currentStock} In Stock`}
+                    {isOutOfStock ? t('pos.productGrid.empty') : `${product.currentStock} ${t('pos.productGrid.inStock')}`}
                   </span>
                 </div>
               </div>

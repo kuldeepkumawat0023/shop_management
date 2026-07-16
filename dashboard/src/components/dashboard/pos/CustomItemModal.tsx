@@ -5,6 +5,7 @@ import { X, PackagePlus } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
 import { usePOS } from '@/contexts/POSContext';
+import { useTranslation } from 'react-i18next';
 
 interface CustomItemModalProps {
   onClose: () => void;
@@ -12,6 +13,7 @@ interface CustomItemModalProps {
 
 export default function CustomItemModal({ onClose }: CustomItemModalProps) {
   const { setCart } = usePOS();
+  const { t } = useTranslation();
   
   const [formData, setFormData] = useState({
     name: '',
@@ -30,7 +32,7 @@ export default function CustomItemModal({ onClose }: CustomItemModalProps) {
 
     const customProduct = {
       productId: `CUSTOM-${Date.now()}`,
-      name: formData.name + ' (Custom)',
+      name: formData.name + t('pos.customItemModal.customSuffix'),
       sellingPrice: price,
       quantity: qty,
       stock: 999999 // Unlimited stock for custom items
@@ -50,7 +52,7 @@ export default function CustomItemModal({ onClose }: CustomItemModalProps) {
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
               <PackagePlus className="w-4 h-4" />
             </div>
-            <h2 className="text-lg font-bold text-on-surface">Add Custom Item</h2>
+            <h2 className="text-lg font-bold text-on-surface">{t('pos.customItemModal.addCustomItem')}</h2>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10">
             <X className="w-4 h-4" />
@@ -60,10 +62,10 @@ export default function CustomItemModal({ onClose }: CustomItemModalProps) {
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-              Item Name / आइटम का नाम
+              {t('pos.customItemModal.itemNameLabel')}
             </label>
             <Input 
-              placeholder="e.g. Delivery Charge" 
+              placeholder={t('pos.customItemModal.itemNamePlaceholder')} 
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               autoFocus
@@ -74,7 +76,7 @@ export default function CustomItemModal({ onClose }: CustomItemModalProps) {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                Price / कीमत
+                {t('pos.customItemModal.priceLabel')}
               </label>
               <Input 
                 type="number"
@@ -88,7 +90,7 @@ export default function CustomItemModal({ onClose }: CustomItemModalProps) {
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                Qty / मात्रा
+                {t('pos.customItemModal.qtyLabel')}
               </label>
               <Input 
                 type="number"
@@ -106,7 +108,7 @@ export default function CustomItemModal({ onClose }: CustomItemModalProps) {
               Cancel
             </Button>
             <Button type="submit" className="flex-1 gradient-button text-white shadow-lg shadow-primary/20">
-              Add to Cart
+              {t('pos.customItemModal.addToCart')}
             </Button>
           </div>
         </form>

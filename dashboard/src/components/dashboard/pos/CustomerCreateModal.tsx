@@ -6,6 +6,7 @@ import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
 import { customerService } from '@/lib/services/customer.services';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface CustomerCreateModalProps {
   onClose: () => void;
@@ -18,11 +19,12 @@ export default function CustomerCreateModal({ onClose, onSuccess }: CustomerCrea
     mobile: '',
   });
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.mobile) {
-      toast.error('Name and Mobile are required / नाम और मोबाइल आवश्यक हैं', { id: 'name-and-mobile-are-required--' });
+      toast.error(t('pos.customerCreateModal.nameMobileRequired'), { id: 'name-and-mobile-are-required--' });
       return;
     }
 
@@ -30,13 +32,13 @@ export default function CustomerCreateModal({ onClose, onSuccess }: CustomerCrea
     try {
       const res = await customerService.createCustomer(formData);
       if (res.success) {
-        toast.success('Customer added successfully! / ग्राहक सफलतापूर्वक जोड़ा गया!');
+        toast.success(t('pos.customerCreateModal.customerAddedSuccess'));
         onSuccess(res.data);
       } else {
-        toast.error(res.message || 'Failed to add customer');
+        toast.error(res.message || t('pos.customerCreateModal.failedToAdd'));
       }
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to add customer / ग्राहक जोड़ने में विफल');
+      toast.error(err.response?.data?.message || t('pos.customerCreateModal.failedToAddError'));
     } finally {
       setLoading(false);
     }
@@ -52,7 +54,7 @@ export default function CustomerCreateModal({ onClose, onSuccess }: CustomerCrea
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
               <UserPlus className="w-4 h-4" />
             </div>
-            <h2 className="text-lg font-bold text-on-surface">Add New Customer</h2>
+            <h2 className="text-lg font-bold text-on-surface">{t('pos.customerCreateModal.addNewCustomer')}</h2>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10">
             <X className="w-4 h-4" />
@@ -62,10 +64,10 @@ export default function CustomerCreateModal({ onClose, onSuccess }: CustomerCrea
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-              Full Name * / पूरा नाम
+              {t('pos.customerCreateModal.fullNameLabel')}
             </label>
             <Input 
-              placeholder="e.g. Rahul Sharma" 
+              placeholder={t('pos.customerCreateModal.fullNamePlaceholder')} 
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               autoFocus
@@ -74,10 +76,10 @@ export default function CustomerCreateModal({ onClose, onSuccess }: CustomerCrea
 
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-              Mobile Number * / मोबाइल नंबर
+              {t('pos.customerCreateModal.mobileNumberLabel')}
             </label>
             <Input 
-              placeholder="e.g. 9876543210" 
+              placeholder={t('pos.customerCreateModal.mobileNumberPlaceholder')} 
               type="tel"
               value={formData.mobile}
               onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
@@ -93,7 +95,7 @@ export default function CustomerCreateModal({ onClose, onSuccess }: CustomerCrea
               className="flex-1 gradient-button text-white shadow-lg shadow-primary/20"
               disabled={loading}
             >
-              {loading ? 'Adding...' : 'Save Customer'}
+              {loading ? t('pos.customerCreateModal.adding') : t('pos.customerCreateModal.saveCustomer')}
             </Button>
           </div>
         </form>

@@ -6,16 +6,19 @@ import { Button } from '@/components/common/Button';
 import { cn } from '@/utils/cn';
 import { usePOS } from '@/contexts/POSContext';
 import { formatCurrency } from '@/utils/formatCurrency';
+import { useTranslation } from 'react-i18next';
 
 interface PaymentModalProps {
   onClose: () => void;
 }
 
-const PAYMENT_METHODS = [
-  { id: 'cash', name: 'Cash', icon: Banknote },
-  { id: 'upi', name: 'UPI / QR', icon: Smartphone },
-  { id: 'card', name: 'Card', icon: CreditCard },
+// @ts-ignore
+const getPaymentMethods = (t) => [
+  { id: 'cash', name: t('pos.paymentModal.cash'), icon: Banknote },
+  { id: 'upi', name: t('pos.paymentModal.upiQr'), icon: Smartphone },
+  { id: 'card', name: t('pos.paymentModal.card'), icon: CreditCard },
 ];
+
 
 const QUICK_CASH = [500, 1000, 2000];
 
@@ -24,6 +27,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
   const [method, setMethod] = useState('cash');
   const [amountReceived, setAmountReceived] = useState<string>(netAmount.toString());
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useTranslation();
   
   const received = parseFloat(amountReceived) || 0;
   const changeDue = received > netAmount ? received - netAmount : 0;
@@ -48,7 +52,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
         
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-outline-variant/20 bg-surface-container-low/50">
-          <h2 className="text-lg font-bold text-on-surface">Complete Payment</h2>
+          <h2 className="text-lg font-bold text-on-surface">{t('pos.paymentModal.completePayment')}</h2>
           <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10">
             <X className="w-4 h-4" />
           </Button>
@@ -57,15 +61,15 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
         <div className="p-5 space-y-6">
           
           <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex flex-col items-center justify-center text-center">
-            <span className="text-sm font-semibold text-on-surface-variant mb-1">Total Payable</span>
+            <span className="text-sm font-semibold text-on-surface-variant mb-1">{t('pos.paymentModal.totalPayable')}</span>
             <span className="text-3xl font-black text-primary">{formatCurrency(netAmount)}</span>
           </div>
 
           {/* Payment Methods */}
           <div className="space-y-3">
-            <label className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Payment Method</label>
+            <label className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">{t('pos.paymentModal.paymentMethod')}</label>
             <div className="grid grid-cols-3 gap-3">
-              {PAYMENT_METHODS.map((m) => {
+              {getPaymentMethods(t).map((m) => {
                 const Icon = m.icon;
                 const isActive = method === m.id;
                 return (
@@ -90,7 +94,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
           {/* Cash Input (Only if Cash is selected) */}
           {method === 'cash' && (
             <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Amount Received</label>
+              <label className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">{t('pos.paymentModal.amountReceived')}</label>
               
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-bold text-on-surface-variant">₹</span>
@@ -117,7 +121,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
 
               {/* Change Due */}
               <div className="flex items-center justify-between p-3 bg-surface border border-outline-variant/20 rounded-xl">
-                <span className="text-sm font-semibold text-on-surface-variant">Change Due</span>
+                <span className="text-sm font-semibold text-on-surface-variant">{t('pos.paymentModal.changeDue')}</span>
                 <span className="text-lg font-black text-error">{formatCurrency(changeDue)}</span>
               </div>
             </div>
@@ -132,7 +136,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
             disabled={isSubmitting || (method === 'cash' && received < netAmount)}
           >
             <CheckCircle2 className="w-5 h-5 mr-2" />
-            {isSubmitting ? 'Processing...' : 'Complete Sale'}
+            {isSubmitting ? t('pos.paymentModal.processing') : t('pos.paymentModal.completeSale')}
           </Button>
         </div>
         

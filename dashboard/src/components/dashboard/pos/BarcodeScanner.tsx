@@ -4,9 +4,11 @@ import { useEffect, useRef } from 'react';
 import { usePOS } from '@/contexts/POSContext';
 import { productService } from '@/lib/services/product.services';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 export default function BarcodeScanner() {
   const { products, addToCart } = usePOS();
+  const { t } = useTranslation();
   const buffer = useRef<string>('');
   const lastKeyTime = useRef<number>(Date.now());
 
@@ -33,18 +35,18 @@ export default function BarcodeScanner() {
           const localMatch = products.find(p => p.sku === barcodeValue);
           if (localMatch) {
             addToCart(localMatch);
-            toast.success(`Scanned: ${localMatch.name}`);
+            toast.success(`${t('pos.barcodeScanner.scanned')} ${localMatch.name}`);
           } else {
             // Try backend barcode API
             productService.getProductByBarcode(barcodeValue).then(res => {
               if (res.success && res.data) {
                 addToCart(res.data);
-                toast.success(`Scanned: ${res.data.name}`);
+                toast.success(`${t('pos.barcodeScanner.scanned')} ${res.data.name}`);
               } else {
-                toast.error(`Unknown barcode: ${barcodeValue}`, { id: 'unknown-barcode----barcodevalu' });
+                toast.error(`${t('pos.barcodeScanner.unknownBarcode')} ${barcodeValue}`, { id: 'unknown-barcode----barcodevalu' });
               }
             }).catch(() => {
-              toast.error(`Barcode not found: ${barcodeValue}`, { id: 'barcode-not-found----barcodeva' });
+              toast.error(`${t('pos.barcodeScanner.barcodeNotFound')} ${barcodeValue}`, { id: 'barcode-not-found----barcodeva' });
             });
           }
         }

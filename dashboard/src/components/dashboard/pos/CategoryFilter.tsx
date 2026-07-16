@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 import { cn } from '@/utils/cn';
 import { LayoutGrid, Coffee, ShoppingBag, Carrot, Package, MonitorSmartphone, Tag } from 'lucide-react';
 import { usePOS } from '@/contexts/POSContext';
+import { useTranslation } from 'react-i18next';
 
 const ICON_MAP: Record<string, React.ElementType> = {
   grocery: ShoppingBag,
@@ -15,18 +16,19 @@ const ICON_MAP: Record<string, React.ElementType> = {
 
 export default function CategoryFilter() {
   const { products, selectedCategory, setSelectedCategory } = usePOS();
+  const { t } = useTranslation();
 
   const categories = useMemo(() => {
     const uniqueCats = Array.from(new Set(products.map(p => p.category?.toLowerCase() || 'other')));
     
     const cats = uniqueCats.map(cat => ({
       id: cat,
-      name: cat === 'other' ? 'Other' : cat.charAt(0).toUpperCase() + cat.slice(1),
+      name: cat === 'other' ? t('pos.categoryFilter.other') : cat.charAt(0).toUpperCase() + cat.slice(1),
       icon: ICON_MAP[cat] || Tag
     }));
 
     return [
-      { id: 'all', name: 'All Items', icon: LayoutGrid },
+      { id: 'all', name: t('pos.categoryFilter.allItems'), icon: LayoutGrid },
       ...cats.sort((a, b) => a.name.localeCompare(b.name))
     ];
   }, [products]);

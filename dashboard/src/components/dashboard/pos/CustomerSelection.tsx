@@ -7,6 +7,7 @@ import { usePOS } from '@/contexts/POSContext';
 import { customerService } from '@/lib/services/customer.services';
 import CustomerCreateModal from './CustomerCreateModal';
 import { cn } from '@/utils/cn';
+import { useTranslation } from 'react-i18next';
 
 interface CustomerData {
   _id: string;
@@ -24,6 +25,7 @@ export default function CustomerSelection() {
   const [loading, setLoading] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -70,7 +72,7 @@ export default function CustomerSelection() {
           </div>
           <input
             type="text"
-            placeholder="Search customer by name or phone..."
+            placeholder={t('pos.customerSelection.searchCustomer')}
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
@@ -83,7 +85,7 @@ export default function CustomerSelection() {
           {isOpen && (searchTerm.length > 0 || customers.length > 0) && (
             <div className="absolute z-50 w-full mt-2 bg-surface border border-outline-variant/30 rounded-xl shadow-xl max-h-60 overflow-y-auto">
               {loading ? (
-                <div className="p-4 text-sm text-center text-on-surface-variant">Loading...</div>
+                <div className="p-4 text-sm text-center text-on-surface-variant">{t('pos.customerSelection.loading')}</div>
               ) : filteredCustomers.length > 0 ? (
                 <ul className="py-2">
                   {filteredCustomers.map(customer => (
@@ -103,7 +105,7 @@ export default function CustomerSelection() {
                 </ul>
               ) : (
                 <div className="p-4 text-sm text-center text-on-surface-variant">
-                  No customers found. 
+                  {t('pos.customerSelection.noCustomers')} 
                   <button 
                     onClick={() => { setIsOpen(false); setIsCreateOpen(true); }}
                     className="text-primary font-bold ml-1 hover:underline"
