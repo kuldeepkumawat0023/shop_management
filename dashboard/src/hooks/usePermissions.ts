@@ -21,7 +21,20 @@ export const usePermissions = () => {
     // Ideally, user object should have a `permissions` array injected by backend
     const userPermissions: string[] = (user as any)?.permissions || [];
     
-    return userPermissions.includes(PERMISSIONS.ALL) || userPermissions.includes(requiredPermission);
+    if (userPermissions.includes(PERMISSIONS.ALL) || userPermissions.includes('all') || userPermissions.includes('*')) {
+      return true;
+    }
+
+    if (userPermissions.includes(requiredPermission)) {
+      return true;
+    }
+
+    const [moduleName] = requiredPermission.split('.');
+    if (moduleName && userPermissions.includes(`${moduleName}.*`)) {
+      return true;
+    }
+
+    return false;
   };
 
   /**

@@ -67,13 +67,24 @@ exports.getRoles = async (req, res, next) => {
       query.$or = [{ shopId: req.scopedShopId }, { shopId: null }];
     }
 
-    const roles = await CustomRole.find(query).populate('createdBy', 'fullname email');
+    const customRoles = await CustomRole.find(query).populate('createdBy', 'fullname email');
+    
+    // Convert object of default roles to array and inject IDs
+    const { ADMIN_DEFAULT_ROLES } = require('../config/permissions');
+    console.log("ADMIN_DEFAULT_ROLES:", ADMIN_DEFAULT_ROLES);
+    const defaultRoles = Object.entries(ADMIN_DEFAULT_ROLES)
+      .filter(([key]) => req.user.role === 'super_admin' || key !== 'SUPER_ADMIN')
+      .map(([key, role]) => ({
+        _id: key.toLowerCase(),
+        ...role,
+        isActive: true
+      }));
 
     res.status(200).json({
       success: true,
       statusCode: 200,
       message: 'Roles fetched successfully',
-      data: roles
+      data: [...defaultRoles, ...customRoles]
     });
   } catch (error) {
     next(error);

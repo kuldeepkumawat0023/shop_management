@@ -34,7 +34,15 @@ const requirePermission = (requiredPermission) => {
         }
       }
 
-      if (defaultPermissions.includes(requiredPermission)) {
+      const hasGlobalWildcard = defaultPermissions.includes('*');
+      const moduleName = requiredPermission.split('.')[0];
+      const hasModuleWildcard = defaultPermissions.includes(`${moduleName}.*`);
+      
+      if (
+        hasGlobalWildcard || 
+        hasModuleWildcard || 
+        defaultPermissions.includes(requiredPermission)
+      ) {
         return next();
       }
 

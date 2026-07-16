@@ -31,6 +31,7 @@ export interface AuthUser {
   profilePhoto?: string;
   personalDetail?: PersonalDetail;
   role: 'super_admin' | 'shop_owner' | 'manager' | 'staff';
+  permissions?: string[];
   shopId?: string; // The default active shop
   assignedShops?: string[]; // Array of shop IDs they have access to
   customRoleId?: string;

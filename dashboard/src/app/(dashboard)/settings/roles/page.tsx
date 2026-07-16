@@ -1,6 +1,6 @@
 import React from 'react';
-import RolesPermissionsView from '@/components/dashboard/settings/RolesPermissionsView';
+import RolesListView from '@/components/dashboard/settings/RolesListView';
 
 export default function RolesPermissionsPage() {
-  return <RolesPermissionsView />;
+  return <RolesListView />;
 }

@@ -376,7 +376,8 @@ const ADMIN_DEFAULT_ROLES = {
       'team.*', 
       'payroll.*', 
       'payments.*', 
-      'reports.view'
+      'reports.view',
+      'roles.*'
     ],
     isDefault: true
   },
