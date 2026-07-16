@@ -10,6 +10,7 @@ import { productSchema } from '@/utils/validations';
 import { productService } from '@/lib/services/product.services';
 import { categoryService } from '@/lib/services/category.services';
 import { brandService } from '@/lib/services/brand.services';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 
 interface ProductFormProps {
@@ -17,6 +18,7 @@ interface ProductFormProps {
 }
 
 export default function ProductForm({ editId }: ProductFormProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -139,7 +141,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
       if (file.size <= 5 * 1024 * 1024) { // 5MB limit
         setSelectedFile(file);
       } else {
-        toast.error('File size should not exceed 5MB / फ़ाइल का आकार 5MB से अधिक नहीं होना चाहिए', { id: 'file-size-should-not-exceed-5m' });
+        toast.error(t('inventory.productForm.fileSizeError'), { id: 'file-size-should-not-exceed-5m' });
       }
     }
   };
@@ -150,7 +152,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
       if (file.size <= 5 * 1024 * 1024) { // 5MB limit
         setSelectedFile(file);
       } else {
-        toast.error('File size should not exceed 5MB / फ़ाइल का आकार 5MB से अधिक नहीं होना चाहिए', { id: 'file-size-should-not-exceed-5m' });
+        toast.error(t('inventory.productForm.fileSizeError'), { id: 'file-size-should-not-exceed-5m' });
       }
     }
   };
@@ -174,11 +176,11 @@ export default function ProductForm({ editId }: ProductFormProps) {
         if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
       }
       setErrors(newErrors);
-      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें', { id: 'please-correct-the-errors-----' });
+      return toast.error(t('inventory.productForm.pleaseCorrectErrors'), { id: 'please-correct-the-errors-----' });
     }
 
     setLoading(true);
-    const toastId = toast.loading(editId ? 'Updating product...' : 'Saving product...');
+    const toastId = toast.loading(editId ? t('inventory.productForm.updatingProduct') : t('inventory.productForm.savingProduct'));
 
     try {
       const res = editId
@@ -186,13 +188,13 @@ export default function ProductForm({ editId }: ProductFormProps) {
         : await productService.createProduct(submissionData);
         
       if (res.success || (res as any).status === 200) {
-        toast.success(editId ? 'Product updated successfully!' : 'Product saved successfully! / उत्पाद सफलतापूर्वक सहेजा गया!', { id: toastId });
+        toast.success(editId ? t('inventory.productForm.productUpdated') : t('inventory.productForm.productSaved'), { id: toastId });
         router.push(editId ? `/products/${editId}` : '/products');
       } else {
-        toast.error((res as any).error || 'Failed to save product', { id: toastId });
+        toast.error((res as any).error || t('inventory.productForm.failedToSave'), { id: toastId });
       }
     } catch (error) {
-      toast.error('An unexpected error occurred', { id: toastId });
+      toast.error(t('inventory.productForm.unexpectedError'), { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -211,10 +213,10 @@ export default function ProductForm({ editId }: ProductFormProps) {
           </Button>
           <div>
             <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">
-              {editId ? 'Edit Product / उत्पाद संपादित करें' : 'Add New Product / नया उत्पाद जोड़ें'}
+              {editId ? t('inventory.productForm.editProduct') : t('inventory.productForm.addNewProduct')}
             </h1>
             <p className="text-sm text-on-surface-variant mt-1 font-medium">
-              {editId ? 'Update product details' : 'Create a new item in your catalog'}
+              {editId ? t('inventory.productForm.updateProductDetails') : t('inventory.productForm.createNewItem')}
             </p>
           </div>
         </div>
@@ -227,12 +229,12 @@ export default function ProductForm({ editId }: ProductFormProps) {
         <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
           <div className="flex items-center gap-2 mb-2">
             <Tag className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-bold text-on-surface">Basic Information</h2>
+            <h2 className="text-lg font-bold text-on-surface">{t('inventory.productForm.basicInformation')}</h2>
           </div>
           
           <div className="space-y-2">
             <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-              <Tag className="w-3.5 h-3.5" /> Product Name / उत्पाद का नाम <span className="text-error">*</span>
+              <Tag className="w-3.5 h-3.5" /> {t('inventory.productForm.productName')} <span className="text-error">*</span>
             </label>
             <input 
               type="text" 
@@ -250,7 +252,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
 
           <div className="space-y-2">
             <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-              <FileText className="w-3.5 h-3.5" /> Description / विवरण
+              <FileText className="w-3.5 h-3.5" /> {t('inventory.productForm.description')}
             </label>
             <textarea 
               name="description"
@@ -269,13 +271,13 @@ export default function ProductForm({ editId }: ProductFormProps) {
         <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
           <div className="flex items-center gap-2 mb-2">
             <Layers className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-bold text-on-surface">Organization / संगठन</h2>
+            <h2 className="text-lg font-bold text-on-surface">{t('inventory.productForm.organization')}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                <Tag className="w-3.5 h-3.5" /> Category / श्रेणी
+                <Tag className="w-3.5 h-3.5" /> {t('inventory.productForm.category')}
               </label>
               <select 
                 name="category"
@@ -283,7 +285,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
                 onChange={handleChange}
                 className="w-full h-11 px-4 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 focus:border-primary/50 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
               >
-                <option value="">Select Category</option>
+                <option value="">{t('inventory.productForm.selectCategory')}</option>
                 {categories.map(c => (
                   <option key={c._id} value={c._id}>{c.name}</option>
                 ))}
@@ -292,7 +294,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
             
             <div className="space-y-2">
               <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                <Tag className="w-3.5 h-3.5" /> Brand / ब्रांड
+                <Tag className="w-3.5 h-3.5" /> {t('inventory.productForm.brand')}
               </label>
               <select 
                 name="brand"
@@ -300,7 +302,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
                 onChange={handleChange}
                 className="w-full h-11 px-4 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 focus:border-primary/50 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
               >
-                <option value="">Select Brand</option>
+                <option value="">{t('inventory.productForm.selectBrand')}</option>
                 {brands.map(b => (
                   <option key={b._id} value={b._id}>{b.name}</option>
                 ))}
@@ -313,13 +315,13 @@ export default function ProductForm({ editId }: ProductFormProps) {
         <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
           <div className="flex items-center gap-2 mb-2">
             <Banknote className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-bold text-on-surface">Pricing & Inventory</h2>
+            <h2 className="text-lg font-bold text-on-surface">{t('inventory.productForm.pricingInventory')}</h2>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                Selling Price (₹) / बिक्री मूल्य <span className="text-error">*</span>
+                {t('inventory.productForm.sellingPrice')} <span className="text-error">*</span>
               </label>
               <input 
                 type="number" 
@@ -337,7 +339,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
             
             <div className="space-y-2">
               <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                Cost Price (₹) / लागत मूल्य
+                {t('inventory.productForm.costPrice')}
               </label>
               <input 
                 type="number" 
@@ -351,7 +353,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
             
             <div className="space-y-2">
               <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                SKU / Barcode <span className="text-error">*</span>
+                {t('inventory.productForm.skuBarcode')} <span className="text-error">*</span>
               </label>
               <input 
                 type="text" 
@@ -369,7 +371,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
             
             <div className="space-y-2">
               <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                Tax Rate (%) / कर दर
+                {t('inventory.productForm.taxRate')}
               </label>
               <select 
                 name="taxRate"
@@ -377,21 +379,21 @@ export default function ProductForm({ editId }: ProductFormProps) {
                 onChange={handleChange}
                 className="w-full h-11 px-4 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 focus:border-primary/50 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
               >
-                <option value="0">0% (GST Exempt)</option>
-                <option value="5">5% (GST)</option>
-                <option value="12">12% (GST)</option>
-                <option value="18">18% (GST)</option>
-                <option value="28">28% (GST)</option>
+                <option value="0">{t('inventory.productForm.gstExempt')}</option>
+                <option value="5">{t('inventory.productForm.gst5')}</option>
+                <option value="12">{t('inventory.productForm.gst12')}</option>
+                <option value="18">{t('inventory.productForm.gst18')}</option>
+                <option value="28">{t('inventory.productForm.gst28')}</option>
               </select>
             </div>
           </div>
 
           <div className="p-4 bg-surface-container-low rounded-xl border border-outline-variant/10 mt-2">
-            <h3 className="text-sm font-bold text-on-surface mb-4 flex items-center gap-2"><Package className="w-4 h-4 text-primary" /> Stock Management</h3>
+            <h3 className="text-sm font-bold text-on-surface mb-4 flex items-center gap-2"><Package className="w-4 h-4 text-primary" /> {t('inventory.productForm.stockManagement')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="space-y-2">
                 <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                  Initial Stock / प्रारंभिक स्टॉक
+                  {t('inventory.productForm.initialStock')}
                 </label>
                 <input 
                   type="number" 
@@ -404,7 +406,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
               </div>
               <div className="space-y-2">
                 <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                  Low Stock Alert At / न्यूनतम स्टॉक
+                  {t('inventory.productForm.lowStockAlert')}
                 </label>
                 <input 
                   type="number" 
@@ -423,7 +425,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
         <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6">
           <div className="flex items-center gap-2 mb-6">
             <UploadCloud className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-bold text-on-surface">Product Image / छवि</h2>
+            <h2 className="text-lg font-bold text-on-surface">{t('inventory.productForm.productImage')}</h2>
           </div>
           
           <input
@@ -448,17 +450,17 @@ export default function ProductForm({ editId }: ProductFormProps) {
               <UploadCloud className="w-6 h-6" />
             </div>
             <p className="text-sm font-bold text-on-surface text-center mb-1">
-              {selectedFile ? selectedFile.name : 'Click to upload or drag and drop'}
+              {selectedFile ? selectedFile.name : t('inventory.productForm.clickToUpload')}
             </p>
             <p className="text-xs text-on-surface-variant text-center">
-              {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB` : 'SVG, PNG, JPG or GIF (MAX. 5MB) / (अधिकतम 5MB)'}
+              {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB` : t('inventory.productForm.max5mb')}
             </p>
           </div>
         </div>
 
         {/* Status */}
         <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-6 shadow-sm">
-          <h2 className="text-lg font-bold text-on-surface mb-6">Status / स्थिति</h2>
+          <h2 className="text-lg font-bold text-on-surface mb-6">{t('inventory.productForm.status')}</h2>
           
           <div className="space-y-3">
             <label className={cn(
@@ -475,8 +477,8 @@ export default function ProductForm({ editId }: ProductFormProps) {
                 />
               </div>
               <div>
-                <span className="block text-sm font-bold text-on-surface">Published / प्रकाशित</span>
-                <span className="block text-xs font-medium text-on-surface-variant mt-0.5">Product will be visible in POS and available for sale.</span>
+                <span className="block text-sm font-bold text-on-surface">{t('inventory.productForm.published')}</span>
+                <span className="block text-xs font-medium text-on-surface-variant mt-0.5">{t('inventory.productForm.productVisible')}</span>
               </div>
             </label>
 
@@ -494,8 +496,8 @@ export default function ProductForm({ editId }: ProductFormProps) {
                 />
               </div>
               <div>
-                <span className="block text-sm font-bold text-on-surface">Draft / ड्राफ़्ट</span>
-                <span className="block text-xs font-medium text-on-surface-variant mt-0.5">Save as draft. Hidden from POS and sales.</span>
+                <span className="block text-sm font-bold text-on-surface">{t('inventory.productForm.draft')}</span>
+                <span className="block text-xs font-medium text-on-surface-variant mt-0.5">{t('inventory.productForm.saveAsDraft')}</span>
               </div>
             </label>
           </div>
@@ -505,14 +507,14 @@ export default function ProductForm({ editId }: ProductFormProps) {
         <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-4 pt-6 border-t border-outline-variant/20">
           <Button type="button" onClick={handleClear} variant="ghost" className="w-full sm:w-auto text-on-surface-variant hover:text-error flex items-center justify-center gap-2">
             <RefreshCcw className="w-4 h-4" />
-            Clear Form
+            {t('inventory.productForm.clearForm')}
           </Button>
           <Button type="button" onClick={() => router.back()} variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
-            Cancel
+            {t('inventory.productForm.cancel')}
           </Button>
           <Button type="submit" disabled={loading} className="w-full sm:w-auto gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
             <Save className="w-4 h-4 shrink-0" />
-            <span className="font-bold tracking-wide truncate">{loading ? 'Saving...' : (editId ? 'Update Product' : 'Save Product')}</span>
+            <span className="font-bold tracking-wide truncate">{loading ? t('inventory.productForm.saving') : (editId ? t('inventory.productForm.updateProduct') : t('inventory.productForm.saveProduct'))}</span>
           </Button>
         </div>
       </div>

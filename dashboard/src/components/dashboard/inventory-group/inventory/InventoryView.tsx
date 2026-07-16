@@ -9,12 +9,17 @@ import { StatusBadge } from '@/components/common/StatusBadge';
 import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import { cn } from '@/utils/cn';
 import { productService } from '@/lib/services/product.services';
+import { useTranslation } from 'react-i18next';
 
 export default function InventoryView() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('All Items');
+  React.useEffect(() => {
+    setActiveTab(t('inventory.inventoryView.allItems'));
+  }, [t]);
   const [inventoryData, setInventoryData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const tabs = ['All Items', 'Low Stock', 'Out of Stock'];
+  const tabs = [t('inventory.inventoryView.allItems'), t('inventory.inventoryView.lowStock'), t('inventory.inventoryView.outOfStock')];
 
   React.useEffect(() => {
     const fetchProducts = async () => {
@@ -24,16 +29,16 @@ export default function InventoryView() {
           setInventoryData(res.data.map((p: any) => {
             const stock = p.currentStock || 0;
             const minStock = p.minStockLevel || 10;
-            let status = 'In Stock';
-            if (stock === 0) status = 'Out of Stock';
-            else if (stock <= minStock) status = 'Low Stock';
+            let status = t('inventory.inventoryView.inStock');
+            if (stock === 0) status = t('inventory.inventoryView.outOfStock');
+            else if (stock <= minStock) status = t('inventory.inventoryView.lowStock');
 
             return {
               ...p,
               id: p._id,
               name: p.name,
-              category: p.category?.name || 'Uncategorized',
-              sku: p.sku || 'N/A',
+              category: p.category?.name || t('inventory.inventoryView.uncategorized'),
+              sku: p.sku || t('inventory.inventoryView.na'),
               stock: stock,
               minStock: minStock,
               price: p.sellingPrice || 0,
@@ -51,15 +56,15 @@ export default function InventoryView() {
   }, []);
 
   const filteredData = inventoryData.filter(item => {
-    if (activeTab === 'All Items') return true;
-    if (activeTab === 'Low Stock') return item.status === 'Low Stock';
-    if (activeTab === 'Out of Stock') return item.status === 'Out of Stock';
+    if (activeTab === t('inventory.inventoryView.allItems')) return true;
+    if (activeTab === t('inventory.inventoryView.lowStock')) return item.status === t('inventory.inventoryView.lowStock');
+    if (activeTab === t('inventory.inventoryView.outOfStock')) return item.status === t('inventory.inventoryView.outOfStock');
     return true;
   });
 
   const columns = [
     { 
-      header: 'Product Details', 
+      header: t('inventory.inventoryView.productDetails'), 
       accessorKey: 'name',
       cell: (row: any) => (
         <div className="flex items-center gap-3">
@@ -74,7 +79,7 @@ export default function InventoryView() {
       )
     },
     { 
-      header: 'SKU', 
+      header: t('inventory.inventoryView.sku'), 
       accessorKey: 'sku',
       cell: (row: any) => (
         <span className="text-xs font-mono font-medium text-on-surface-variant bg-surface-container px-2 py-1 rounded-md border border-outline-variant/10">
@@ -83,7 +88,7 @@ export default function InventoryView() {
       )
     },
     { 
-      header: 'Stock', 
+      header: t('inventory.inventoryView.stock'), 
       accessorKey: 'stock',
       cell: (row: any) => (
         <div className="flex flex-col">
@@ -91,28 +96,28 @@ export default function InventoryView() {
             "font-black text-base",
             row.stock === 0 ? "text-error" : row.stock <= row.minStock ? "text-warning" : "text-success"
           )}>
-            {row.stock} <span className="text-xs font-medium text-on-surface-variant">units</span>
+            {row.stock} <span className="text-xs font-medium text-on-surface-variant">{t('inventory.inventoryView.units')}</span>
           </span>
-          <span className="text-[10px] text-on-surface-variant uppercase tracking-widest font-semibold">Min: {row.minStock}</span>
+          <span className="text-[10px] text-on-surface-variant uppercase tracking-widest font-semibold">{t('inventory.inventoryView.min')} {row.minStock}</span>
         </div>
       )
     },
     { 
-      header: 'Unit Price', 
+      header: t('inventory.inventoryView.unitPrice'), 
       accessorKey: 'price',
       cell: (row: any) => (
         <span className="font-bold text-on-surface">₹{row.price.toFixed(2)}</span>
       )
     },
     {
-      header: 'Status',
+      header: t('inventory.inventoryView.status'),
       accessorKey: 'status',
       cell: (row: any) => (
-        <StatusBadge variant="dot" animate={row.status === 'Out of Stock' || row.status === 'Low Stock'} status={row.status} />
+        <StatusBadge variant="dot" animate={row.status === t('inventory.inventoryView.outOfStock') || row.status === t('inventory.inventoryView.lowStock')} status={row.status} />
       )
     },
     {
-      header: 'Actions',
+      header: t('inventory.inventoryView.actions'),
       accessorKey: 'id',
       cell: (row: any) => (
         <div className="flex items-center gap-2">
@@ -155,9 +160,9 @@ export default function InventoryView() {
     <div className="flex flex-col h-full bg-background p-4 md:p-6 overflow-y-auto custom-scrollbar">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-black text-on-surface tracking-tight">Inventory Status</h1>
+          <h1 className="text-3xl font-black text-on-surface tracking-tight">{t('inventory.inventoryView.inventoryStatus')}</h1>
           <p className="text-sm font-medium text-on-surface-variant mt-1">
-            Monitor stock levels, track product availability, and manage low stock alerts.
+            {t('inventory.inventoryView.monitorStock')}
           </p>
         </div>
       </div>
@@ -165,31 +170,31 @@ export default function InventoryView() {
       {/* Stats Cards Row */}
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 shrink-0">
         <StatsCard 
-          title="Total Products"
+          title={t('inventory.inventoryView.totalProducts')}
           value={inventoryData.length}
           icon={Package}
-          trendLabel="UNIQUE ITEMS"
+          trendLabel={t('inventory.inventoryView.uniqueItems')}
           colorTheme="primary"
         />
         <StatsCard 
-          title="Total Stock Value"
+          title={t('inventory.inventoryView.totalStockValue')}
           value={`₹${inventoryData.reduce((acc, curr) => acc + (curr.price * curr.stock), 0).toLocaleString('en-IN')}`}
           icon={Banknote}
-          trendLabel="CURRENT ESTIMATE"
+          trendLabel={t('inventory.inventoryView.currentEstimate')}
           colorTheme="purple"
         />
         <StatsCard 
-          title="Low Stock"
-          value={inventoryData.filter(i => i.status === 'Low Stock').length}
+          title={t('inventory.inventoryView.lowStock')}
+          value={inventoryData.filter(i => i.status === t('inventory.inventoryView.lowStock')).length}
           icon={AlertTriangle}
-          trendLabel="NEEDS REORDER"
+          trendLabel={t('inventory.inventoryView.needsReorder')}
           colorTheme="warning"
         />
         <StatsCard 
-          title="Out of Stock"
-          value={inventoryData.filter(i => i.status === 'Out of Stock').length}
+          title={t('inventory.inventoryView.outOfStock')}
+          value={inventoryData.filter(i => i.status === t('inventory.inventoryView.outOfStock')).length}
           icon={AlertCircle}
-          trendLabel="UNAVAILABLE"
+          trendLabel={t('inventory.inventoryView.unavailable')}
           colorTheme="error"
         />
       </div>
@@ -201,13 +206,13 @@ export default function InventoryView() {
           headerContent={
             <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-6 w-full">
               <div className="flex items-center gap-2 shrink-0">
-                <h2 className="text-lg font-bold text-on-surface">Product List</h2>
-                <StatusBadge status="Live Sync" variant="dot" colorTheme="success" className="ml-2 bg-success/10 text-success border-success/20" />
+                <h2 className="text-lg font-bold text-on-surface">{t('inventory.inventoryView.productList')}</h2>
+                <StatusBadge status={t('inventory.inventoryView.liveSync')} variant="dot" colorTheme="success" className="ml-2 bg-success/10 text-success border-success/20" />
               </div>
               {TabsComponent}
             </div>
           }
-          searchPlaceholder="Search by product name or SKU..."
+          searchPlaceholder={t('inventory.inventoryView.searchPlaceholder')}
           className="border-none shadow-none bg-transparent"
           itemsPerPage={10}
         />

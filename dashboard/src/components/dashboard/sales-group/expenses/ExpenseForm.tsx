@@ -9,6 +9,7 @@ import { cn } from '@/utils/cn';
 import { expenseSchema } from '@/utils/validations';
 import toast from 'react-hot-toast';
 import { expenseService } from '@/lib/services/expense.services';
+import { useTranslation } from 'react-i18next';
 
 export default function ExpenseForm() {
   const router = useRouter();
@@ -26,6 +27,7 @@ export default function ExpenseForm() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const { t } = useTranslation();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -68,7 +70,7 @@ export default function ExpenseForm() {
       if (file.size <= 5 * 1024 * 1024) { // 5MB limit
         setSelectedFile(file);
       } else {
-        toast.error('File size should not exceed 5MB / फ़ाइल का आकार 5MB से अधिक नहीं होना चाहिए', { id: 'file-size-should-not-exceed-5m' });
+        toast.error(t('expenses.expenseForm.fileSizeError'), { id: 'file-size-should-not-exceed-5m' });
       }
     }
   };
@@ -79,7 +81,7 @@ export default function ExpenseForm() {
       if (file.size <= 5 * 1024 * 1024) { // 5MB limit
         setSelectedFile(file);
       } else {
-        toast.error('File size should not exceed 5MB / फ़ाइल का आकार 5MB से अधिक नहीं होना चाहिए', { id: 'file-size-should-not-exceed-5m' });
+        toast.error(t('expenses.expenseForm.fileSizeError'), { id: 'file-size-should-not-exceed-5m' });
       }
     }
   };
@@ -99,11 +101,11 @@ export default function ExpenseForm() {
         if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
       }
       setErrors(newErrors);
-      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें', { id: 'please-correct-the-errors-----' });
+      return toast.error(t('expenses.expenseForm.pleaseCorrectErrors'), { id: 'please-correct-the-errors-----' });
     }
 
     setSubmitting(true);
-    const toastId = toast.loading('Saving expense... / व्यय सहेज रहा है...');
+    const toastId = toast.loading(t('expenses.expenseForm.savingExpense'));
     
     try {
       const payload = {
@@ -117,13 +119,13 @@ export default function ExpenseForm() {
       
       const response = await expenseService.createExpense(payload);
       if (response.success) {
-        toast.success('Expense saved successfully! / व्यय सफलतापूर्वक सहेजा गया!', { id: toastId });
+        toast.success(t('expenses.expenseForm.expenseSavedSuccess'), { id: toastId });
         router.back();
       } else {
-        toast.error(response.message || 'Failed to save expense / व्यय सहेजने में विफल', { id: toastId });
+        toast.error(response.message || t('expenses.expenseForm.failedToSaveExpense'), { id: toastId });
       }
     } catch (err: any) {
-      toast.error('Failed to save expense / व्यय सहेजने में विफल', { id: toastId });
+      toast.error(t('expenses.expenseForm.failedToSaveExpense'), { id: toastId });
     } finally {
       setSubmitting(false);
     }
@@ -138,8 +140,8 @@ export default function ExpenseForm() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">Log Expense / व्यय दर्ज करें</h1>
-            <p className="text-sm text-on-surface-variant mt-1 font-medium">Record a new outgoing payment or bill / एक नया आउटगोइंग भुगतान या बिल दर्ज करें</p>
+            <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">{t('expenses.expenseForm.logExpense')}</h1>
+            <p className="text-sm text-on-surface-variant mt-1 font-medium">{t('expenses.expenseForm.recordOutgoing')}</p>
           </div>
         </div>
       </div>
@@ -151,12 +153,12 @@ export default function ExpenseForm() {
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
             <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
               <Info className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">General Details / सामान्य विवरण</h2>
+              <h2 className="text-lg font-bold text-on-surface">{t('expenses.expenseForm.generalDetails')}</h2>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Payee / Vendor / प्राप्तकर्ता / विक्रेता <span className="text-error ml-1">*</span></label>
+                <label className="text-sm font-bold text-on-surface">{t('expenses.expenseForm.payeeVendor')} <span className="text-error ml-1">*</span></label>
                 <input
                   name="payee"
                   value={formData.payee}
@@ -170,7 +172,7 @@ export default function ExpenseForm() {
                 {errors.payee && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.payee}</p>}
               </div>
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Expense Category / व्यय श्रेणी <span className="text-error ml-1">*</span></label>
+                <label className="text-sm font-bold text-on-surface">{t('expenses.expenseForm.expenseCategory')} <span className="text-error ml-1">*</span></label>
                 <select 
                   name="category"
                   value={formData.category}
@@ -180,22 +182,22 @@ export default function ExpenseForm() {
                     errors.category ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
                   )}
                 >
-                  <option value="">Select category... / श्रेणी चुनें...</option>
-                  <option value="Utilities">Utilities (Electricity, Water) / उपयोगिताएँ</option>
-                  <option value="Rent">Rent</option>
-                  <option value="Maintenance">Maintenance & Repairs</option>
-                  <option value="Marketing">Marketing & Advertising</option>
-                  <option value="Office Supplies">Office Supplies</option>
-                  <option value="Salaries">Salaries & Wages</option>
-                  <option value="Software">Software & IT</option>
-                  <option value="Misc">Miscellaneous</option>
+                  <option value="">{t('expenses.expenseForm.selectCategory')}</option>
+                  <option value="Utilities">{t('expenses.expenseForm.utilities')}</option>
+                  <option value="Rent">{t('expenses.expenseForm.rent')}</option>
+                  <option value="Maintenance">{t('expenses.expenseForm.maintenance')}</option>
+                  <option value="Marketing">{t('expenses.expenseForm.marketing')}</option>
+                  <option value="Office Supplies">{t('expenses.expenseForm.officeSupplies')}</option>
+                  <option value="Salaries">{t('expenses.expenseForm.salaries')}</option>
+                  <option value="Software">{t('expenses.expenseForm.software')}</option>
+                  <option value="Misc">{t('expenses.expenseForm.misc')}</option>
                 </select>
                 {errors.category && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.category}</p>}
               </div>
             </div>
 
             <div className="flex flex-col gap-1.5 w-full">
-              <label className="text-sm font-bold text-on-surface">Description (Optional) / विवरण (वैकल्पिक)</label>
+              <label className="text-sm font-bold text-on-surface">{t('expenses.expenseForm.descriptionOpt')}</label>
               <textarea 
                 name="description"
                 value={formData.description}
@@ -210,12 +212,12 @@ export default function ExpenseForm() {
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
             <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
               <IndianRupee className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">Payment Info / भुगतान जानकारी</h2>
+              <h2 className="text-lg font-bold text-on-surface">{t('expenses.expenseForm.paymentInfo')}</h2>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Amount / राशि <span className="text-error ml-1">*</span></label>
+                <label className="text-sm font-bold text-on-surface">{t('expenses.expenseForm.amount')} <span className="text-error ml-1">*</span></label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-on-surface-variant">₹</span>
                   <input
@@ -234,7 +236,7 @@ export default function ExpenseForm() {
               </div>
 
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Expense Date / व्यय की तिथि <span className="text-error ml-1">*</span></label>
+                <label className="text-sm font-bold text-on-surface">{t('expenses.expenseForm.expenseDate')} <span className="text-error ml-1">*</span></label>
                 <input
                   type="date"
                   name="date"
@@ -251,7 +253,7 @@ export default function ExpenseForm() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Payment Method / भुगतान विधि</label>
+                <label className="text-sm font-bold text-on-surface">{t('expenses.expenseForm.paymentMethod')}</label>
                 <select 
                   name="paymentMethod"
                   value={formData.paymentMethod}
@@ -266,7 +268,7 @@ export default function ExpenseForm() {
                 </select>
               </div>
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Status / स्थिति</label>
+                <label className="text-sm font-bold text-on-surface">{t('expenses.expenseForm.status')}</label>
                 <select 
                   name="status"
                   value={formData.status}
@@ -287,10 +289,10 @@ export default function ExpenseForm() {
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
             <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
               <FileText className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">Receipt / Bill / रसीद / बिल</h2>
+              <h2 className="text-lg font-bold text-on-surface">{t('expenses.expenseForm.receiptBill')}</h2>
             </div>
             
-            <p className="text-sm text-on-surface-variant font-medium">Attach proof of payment or invoice. / भुगतान या चालान का प्रमाण संलग्न करें।</p>
+            <p className="text-sm text-on-surface-variant font-medium">{t('expenses.expenseForm.attachProof')}</p>
             
             <input
               type="file"
@@ -312,10 +314,10 @@ export default function ExpenseForm() {
                 <UploadCloud className="w-6 h-6 text-primary" />
               </div>
               <span className="text-sm font-bold text-on-surface mb-1 text-center">
-                {selectedFile ? selectedFile.name : 'Click or drag receipt here / रसीद यहाँ क्लिक करें या खींचें'}
+                {selectedFile ? selectedFile.name : t('expenses.expenseForm.clickOrDrag')}
               </span>
               <span className="text-xs font-medium text-on-surface-variant text-center">
-                {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB` : 'PNG, JPG, PDF (MAX. 5MB) / (अधिकतम 5MB)'}
+                {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB` : t('expenses.expenseForm.max5mb')}
               </span>
             </div>
           </div>
@@ -326,14 +328,14 @@ export default function ExpenseForm() {
         <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-4 pt-6 border-t border-outline-variant/20">
           <Button type="button" onClick={handleClear} variant="ghost" className="w-full sm:w-auto text-on-surface-variant hover:text-error flex items-center justify-center gap-2">
             <RefreshCcw className="w-4 h-4" />
-            Clear Form / फ़ॉर्म साफ़ करें
+            {t('expenses.expenseForm.clearForm')}
           </Button>
           <Button type="button" onClick={() => router.back()} variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
-            Cancel / रद्द करें
+            {t('expenses.expenseForm.cancel')}
           </Button>
           <Button type="submit" disabled={submitting} className="w-full sm:w-auto gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
             <Save className="w-4 h-4" />
-            <span className="font-bold tracking-wide">{submitting ? 'Saving... / सहेज रहा है...' : 'Save Expense / व्यय सहेजें'}</span>
+            <span className="font-bold tracking-wide">{submitting ? t('expenses.expenseForm.saving') : t('expenses.expenseForm.saveExpense')}</span>
           </Button>
         </div>
       </div>

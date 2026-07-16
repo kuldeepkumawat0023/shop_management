@@ -10,12 +10,17 @@ import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import { cn } from '@/utils/cn';
 import Link from 'next/link';
 import { categoryService, CategoryData } from '@/lib/services/category.services';
+import { useTranslation } from 'react-i18next';
 
 export default function CategoriesView() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('All Categories');
+  React.useEffect(() => {
+    setActiveTab(t('inventory.categoriesView.allCategories'));
+  }, [t]);
   const [categoriesData, setCategoriesData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const tabs = ['All Categories', 'Active', 'Inactive'];
+  const tabs = [t('inventory.categoriesView.allCategories'), t('inventory.categoriesView.active'), t('inventory.categoriesView.inactive')];
 
   React.useEffect(() => {
     const fetchCategories = async () => {
@@ -25,7 +30,7 @@ export default function CategoriesView() {
           setCategoriesData(res.data.map(c => ({
             ...c,
             id: c._id,
-            status: c.isActive !== false ? 'Active' : 'Inactive',
+            status: c.isActive !== false ? t('inventory.categoriesView.active') : t('inventory.categoriesView.inactive'),
             totalProducts: 0 // Fallback
           })));
         }
@@ -39,15 +44,15 @@ export default function CategoriesView() {
   }, []);
 
   const filteredData = categoriesData.filter(item => {
-    if (activeTab === 'All Categories') return true;
-    if (activeTab === 'Active') return item.status === 'Active';
-    if (activeTab === 'Inactive') return item.status === 'Inactive';
+    if (activeTab === t('inventory.categoriesView.allCategories')) return true;
+    if (activeTab === t('inventory.categoriesView.active')) return item.status === t('inventory.categoriesView.active');
+    if (activeTab === t('inventory.categoriesView.inactive')) return item.status === t('inventory.categoriesView.inactive');
     return true;
   });
 
   const columns = [
     {
-      header: 'Category Info',
+      header: t('inventory.categoriesView.categoryInfo'),
       accessorKey: 'name',
       cell: (row: any) => (
         <div className="flex items-center gap-3">
@@ -64,7 +69,7 @@ export default function CategoriesView() {
       )
     },
     {
-      header: 'Slug',
+      header: t('inventory.categoriesView.slug'),
       accessorKey: 'slug',
       cell: (row: any) => (
         <span className="text-xs font-mono font-medium text-on-surface-variant bg-surface-container px-2 py-1 rounded-md border border-outline-variant/10">
@@ -73,7 +78,7 @@ export default function CategoriesView() {
       )
     },
     {
-      header: 'Total Products',
+      header: t('inventory.categoriesView.totalProducts'),
       accessorKey: 'totalProducts',
       cell: (row: any) => (
         <div className="flex items-center gap-1.5 font-bold text-on-surface">
@@ -83,18 +88,18 @@ export default function CategoriesView() {
       )
     },
     {
-      header: 'Status',
+      header: t('inventory.categoriesView.status'),
       accessorKey: 'status',
       cell: (row: any) => (
         <StatusBadge
           status={row.status}
           variant="dot"
-          animate={row.status === 'Active'}
+          animate={row.status === t('inventory.categoriesView.active')}
         />
       )
     },
     {
-      header: 'Actions',
+      header: t('inventory.categoriesView.actions'),
       accessorKey: 'actions',
       cell: (row: any) => (
         <div className="flex items-center gap-2">
@@ -115,8 +120,8 @@ export default function CategoriesView() {
   ];
 
   const totalCategories = categoriesData.length;
-  const activeCategories = categoriesData.filter(c => c.status === 'Active').length;
-  const inactiveCategories = categoriesData.filter(c => c.status === 'Inactive').length;
+  const activeCategories = categoriesData.filter(c => c.status === t('inventory.categoriesView.active')).length;
+  const inactiveCategories = categoriesData.filter(c => c.status === t('inventory.categoriesView.inactive')).length;
 
   const TabsComponent = (
     <div className="flex items-center gap-1 bg-surface-container-low p-1 rounded-lg border border-outline-variant/20 self-start lg:self-auto overflow-x-auto max-w-[calc(100vw-2rem)] lg:max-w-none no-scrollbar">
@@ -144,13 +149,13 @@ export default function CategoriesView() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">Product Categories</h1>
-          <p className="text-sm text-on-surface-variant mt-1 font-medium">Manage your product classification and hierarchy</p>
+          <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">{t('inventory.categoriesView.productCategories')}</h1>
+          <p className="text-sm text-on-surface-variant mt-1 font-medium">{t('inventory.categoriesView.manageClassification')}</p>
         </div>
         <Link href="/categories/new">
           <Button className="gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 shrink-0">
             <Plus className="w-4 h-4" />
-            <span className="font-bold tracking-wide">Add Category</span>
+            <span className="font-bold tracking-wide">{t('inventory.categoriesView.addCategory')}</span>
           </Button>
         </Link>
       </div>
@@ -158,19 +163,19 @@ export default function CategoriesView() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <StatsCard
-          title="Total Categories"
+          title={t('inventory.categoriesView.totalCategories')}
           value={totalCategories}
           icon={FolderTree}
           colorTheme="primary"
         />
         <StatsCard
-          title="Active Categories"
+          title={t('inventory.categoriesView.activeCategories')}
           value={activeCategories}
           icon={CheckCircle2}
           colorTheme="success"
         />
         <StatsCard
-          title="Inactive Categories"
+          title={t('inventory.categoriesView.inactiveCategories')}
           value={inactiveCategories}
           icon={AlertCircle}
           colorTheme="warning"
@@ -186,12 +191,12 @@ export default function CategoriesView() {
             <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-6 w-full">
               <div className="flex items-center gap-2 shrink-0">
                 <LayoutGrid className="w-5 h-5 text-primary" />
-                <h2 className="text-lg font-bold text-on-surface">Category List</h2>
+                <h2 className="text-lg font-bold text-on-surface">{t('inventory.categoriesView.categoryList')}</h2>
               </div>
               {TabsComponent}
             </div>
           }
-          searchPlaceholder="Search by category name or slug..."
+          searchPlaceholder={t('inventory.categoriesView.searchPlaceholder')}
           itemsPerPage={10}
           className="border-none shadow-none bg-transparent"
         />

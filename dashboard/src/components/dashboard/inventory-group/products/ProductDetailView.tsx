@@ -9,6 +9,7 @@ import { DetailViewSkeleton } from '@/components/common/DetailViewSkeleton';
 import { cn } from '@/utils/cn';
 import { useRouter } from 'next/navigation';
 import { productService } from '@/lib/services/product.services';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 
 interface ProductDetailViewProps {
@@ -16,6 +17,7 @@ interface ProductDetailViewProps {
 }
 
 export default function ProductDetailView({ productId }: ProductDetailViewProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('Overview');
   const [productData, setProductData] = useState<any>(null);
@@ -41,17 +43,17 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
   }, [productId]);
 
   const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this product? / क्या आप वाकई इस उत्पाद को हटाना चाहते हैं?')) {
+    if (window.confirm(t('inventory.productDetail.confirmDelete'))) {
       try {
         const res = await productService.deleteProduct(productId);
         if (res.success) {
-          toast.success('Product deleted successfully');
+          toast.success(t('inventory.productDetail.productDeleted'));
           router.push('/products');
         } else {
-          toast.error(res.message || 'Failed to delete product');
+          toast.error(res.message || t('inventory.productDetail.deleteFailed'));
         }
       } catch (err) {
-        toast.error('Error deleting product', { id: 'error-deleting-product' });
+        toast.error(t('inventory.productDetail.deleteError'), { id: 'error-deleting-product' });
       }
     }
   };
@@ -62,9 +64,9 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
     return (
       <div className="p-8 flex flex-col items-center justify-center h-full text-center">
         <Package className="w-16 h-16 text-outline-variant mb-4" />
-        <h2 className="text-2xl font-bold text-on-surface">Product Not Found</h2>
-        <p className="text-on-surface-variant mt-2 mb-6">The product you are looking for does not exist or has been removed.</p>
-        <Button onClick={() => router.back()}>Go Back</Button>
+        <h2 className="text-2xl font-bold text-on-surface">{t('inventory.productDetail.productNotFound')}</h2>
+        <p className="text-on-surface-variant mt-2 mb-6">{t('inventory.productDetail.productNotFoundMsg')}</p>
+        <Button onClick={() => router.back()}>{t('inventory.productDetail.goBack')}</Button>
       </div>
     );
   }
@@ -82,19 +84,19 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-2xl font-black text-on-surface tracking-tight">Product Details</h1>
+            <h1 className="text-2xl font-black text-on-surface tracking-tight">{t('inventory.productDetail.productDetails')}</h1>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <Link href={`/products/${productId}/edit`}>
             <Button variant="ghost" className="text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-xl">
               <Edit className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Edit</span>
+              <span className="hidden sm:inline">{t('inventory.productDetail.edit')}</span>
             </Button>
           </Link>
           <Button onClick={handleDelete} variant="ghost" className="text-on-surface-variant hover:bg-error/10 hover:text-error rounded-xl">
             <Trash2 className="w-4 h-4 sm:mr-2" />
-            <span className="hidden sm:inline">Delete</span>
+            <span className="hidden sm:inline">{t('inventory.productDetail.delete')}</span>
           </Button>
         </div>
       </div>
@@ -126,13 +128,13 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
               </div>
             </div>
             <p className="text-sm text-on-surface-variant leading-relaxed ">
-              {productData.description || 'No description provided.'}
+              {productData.description || t('inventory.productDetail.noDescription')}
             </p>
           </div>
           <div className="bg-surface-container-low rounded-2xl p-5 border border-outline-variant/20 w-full md:w-auto shrink-0 md:text-right">
-            <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1">Selling Price</p>
+            <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1">{t('inventory.productDetail.sellingPrice')}</p>
             <p className="text-3xl font-black text-primary">₹{sellingPrice.toLocaleString('en-IN')}</p>
-            <p className="text-xs font-medium text-on-surface-variant mt-2">Cost: ₹{costPrice.toLocaleString('en-IN')}</p>
+            <p className="text-xs font-medium text-on-surface-variant mt-2">{t('inventory.productDetail.cost')}{costPrice.toLocaleString('en-IN')}</p>
           </div>
         </div>
 
@@ -143,7 +145,7 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
               <Package className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1">Current Stock</p>
+              <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1">{t('inventory.productDetail.currentStock')}</p>
               <p className={cn(
                 "text-2xl font-black",
                 currentStock === 0 ? "text-error" : currentStock <= (productData.minStockLevel || 10) ? "text-warning" : "text-success"
@@ -156,7 +158,7 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
               <TrendingUp className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1">Total Sold</p>
+              <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1">{t('inventory.productDetail.totalSold')}</p>
               <p className="text-2xl font-black text-on-surface">0</p>
             </div>
           </div>
@@ -166,7 +168,7 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
               <IndianRupee className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1">Total Revenue</p>
+              <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1">{t('inventory.productDetail.totalRevenue')}</p>
               <p className="text-2xl font-black text-on-surface">₹0</p>
             </div>
           </div>
@@ -176,35 +178,35 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl shadow-sm overflow-hidden p-6">
               <h2 className="text-lg font-bold text-on-surface mb-6 flex items-center gap-2">
-                <Clock className="w-5 h-5 text-primary" /> Stock History (Coming Soon)
+                <Clock className="w-5 h-5 text-primary" /> {t('inventory.productDetail.stockHistoryTitle')}
               </h2>
               <div className="text-center py-6 text-on-surface-variant">
-                Stock history tracking will be available soon.
+                {t('inventory.productDetail.stockHistoryMsg')}
               </div>
             </div>
           </div>
 
           <div className="space-y-6">
             <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl shadow-sm p-6">
-              <h2 className="text-lg font-bold text-on-surface mb-4">Inventory Settings</h2>
+              <h2 className="text-lg font-bold text-on-surface mb-4">{t('inventory.productDetail.inventorySettings')}</h2>
               
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-2 border-b border-outline-variant/10">
-                  <span className="text-sm font-medium text-on-surface-variant">Min Stock Alert</span>
-                  <span className="text-sm font-bold text-on-surface">{productData.minStockLevel || 10} units</span>
+                  <span className="text-sm font-medium text-on-surface-variant">{t('inventory.productDetail.minStockAlert')}</span>
+                  <span className="text-sm font-bold text-on-surface">{productData.minStockLevel || 10} {t('inventory.productDetail.units')}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-outline-variant/10">
-                  <span className="text-sm font-medium text-on-surface-variant">Tax Rate</span>
+                  <span className="text-sm font-medium text-on-surface-variant">{t('inventory.productDetail.taxRate')}</span>
                   <span className="text-sm font-bold text-on-surface">{productData.taxRate || 18}%</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-outline-variant/10">
-                  <span className="text-sm font-medium text-on-surface-variant">Created On</span>
+                  <span className="text-sm font-medium text-on-surface-variant">{t('inventory.productDetail.createdOn')}</span>
                   <span className="text-sm font-bold text-on-surface">{new Date(productData.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
               
               <Button variant="outline" className="w-full mt-6">
-                Adjust Stock
+                {t('inventory.productDetail.adjustStock')}
               </Button>
             </div>
           </div>
