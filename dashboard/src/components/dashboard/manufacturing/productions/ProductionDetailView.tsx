@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { productionService } from '@/lib/services/production.services';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
+import ActionGuard from '@/components/auth/ActionGuard';
 
 interface ProductionDetailViewProps {
   productionId: string;
@@ -81,10 +82,12 @@ export default function ProductionDetailView({ productionId }: ProductionDetailV
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={handleDelete} variant="ghost" className="text-on-surface-variant hover:bg-error/10 hover:text-error rounded-xl">
-            <Trash2 className="w-4 h-4 sm:mr-2" />
-            <span className="hidden sm:inline">{t('manufacturing.productionDetail.revertDelete')}</span>
-          </Button>
+          <ActionGuard permission="productions.delete">
+            <Button onClick={handleDelete} variant="ghost" className="text-on-surface-variant hover:bg-error/10 hover:text-error rounded-xl">
+              <Trash2 className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">{t('manufacturing.productionDetail.revertDelete')}</span>
+            </Button>
+          </ActionGuard>
         </div>
       </div>
 

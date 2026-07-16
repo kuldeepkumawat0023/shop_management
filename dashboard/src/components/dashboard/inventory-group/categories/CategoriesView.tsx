@@ -11,6 +11,7 @@ import { cn } from '@/utils/cn';
 import Link from 'next/link';
 import { categoryService, CategoryData } from '@/lib/services/category.services';
 import { useTranslation } from 'react-i18next';
+import ActionGuard from '@/components/auth/ActionGuard';
 
 export default function CategoriesView() {
   const { t } = useTranslation();
@@ -108,12 +109,16 @@ export default function CategoriesView() {
               <Eye className="w-4 h-4" />
             </Button>
           </Link>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
-            <Edit className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
-            <Trash2 className="w-4 h-4" />
-          </Button>
+          <ActionGuard permission="categories.update">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
+              <Edit className="w-4 h-4" />
+            </Button>
+          </ActionGuard>
+          <ActionGuard permission="categories.delete">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </ActionGuard>
         </div>
       )
     }
@@ -152,12 +157,14 @@ export default function CategoriesView() {
           <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">{t('inventory.categoriesView.productCategories')}</h1>
           <p className="text-sm text-on-surface-variant mt-1 font-medium">{t('inventory.categoriesView.manageClassification')}</p>
         </div>
-        <Link href="/categories/new">
-          <Button className="gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 shrink-0">
-            <Plus className="w-4 h-4" />
-            <span className="font-bold tracking-wide">{t('inventory.categoriesView.addCategory')}</span>
-          </Button>
-        </Link>
+        <ActionGuard permission="categories.create">
+          <Link href="/categories/new">
+            <Button className="gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 shrink-0">
+              <Plus className="w-4 h-4" />
+              <span className="font-bold tracking-wide">{t('inventory.categoriesView.addCategory')}</span>
+            </Button>
+          </Link>
+        </ActionGuard>
       </div>
 
       {/* Stats Cards */}

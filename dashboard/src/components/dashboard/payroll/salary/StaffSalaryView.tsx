@@ -9,6 +9,7 @@ import { Plus, Download, Filter, Search, Wallet, CheckCircle2, AlertCircle, Cale
 import Link from 'next/link';
 import { payrollService } from '@/lib/services/payroll.services';
 import toast from 'react-hot-toast';
+import ActionGuard from '@/components/auth/ActionGuard';
 
 export default function StaffSalaryView() {
   const [salaries, setSalaries] = useState<any[]>([]);
@@ -69,11 +70,13 @@ export default function StaffSalaryView() {
           <Eye className="w-4 h-4" />
         </Button>
         {row.status === 'Pending' && (
-          <Link href={`/payroll/staff/pay?employeeId=${row.id}`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-success hover:text-success hover:bg-success/10 transition-colors" title="Process Payment">
-              <CreditCard className="w-4 h-4" />
-            </Button>
-          </Link>
+          <ActionGuard permission="payroll.update">
+            <Link href={`/payroll/staff/pay?employeeId=${row.id}`}>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-success hover:text-success hover:bg-success/10 transition-colors" title="Process Payment">
+                <CreditCard className="w-4 h-4" />
+              </Button>
+            </Link>
+          </ActionGuard>
         )}
       </div>
     )},
@@ -92,12 +95,14 @@ export default function StaffSalaryView() {
             <Download className="w-4 h-4" />
             Export Payroll
           </Button>
-          <Link href="/payroll/staff/pay" className="flex-1 md:flex-none">
-            <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 border-none">
-              <Plus className="w-4 h-4" />
-              Process Salary
-            </Button>
-          </Link>
+          <ActionGuard permission="payroll.create">
+            <Link href="/payroll/staff/pay" className="flex-1 md:flex-none">
+              <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 border-none">
+                <Plus className="w-4 h-4" />
+                Process Salary
+              </Button>
+            </Link>
+          </ActionGuard>
         </div>
       </div>
 

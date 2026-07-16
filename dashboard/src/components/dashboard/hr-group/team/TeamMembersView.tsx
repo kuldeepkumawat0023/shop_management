@@ -12,6 +12,7 @@ import { teamService, StaffData } from '@/lib/services/team.services';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { cn } from '@/utils/cn';
+import ActionGuard from '@/components/auth/ActionGuard';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -121,14 +122,18 @@ export default function TeamMembersView() {
             <Eye className="w-4 h-4" />
           </Button>
         </Link>
-        <Link href={`/team/${row._id}/edit`}>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
-            <Edit className="w-4 h-4" />
+        <ActionGuard permission="team.update">
+          <Link href={`/team/${row._id}/edit`}>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
+              <Edit className="w-4 h-4" />
+            </Button>
+          </Link>
+        </ActionGuard>
+        <ActionGuard permission="team.delete">
+          <Button variant="ghost" size="icon" onClick={() => handleDelete(row._id)} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+            <Trash2 className="w-4 h-4" />
           </Button>
-        </Link>
-        <Button variant="ghost" size="icon" onClick={() => handleDelete(row._id)} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
-          <Trash2 className="w-4 h-4" />
-        </Button>
+        </ActionGuard>
       </div>
     )},
   ];
@@ -167,12 +172,14 @@ export default function TeamMembersView() {
             <Download className="w-4 h-4" />
             {t('hr.teamMembersView.export')}
           </Button>
-          <Link href="/team/new" className="flex-1 md:flex-none">
-            <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 border-none">
-              <Plus className="w-4 h-4" />
-              {t('hr.teamMembersView.addMember')}
-            </Button>
-          </Link>
+          <ActionGuard permission="team.create">
+            <Link href="/team/new" className="flex-1 md:flex-none">
+              <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 border-none">
+                <Plus className="w-4 h-4" />
+                {t('hr.teamMembersView.addMember')}
+              </Button>
+            </Link>
+          </ActionGuard>
         </div>
       </div>
 

@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { productService } from '@/lib/services/product.services';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
+import ActionGuard from '@/components/auth/ActionGuard';
 
 interface ProductDetailViewProps {
   productId: string;
@@ -88,16 +89,20 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Link href={`/products/${productId}/edit`}>
-            <Button variant="ghost" className="text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-xl">
-              <Edit className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">{t('inventory.productDetail.edit')}</span>
+          <ActionGuard permission="products.update">
+            <Link href={`/products/${productId}/edit`}>
+              <Button variant="ghost" className="text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-xl">
+                <Edit className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">{t('inventory.productDetail.edit')}</span>
+              </Button>
+            </Link>
+          </ActionGuard>
+          <ActionGuard permission="products.delete">
+            <Button onClick={handleDelete} variant="ghost" className="text-on-surface-variant hover:bg-error/10 hover:text-error rounded-xl">
+              <Trash2 className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">{t('inventory.productDetail.delete')}</span>
             </Button>
-          </Link>
-          <Button onClick={handleDelete} variant="ghost" className="text-on-surface-variant hover:bg-error/10 hover:text-error rounded-xl">
-            <Trash2 className="w-4 h-4 sm:mr-2" />
-            <span className="hidden sm:inline">{t('inventory.productDetail.delete')}</span>
-          </Button>
+          </ActionGuard>
         </div>
       </div>
 
@@ -205,9 +210,11 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
                 </div>
               </div>
               
-              <Button variant="outline" className="w-full mt-6">
-                {t('inventory.productDetail.adjustStock')}
-              </Button>
+              <ActionGuard permission="products.update">
+                <Button variant="outline" className="w-full mt-6">
+                  {t('inventory.productDetail.adjustStock')}
+                </Button>
+              </ActionGuard>
             </div>
           </div>
         </div>

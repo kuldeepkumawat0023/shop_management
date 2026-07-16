@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { cn } from '@/utils/cn';
 import { productService } from '@/lib/services/product.services';
 import { useTranslation } from 'react-i18next';
+import ActionGuard from '@/components/auth/ActionGuard';
 
 export default function ProductsView() {
   const { t } = useTranslation();
@@ -132,12 +133,16 @@ export default function ProductsView() {
               <Eye className="w-4 h-4" />
             </Button>
           </Link>
-          <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10">
-            <Edit className="w-4 h-4" />
-          </Button>
-          <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10">
-            <Trash2 className="w-4 h-4" />
-          </Button>
+          <ActionGuard permission="products.update">
+            <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10">
+              <Edit className="w-4 h-4" />
+            </Button>
+          </ActionGuard>
+          <ActionGuard permission="products.delete">
+            <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10">
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </ActionGuard>
         </div>
       )
     }
@@ -173,12 +178,14 @@ export default function ProductsView() {
             {t('inventory.productsView.manageCatalog')}
           </p>
         </div>
-        <Link href="/products/new">
-          <Button className="w-full sm:w-auto shadow-md">
-            <Plus className="w-5 h-5 mr-2" />
-            {t('inventory.productsView.addNewProduct')}
-          </Button>
-        </Link>
+        <ActionGuard permission="products.create">
+          <Link href="/products/new">
+            <Button className="w-full sm:w-auto shadow-md">
+              <Plus className="w-5 h-5 mr-2" />
+              {t('inventory.productsView.addNewProduct')}
+            </Button>
+          </Link>
+        </ActionGuard>
       </div>
 
       {/* Stats Cards Row */}

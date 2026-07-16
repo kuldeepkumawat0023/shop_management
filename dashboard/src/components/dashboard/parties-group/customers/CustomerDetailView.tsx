@@ -10,6 +10,7 @@ import { saleService, SaleData } from '@/lib/services/sale.services';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
+import ActionGuard from '@/components/auth/ActionGuard';
 
 export default function CustomerDetailView({ id }: { id: string }) {
   const { t } = useTranslation();
@@ -87,16 +88,20 @@ export default function CustomerDetailView({ id }: { id: string }) {
             </div>
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <Link href={`/customers/${id}/edit`}>
-              <Button variant="outline" className="flex-1 sm:flex-none border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-primary/10 font-semibold gap-2 rounded-xl transition-colors">
-                <Edit className="w-4 h-4" />
-                <span className="hidden sm:inline">{t('parties.customerDetailView.editProfile')}</span>
+            <ActionGuard permission="customers.update">
+              <Link href={`/customers/${id}/edit`}>
+                <Button variant="outline" className="flex-1 sm:flex-none border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-primary/10 font-semibold gap-2 rounded-xl transition-colors">
+                  <Edit className="w-4 h-4" />
+                  <span className="hidden sm:inline">{t('parties.customerDetailView.editProfile')}</span>
+                </Button>
+              </Link>
+            </ActionGuard>
+            <ActionGuard permission="customers.delete">
+              <Button onClick={handleDelete} variant="outline" className="flex-1 sm:flex-none border-outline-variant/30 text-error hover:bg-error/10 font-semibold gap-2 rounded-xl transition-colors">
+                <Trash2 className="w-4 h-4" />
+                <span className="hidden sm:inline">{t('parties.customerDetailView.delete')}</span>
               </Button>
-            </Link>
-            <Button onClick={handleDelete} variant="outline" className="flex-1 sm:flex-none border-outline-variant/30 text-error hover:bg-error/10 font-semibold gap-2 rounded-xl transition-colors">
-              <Trash2 className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('parties.customerDetailView.delete')}</span>
-            </Button>
+            </ActionGuard>
           </div>
         </div>
       </div>

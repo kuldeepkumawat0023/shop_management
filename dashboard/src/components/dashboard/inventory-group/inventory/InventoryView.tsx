@@ -10,6 +10,7 @@ import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import { cn } from '@/utils/cn';
 import { productService } from '@/lib/services/product.services';
 import { useTranslation } from 'react-i18next';
+import ActionGuard from '@/components/auth/ActionGuard';
 
 export default function InventoryView() {
   const { t } = useTranslation();
@@ -124,12 +125,16 @@ export default function InventoryView() {
           <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10">
             <Eye className="w-4 h-4" />
           </Button>
-          <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10">
-            <Edit className="w-4 h-4" />
-          </Button>
-          <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10">
-            <Trash2 className="w-4 h-4" />
-          </Button>
+          <ActionGuard permission="products.update">
+            <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10">
+              <Edit className="w-4 h-4" />
+            </Button>
+          </ActionGuard>
+          <ActionGuard permission="products.delete">
+            <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10">
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </ActionGuard>
         </div>
       )
     }

@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
+import ActionGuard from '@/components/auth/ActionGuard';
 
 export default function TeamMemberDetailView() {
   const { t } = useTranslation();
@@ -78,16 +79,20 @@ export default function TeamMemberDetailView() {
             </div>
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <Link href={`/team/${id}/edit`} className="flex-1 sm:flex-none">
-              <Button variant="outline" className="w-full border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-primary/10 font-semibold gap-2 rounded-xl transition-colors">
-                <Edit className="w-4 h-4" />
-                <span className="hidden sm:inline">{t('hr.teamMemberDetail.editDetails')}</span>
+            <ActionGuard permission="team.update">
+              <Link href={`/team/${id}/edit`} className="flex-1 sm:flex-none">
+                <Button variant="outline" className="w-full border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-primary/10 font-semibold gap-2 rounded-xl transition-colors">
+                  <Edit className="w-4 h-4" />
+                  <span className="hidden sm:inline">{t('hr.teamMemberDetail.editDetails')}</span>
+                </Button>
+              </Link>
+            </ActionGuard>
+            <ActionGuard permission="team.delete">
+              <Button variant="outline" onClick={handleDelete} className="flex-1 sm:flex-none border-outline-variant/30 text-error hover:bg-error/10 font-semibold gap-2 rounded-xl transition-colors">
+                <Trash2 className="w-4 h-4" />
+                <span className="hidden sm:inline">{t('hr.teamMemberDetail.terminate')}</span>
               </Button>
-            </Link>
-            <Button variant="outline" onClick={handleDelete} className="flex-1 sm:flex-none border-outline-variant/30 text-error hover:bg-error/10 font-semibold gap-2 rounded-xl transition-colors">
-              <Trash2 className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('hr.teamMemberDetail.terminate')}</span>
-            </Button>
+            </ActionGuard>
           </div>
         </div>
       </div>

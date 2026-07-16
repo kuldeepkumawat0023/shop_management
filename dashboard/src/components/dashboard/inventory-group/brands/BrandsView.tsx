@@ -12,6 +12,7 @@ import { cn } from '@/utils/cn';
 import { brandService, BrandData } from '@/lib/services/brand.services';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
+import ActionGuard from '@/components/auth/ActionGuard';
 
 export default function BrandsView() {
   const { t } = useTranslation();
@@ -121,14 +122,18 @@ export default function BrandsView() {
           <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
             <Eye className="w-4 h-4" />
           </Button>
-          <Link href={`/brands/${row.id}/edit`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
-              <Edit className="w-4 h-4" />
+          <ActionGuard permission="brands.update">
+            <Link href={`/brands/${row.id}/edit`}>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
+                <Edit className="w-4 h-4" />
+              </Button>
+            </Link>
+          </ActionGuard>
+          <ActionGuard permission="brands.delete">
+            <Button onClick={() => handleDelete(row.id)} variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+              <Trash2 className="w-4 h-4" />
             </Button>
-          </Link>
-          <Button onClick={() => handleDelete(row.id)} variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
-            <Trash2 className="w-4 h-4" />
-          </Button>
+          </ActionGuard>
         </div>
       )
     }
@@ -149,12 +154,14 @@ export default function BrandsView() {
             <Download className="w-4 h-4" />
             {t('inventory.brandsView.export')}
           </Button>
-          <Link href="/brands/new" className="flex-1 md:flex-none">
-            <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border-none whitespace-nowrap">
-              <Plus className="w-4 h-4 shrink-0" />
-              <span className="truncate">{t('inventory.brandsView.addNewBrand')}</span>
-            </Button>
-          </Link>
+          <ActionGuard permission="brands.create">
+            <Link href="/brands/new" className="flex-1 md:flex-none">
+              <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border-none whitespace-nowrap">
+                <Plus className="w-4 h-4 shrink-0" />
+                <span className="truncate">{t('inventory.brandsView.addNewBrand')}</span>
+              </Button>
+            </Link>
+          </ActionGuard>
         </div>
       </div>
 

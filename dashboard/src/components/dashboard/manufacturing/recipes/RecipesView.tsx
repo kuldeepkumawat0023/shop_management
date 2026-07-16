@@ -12,6 +12,7 @@ import { cn } from '@/utils/cn';
 import { recipeService } from '@/lib/services/recipe.services';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
+import ActionGuard from '@/components/auth/ActionGuard';
 
 export default function RecipesView() {
   const { t } = useTranslation();
@@ -103,9 +104,11 @@ export default function RecipesView() {
               <Eye className="w-4 h-4" />
             </Button>
           </Link>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors" onClick={() => handleDelete(row.id)}>
-            <Trash2 className="w-4 h-4" />
-          </Button>
+          <ActionGuard permission="recipes.delete">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors" onClick={() => handleDelete(row.id)}>
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </ActionGuard>
         </div>
       )
     },
@@ -145,12 +148,14 @@ export default function RecipesView() {
             <Download className="w-4 h-4" />
             {t('manufacturing.recipesView.export')}
           </Button>
-          <Link href="/manufacturing/recipes/new" className="flex-1 sm:flex-none w-full sm:w-auto">
-            <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border-none whitespace-nowrap">
-              <Plus className="w-4 h-4 shrink-0" />
-              <span className="truncate">{t('manufacturing.recipesView.addRecipe')}</span>
-            </Button>
-          </Link>
+          <ActionGuard permission="recipes.create">
+            <Link href="/manufacturing/recipes/new" className="flex-1 sm:flex-none w-full sm:w-auto">
+              <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border-none whitespace-nowrap">
+                <Plus className="w-4 h-4 shrink-0" />
+                <span className="truncate">{t('manufacturing.recipesView.addRecipe')}</span>
+              </Button>
+            </Link>
+          </ActionGuard>
         </div>
       </div>
 

@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { recipeService } from '@/lib/services/recipe.services';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
+import ActionGuard from '@/components/auth/ActionGuard';
 
 interface RecipeDetailViewProps {
   recipeId: string;
@@ -81,16 +82,20 @@ export default function RecipeDetailView({ recipeId }: RecipeDetailViewProps) {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Link href={`/manufacturing/recipes/${recipeId}/edit`}>
-            <Button variant="ghost" className="text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-xl">
-              <Edit className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">{t('manufacturing.recipeDetail.edit')}</span>
+          <ActionGuard permission="recipes.update">
+            <Link href={`/manufacturing/recipes/${recipeId}/edit`}>
+              <Button variant="ghost" className="text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-xl">
+                <Edit className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">{t('manufacturing.recipeDetail.edit')}</span>
+              </Button>
+            </Link>
+          </ActionGuard>
+          <ActionGuard permission="recipes.delete">
+            <Button onClick={handleDelete} variant="ghost" className="text-on-surface-variant hover:bg-error/10 hover:text-error rounded-xl">
+              <Trash2 className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">{t('manufacturing.recipeDetail.delete')}</span>
             </Button>
-          </Link>
-          <Button onClick={handleDelete} variant="ghost" className="text-on-surface-variant hover:bg-error/10 hover:text-error rounded-xl">
-            <Trash2 className="w-4 h-4 sm:mr-2" />
-            <span className="hidden sm:inline">{t('manufacturing.recipeDetail.delete')}</span>
-          </Button>
+          </ActionGuard>
         </div>
       </div>
 

@@ -9,6 +9,7 @@ import { Plus, Download, Filter, Search, Banknote, HandCoins, UserMinus, Eye, Tr
 import Link from 'next/link';
 import { payrollService } from '@/lib/services/payroll.services';
 import toast from 'react-hot-toast';
+import ActionGuard from '@/components/auth/ActionGuard';
 
 export default function SalaryAdvancesView() {
   const [advances, setAdvances] = useState<any[]>([]);
@@ -62,9 +63,11 @@ export default function SalaryAdvancesView() {
         <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
           <Eye className="w-4 h-4" />
         </Button>
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
-          <Trash2 className="w-4 h-4" />
-        </Button>
+        <ActionGuard permission="payroll.delete">
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        </ActionGuard>
       </div>
     )},
   ];
@@ -82,12 +85,14 @@ export default function SalaryAdvancesView() {
             <Download className="w-4 h-4" />
             Export Data
           </Button>
-          <Link href="/payroll/advances/new" className="flex-1 md:flex-none">
-            <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 border-none">
-              <Plus className="w-4 h-4" />
-              Grant Advance
-            </Button>
-          </Link>
+          <ActionGuard permission="payroll.create">
+            <Link href="/payroll/advances/new" className="flex-1 md:flex-none">
+              <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 border-none">
+                <Plus className="w-4 h-4" />
+                Grant Advance
+              </Button>
+            </Link>
+          </ActionGuard>
         </div>
       </div>
 

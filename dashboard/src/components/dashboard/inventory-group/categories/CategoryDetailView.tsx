@@ -13,6 +13,7 @@ import { categoryService } from '@/lib/services/category.services';
 import { productService } from '@/lib/services/product.services';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
+import ActionGuard from '@/components/auth/ActionGuard';
 
 interface CategoryDetailViewProps {
   categoryId: string;
@@ -157,9 +158,11 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
               <Eye className="w-4 h-4" />
             </Button>
           </Link>
-          <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10">
-            <Edit className="w-4 h-4" />
-          </Button>
+          <ActionGuard permission="products.update">
+            <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10">
+              <Edit className="w-4 h-4" />
+            </Button>
+          </ActionGuard>
         </div>
       )
     }
@@ -210,14 +213,18 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto mt-4 sm:mt-0 ml-14 sm:ml-0">
-          <Link href={`/categories/${categoryId}/edit`} className="flex-1 sm:flex-none">
-            <Button variant="outline" className="w-full shadow-sm rounded-xl">
-              <Edit className="w-4 h-4 mr-2" /> {t('inventory.categoryDetail.edit')}
+          <ActionGuard permission="categories.update">
+            <Link href={`/categories/${categoryId}/edit`} className="flex-1 sm:flex-none">
+              <Button variant="outline" className="w-full shadow-sm rounded-xl">
+                <Edit className="w-4 h-4 mr-2" /> {t('inventory.categoryDetail.edit')}
+              </Button>
+            </Link>
+          </ActionGuard>
+          <ActionGuard permission="categories.delete">
+            <Button onClick={handleDelete} variant="outline" className="flex-1 sm:flex-none text-error hover:bg-error/10 hover:border-error/30 shadow-sm rounded-xl">
+              <Trash2 className="w-4 h-4 mr-2" /> {t('inventory.categoryDetail.delete')}
             </Button>
-          </Link>
-          <Button onClick={handleDelete} variant="outline" className="flex-1 sm:flex-none text-error hover:bg-error/10 hover:border-error/30 shadow-sm rounded-xl">
-            <Trash2 className="w-4 h-4 mr-2" /> {t('inventory.categoryDetail.delete')}
-          </Button>
+          </ActionGuard>
         </div>
       </div>
 

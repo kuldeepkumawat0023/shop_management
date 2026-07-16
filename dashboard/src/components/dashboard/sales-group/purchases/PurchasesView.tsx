@@ -10,7 +10,7 @@ import { Plus, Download, ShoppingCart, Truck, Wallet, FileText, ChevronRight, Ey
 import Link from 'next/link';
 import { purchaseService } from '@/lib/services/purchase.services';
 import { useTranslation } from 'react-i18next';
-import { usePermissions } from '@/hooks/usePermissions';
+import ActionGuard from '@/components/auth/ActionGuard';
 
 // Dynamic KPIs will be calculated
 const getInitialKPIs = (t: any) => [
@@ -22,7 +22,6 @@ const getInitialKPIs = (t: any) => [
 
 export default function PurchasesView() {
   const { t } = useTranslation();
-  const { hasPermission } = usePermissions();
   const [searchQuery, setSearchQuery] = useState('');
   const [purchasesList, setPurchasesList] = useState<any[]>([]);
   const [kpis, setKpis] = useState(() => getInitialKPIs(t));
@@ -97,16 +96,16 @@ export default function PurchasesView() {
             <Eye className="w-4 h-4" />
           </Button>
         </Link>
-        {hasPermission('purchases.update') && (
+        <ActionGuard permission="purchases.update">
           <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
             <Edit className="w-4 h-4" />
           </Button>
-        )}
-        {hasPermission('purchases.delete') && (
+        </ActionGuard>
+        <ActionGuard permission="purchases.delete">
           <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
             <Trash2 className="w-4 h-4" />
           </Button>
-        )}
+        </ActionGuard>
       </div>
     )},
   ];
@@ -124,14 +123,14 @@ export default function PurchasesView() {
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">{t('purchases.purchasesView.export')}</span>
           </Button>
-          {hasPermission('purchases.create') && (
+          <ActionGuard permission="purchases.create">
             <Link href="/purchases/new" className="flex-1 md:flex-none">
               <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border-none whitespace-nowrap">
                 <Plus className="w-4 h-4 shrink-0" />
                 <span className="truncate">{t('purchases.purchasesView.newPurchase')}</span>
               </Button>
             </Link>
-          )}
+          </ActionGuard>
         </div>
       </div>
 

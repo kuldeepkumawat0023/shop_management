@@ -10,6 +10,7 @@ import { Plus, Download, Receipt, Users, Banknote, FileText, ChevronRight, Eye, 
 import Link from 'next/link';
 import { saleService } from '@/lib/services/sale.services';
 import { useTranslation } from 'react-i18next';
+import ActionGuard from '@/components/auth/ActionGuard';
 
 export default function SalesHistoryView() {
   const { t } = useTranslation();
@@ -85,12 +86,16 @@ export default function SalesHistoryView() {
             <Eye className="w-4 h-4" />
           </Button>
         </Link>
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
-          <Edit className="w-4 h-4" />
-        </Button>
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
-          <Trash2 className="w-4 h-4" />
-        </Button>
+        <ActionGuard permission="sales.update">
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
+            <Edit className="w-4 h-4" />
+          </Button>
+        </ActionGuard>
+        <ActionGuard permission="sales.delete">
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        </ActionGuard>
       </div>
     )},
   ];
@@ -108,12 +113,14 @@ export default function SalesHistoryView() {
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">{t('sales.salesHistory.export')}</span>
           </Button>
-          <Link href="/pos" className="flex-1 md:flex-none">
-            <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border-none whitespace-nowrap">
-              <Plus className="w-4 h-4 shrink-0" />
-              <span className="truncate">{t('sales.salesHistory.newSale')}</span>
-            </Button>
-          </Link>
+          <ActionGuard permission="sales.create">
+            <Link href="/pos" className="flex-1 md:flex-none">
+              <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border-none whitespace-nowrap">
+                <Plus className="w-4 h-4 shrink-0" />
+                <span className="truncate">{t('sales.salesHistory.newSale')}</span>
+              </Button>
+            </Link>
+          </ActionGuard>
         </div>
       </div>
 

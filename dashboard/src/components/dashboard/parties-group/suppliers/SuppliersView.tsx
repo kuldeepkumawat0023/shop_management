@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { supplierService } from '@/lib/services/supplier.services';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
+import ActionGuard from '@/components/auth/ActionGuard';
 
 export default function SuppliersView() {
   const [suppliers, setSuppliers] = React.useState<any[]>([]);
@@ -76,14 +77,18 @@ export default function SuppliersView() {
             <Eye className="w-4 h-4" />
           </Button>
         </Link>
-        <Link href={`/suppliers/${row._id}/edit`}>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
-            <Edit className="w-4 h-4" />
+        <ActionGuard permission="suppliers.update">
+          <Link href={`/suppliers/${row._id}/edit`}>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
+              <Edit className="w-4 h-4" />
+            </Button>
+          </Link>
+        </ActionGuard>
+        <ActionGuard permission="suppliers.delete">
+          <Button variant="ghost" size="icon" onClick={() => handleDelete(row._id)} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+            <Trash2 className="w-4 h-4" />
           </Button>
-        </Link>
-        <Button variant="ghost" size="icon" onClick={() => handleDelete(row._id)} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
-          <Trash2 className="w-4 h-4" />
-        </Button>
+        </ActionGuard>
       </div>
     )},
   ];
@@ -121,12 +126,14 @@ export default function SuppliersView() {
             <Download className="w-4 h-4" />
             {t('suppliers.suppliersView.export')}
           </Button>
-          <Link href="/suppliers/new" className="flex-1 md:flex-none">
-            <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 border-none">
-              <Plus className="w-4 h-4" />
-              {t('suppliers.suppliersView.addSupplier')}
-            </Button>
-          </Link>
+          <ActionGuard permission="suppliers.create">
+            <Link href="/suppliers/new" className="flex-1 md:flex-none">
+              <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 border-none">
+                <Plus className="w-4 h-4" />
+                {t('suppliers.suppliersView.addSupplier')}
+              </Button>
+            </Link>
+          </ActionGuard>
         </div>
       </div>
 
