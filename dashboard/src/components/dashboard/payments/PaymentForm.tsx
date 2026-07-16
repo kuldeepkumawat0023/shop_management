@@ -7,8 +7,10 @@ import { useRouter } from 'next/navigation';
 import { cn } from '@/utils/cn';
 import { paymentSchema } from '@/utils/validations';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 export default function PaymentForm() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [formData, setFormData] = useState({
     paymentType: 'Money In',
@@ -68,19 +70,19 @@ export default function PaymentForm() {
         if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
       }
       setErrors(newErrors);
-      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें', { id: 'please-correct-the-errors-----' });
+      return toast.error(t('finance.paymentForm.pleaseCorrectErrors'), { id: 'please-correct-the-errors-----' });
     }
 
     setSubmitting(true);
-    const toastId = toast.loading('Saving payment...');
+    const toastId = toast.loading(t('finance.paymentForm.savingPayment'));
     
     try {
       // API call would go here
       await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Payment saved successfully!', { id: toastId });
+      toast.success(t('finance.paymentForm.savedSuccess'), { id: toastId });
       router.back();
     } catch (err: any) {
-      toast.error('Failed to save payment', { id: toastId });
+      toast.error(t('finance.paymentForm.saveFailed'), { id: toastId });
     } finally {
       setSubmitting(false);
     }
@@ -95,8 +97,8 @@ export default function PaymentForm() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">Record Payment</h1>
-            <p className="text-sm text-on-surface-variant mt-1 font-medium">Log an incoming receipt or outgoing expense.</p>
+            <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">{t('finance.paymentForm.recordPayment')}</h1>
+            <p className="text-sm text-on-surface-variant mt-1 font-medium">{t('finance.paymentForm.logReceiptMsg')}</p>
           </div>
         </div>
       </div>
@@ -137,12 +139,12 @@ export default function PaymentForm() {
 
             <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20 mt-2">
               <Banknote className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">Payment Amount</h2>
+              <h2 className="text-lg font-bold text-on-surface">{t('finance.paymentForm.paymentAmount')}</h2>
             </div>
             
             <div className="flex flex-col gap-5">
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Amount (₹) <span className="text-error ml-1">*</span></label>
+                <label className="text-sm font-bold text-on-surface">{t('finance.paymentForm.amountLabel')} <span className="text-error ml-1">*</span></label>
                 <input
                   type="number"
                   name="amount"
@@ -159,7 +161,7 @@ export default function PaymentForm() {
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Date <span className="text-error ml-1">*</span></label>
+                  <label className="text-sm font-bold text-on-surface">{t('finance.paymentForm.date')} <span className="text-error ml-1">*</span></label>
                   <input
                     type="date"
                     name="date"
@@ -173,7 +175,7 @@ export default function PaymentForm() {
                   {errors.date && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.date}</p>}
                 </div>
                 <div className="flex flex-col gap-1.5 w-full">
-                  <label className="text-sm font-bold text-on-surface">Payment Method <span className="text-error ml-1">*</span></label>
+                  <label className="text-sm font-bold text-on-surface">{t('finance.paymentForm.paymentMethod')} <span className="text-error ml-1">*</span></label>
                   <select 
                     name="paymentMethod"
                     value={formData.paymentMethod}
@@ -183,11 +185,11 @@ export default function PaymentForm() {
                       errors.paymentMethod ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
                     )}
                   >
-                    <option value="UPI">UPI / QR Code</option>
-                    <option value="Bank Transfer">Bank Transfer (NEFT/RTGS)</option>
-                    <option value="Cash">Cash</option>
-                    <option value="Cheque">Cheque</option>
-                    <option value="Card">Credit/Debit Card</option>
+                    <option value="UPI">{t('finance.paymentForm.upi')}</option>
+                    <option value="Bank Transfer">{t('finance.paymentForm.bankTransfer')}</option>
+                    <option value="Cash">{t('finance.paymentForm.cash')}</option>
+                    <option value="Cheque">{t('finance.paymentForm.cheque')}</option>
+                    <option value="Card">{t('finance.paymentForm.card')}</option>
                   </select>
                   {errors.paymentMethod && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.paymentMethod}</p>}
                 </div>
@@ -201,13 +203,13 @@ export default function PaymentForm() {
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
             <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
               <User className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">Party Details</h2>
+              <h2 className="text-lg font-bold text-on-surface">{t('finance.paymentForm.partyDetails')}</h2>
             </div>
             
             <div className="flex flex-col gap-5">
               <div className="flex flex-col gap-1.5 w-full">
                 <label className="text-sm font-bold text-on-surface">
-                  {formData.paymentType === 'Money In' ? 'Received From (Customer)' : 'Paid To (Supplier/Vendor)'} <span className="text-error ml-1">*</span>
+                  {formData.paymentType === 'Money In' ? t('finance.paymentForm.receivedFrom') : t('finance.paymentForm.paidTo')} <span className="text-error ml-1">*</span>
                 </label>
                 <input 
                   type="text"
@@ -228,12 +230,12 @@ export default function PaymentForm() {
           <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6 h-full">
             <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
               <Receipt className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-on-surface">Reference & Notes</h2>
+              <h2 className="text-lg font-bold text-on-surface">{t('finance.paymentForm.referenceNotes')}</h2>
             </div>
             
             <div className="flex flex-col gap-5">
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Reference ID / UTR No</label>
+                <label className="text-sm font-bold text-on-surface">{t('finance.paymentForm.referenceId')}</label>
                 <input
                   type="text"
                   name="referenceNo"
@@ -245,7 +247,7 @@ export default function PaymentForm() {
               </div>
               
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-sm font-bold text-on-surface">Internal Notes</label>
+                <label className="text-sm font-bold text-on-surface">{t('finance.paymentForm.internalNotes')}</label>
                 <textarea 
                   name="notes"
                   value={formData.notes}
@@ -257,16 +259,16 @@ export default function PaymentForm() {
               </div>
 
               <div className="flex flex-col gap-1.5 w-full mt-2">
-                <label className="text-sm font-bold text-on-surface">Status</label>
+                <label className="text-sm font-bold text-on-surface">{t('finance.paymentForm.status')}</label>
                 <select 
                   name="status"
                   value={formData.status}
                   onChange={handleInputChange}
                   className="flex w-full h-10 rounded-xl bg-surface border border-outline-variant/30 px-3 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all appearance-none"
                 >
-                  <option value="Completed">Completed (Cleared)</option>
-                  <option value="Pending">Pending (Processing)</option>
-                  <option value="Failed">Failed / Bounced</option>
+                  <option value="Completed">{t('finance.paymentForm.completed')}</option>
+                  <option value="Pending">{t('finance.paymentForm.pending')}</option>
+                  <option value="Failed">{t('finance.paymentForm.failed')}</option>
                 </select>
               </div>
             </div>
@@ -285,7 +287,7 @@ export default function PaymentForm() {
           </Button>
           <Button type="submit" disabled={submitting} className="w-full sm:w-auto gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
             <Save className="w-4 h-4" />
-            <span className="font-bold tracking-wide">{submitting ? 'Saving...' : 'Save Payment'}</span>
+            <span className="font-bold tracking-wide">{submitting ? t('finance.paymentForm.saving') : t('finance.paymentForm.savePayment')}</span>
           </Button>
         </div>
       </div>

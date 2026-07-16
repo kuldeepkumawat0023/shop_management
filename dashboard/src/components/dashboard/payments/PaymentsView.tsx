@@ -7,15 +7,9 @@ import { StatusBadge } from '@/components/common/StatusBadge';
 import { StatsCard } from '@/components/common/StatsCard';
 import { Plus, Download, Filter, Search, ArrowDownLeft, ArrowUpRight, Clock, AlertCircle, Eye, Printer, Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 
 // Mock Data
-const paymentKPIs = [
-  { title: "Total Received", value: "₹3,25,000", trend: "Money In (This Month)", isPositive: true, icon: ArrowDownLeft },
-  { title: "Total Paid", value: "₹1,45,000", trend: "Money Out (This Month)", isPositive: false, icon: ArrowUpRight },
-  { title: "Pending Receivables", value: "₹45,000", trend: "To collect from customers", isPositive: true, icon: Clock },
-  { title: "Pending Payables", value: "₹12,000", trend: "To pay to suppliers", isPositive: false, icon: AlertCircle },
-];
-
 const paymentList = [
   { id: 'PAY-2026-081', date: 'Jul 24, 2026', party: 'Ramesh Singh', type: 'Money In', amount: 15000, method: 'UPI', status: 'Completed' },
   { id: 'PAY-2026-080', date: 'Jul 24, 2026', party: 'Global Traders', type: 'Money Out', amount: 45000, method: 'Bank Transfer', status: 'Completed' },
@@ -25,10 +19,18 @@ const paymentList = [
 ];
 
 export default function PaymentsView() {
+  const { t } = useTranslation();
+  const paymentKPIs = [
+    { title: t('finance.paymentsView.totalReceived'), value: "₹3,25,000", trend: t('finance.paymentsView.moneyInMonth'), isPositive: true, icon: ArrowDownLeft },
+    { title: t('finance.paymentsView.totalPaid'), value: "₹1,45,000", trend: t('finance.paymentsView.moneyOutMonth'), isPositive: false, icon: ArrowUpRight },
+    { title: t('finance.paymentsView.pendingReceivables'), value: "₹45,000", trend: t('finance.paymentsView.toCollect'), isPositive: true, icon: Clock },
+    { title: t('finance.paymentsView.pendingPayables'), value: "₹12,000", trend: t('finance.paymentsView.toPay'), isPositive: false, icon: AlertCircle },
+  ];
+  const { t } = useTranslation();
   const columns = [
-    { header: 'Date', accessorKey: 'date', cell: (row: any) => <span className="text-sm font-medium text-on-surface-variant">{row.date}</span> },
-    { header: 'Ref ID', accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id}</span> },
-    { header: 'Type', accessorKey: 'type', cell: (row: any) => (
+    { header: t('finance.paymentsView.date'), accessorKey: 'date', cell: (row: any) => <span className="text-sm font-medium text-on-surface-variant">{row.date}</span> },
+    { header: t('finance.paymentsView.refId'), accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id}</span> },
+    { header: t('finance.paymentsView.type'), accessorKey: 'type', cell: (row: any) => (
       <div className="flex items-center gap-1.5">
         {row.type === 'Money In' ? (
           <ArrowDownLeft className="w-4 h-4 text-success" />
@@ -40,15 +42,15 @@ export default function PaymentsView() {
         </span>
       </div>
     )},
-    { header: 'Party Name', accessorKey: 'party', cell: (row: any) => <span className="font-semibold text-on-surface">{row.party}</span> },
-    { header: 'Amount', accessorKey: 'amount', cell: (row: any) => (
+    { header: t('finance.paymentsView.partyName'), accessorKey: 'party', cell: (row: any) => <span className="font-semibold text-on-surface">{row.party}</span> },
+    { header: t('finance.paymentsView.amount'), accessorKey: 'amount', cell: (row: any) => (
       <span className={`font-black ${row.type === 'Money In' ? 'text-success' : 'text-on-surface'}`}>
         {row.type === 'Money In' ? '+' : '-'}₹{row.amount.toLocaleString()}
       </span>
     )},
-    { header: 'Method', accessorKey: 'method', cell: (row: any) => <span className="text-sm font-medium text-on-surface-variant">{row.method}</span> },
-    { header: 'Status', accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
-    { header: 'Actions', accessorKey: 'actions', cell: (row: any) => (
+    { header: t('finance.paymentsView.method'), accessorKey: 'method', cell: (row: any) => <span className="text-sm font-medium text-on-surface-variant">{row.method}</span> },
+    { header: t('finance.paymentsView.status'), accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
+    { header: t('finance.paymentsView.actions'), accessorKey: 'actions', cell: (row: any) => (
       <div className="flex items-center gap-2">
         <Link href={`/payments/${row.id}`}>
           <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
@@ -70,18 +72,18 @@ export default function PaymentsView() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
         <div>
-          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">Payments</h2>
-          <p className="text-sm font-medium text-on-surface-variant">Track all incoming receipts and outgoing payments.</p>
+          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">{t('finance.paymentsView.payments')}</h2>
+          <p className="text-sm font-medium text-on-surface-variant">{t('finance.paymentsView.trackPayments')}</p>
         </div>
         <div className="flex gap-3 w-full md:w-auto">
           <Button variant="outline" className="flex-1 md:flex-none bg-surface-container-lowest border-primary text-primary px-4 py-2 rounded-lg font-bold hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2 shadow-sm">
             <Download className="w-4 h-4" />
-            Export Statement
+            {t('finance.paymentsView.exportStatement')}
           </Button>
           <Link href="/payments/new" className="flex-1 md:flex-none">
             <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 border-none">
               <Plus className="w-4 h-4" />
-              Record Payment
+              {t('finance.paymentsView.recordPayment')}
             </Button>
           </Link>
         </div>
@@ -102,13 +104,13 @@ export default function PaymentsView() {
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
             <input 
               type="text"
-              placeholder="Search by Party or Ref ID..."
+              placeholder={t('finance.paymentsView.searchPlaceholder')}
               className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface border border-outline-variant/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm font-medium transition-all text-on-surface placeholder:text-on-surface-variant/50"
             />
           </div>
           <Button variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface bg-surface font-semibold gap-2">
             <Filter className="w-4 h-4" />
-            Filters
+            {t('finance.paymentsView.filters')}
           </Button>
         </div>
 
