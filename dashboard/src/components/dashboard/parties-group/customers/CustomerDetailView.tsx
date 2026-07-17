@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { DetailViewSkeleton } from '@/components/common/DetailViewSkeleton';
 
 export default function CustomerDetailView({ id }: { id: string }) {
   const { t } = useTranslation();
@@ -67,7 +68,7 @@ export default function CustomerDetailView({ id }: { id: string }) {
     }
   };
 
-  if (loading) return <div className="p-8 text-center">{t('parties.customerDetailView.loadingDetails')}</div>;
+  if (loading) return <DetailViewSkeleton />;
   if (!customer) return <div className="p-8 text-center">{t('parties.customerDetailView.customerNotFound')}</div>;
 
   return (

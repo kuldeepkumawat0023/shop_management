@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { payrollService } from '@/lib/services/payroll.services';
 import toast from 'react-hot-toast';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 
 export default function StaffSalaryView() {
   const [salaries, setSalaries] = useState<any[]>([]);
@@ -81,6 +82,8 @@ export default function StaffSalaryView() {
       </div>
     )},
   ];
+
+  if (loading) return <ViewPageSkeleton />;
 
   return (
     <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full ">

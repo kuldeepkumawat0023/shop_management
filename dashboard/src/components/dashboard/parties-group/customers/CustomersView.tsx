@@ -14,6 +14,7 @@ import { customerService } from '@/lib/services/customer.services';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 
 export default function CustomersView() {
   const { t } = useTranslation();
@@ -109,6 +110,8 @@ export default function CustomersView() {
     { title: t('parties.customersView.newThisMonth'), value: newThisMonth.toString(), trend: t('parties.customersView.currentMonth'), isPositive: true, icon: UserPlus },
     { title: t('parties.customersView.totalReceivables'), value: `₹${totalReceivables.toLocaleString()}`, trend: t('parties.customersView.outstandingDue'), isPositive: false, icon: IndianRupee },
   ];
+
+  if (loading) return <ViewPageSkeleton />;
 
   return (
     <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full ">
