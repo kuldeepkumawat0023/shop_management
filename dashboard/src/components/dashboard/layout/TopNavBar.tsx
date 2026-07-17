@@ -12,7 +12,8 @@ import {
   LogOut,
   Settings,
   ShoppingCart,
-  Bell
+  Bell,
+  Globe
 } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import { cn } from '@/utils/cn';
@@ -103,12 +104,14 @@ export default function TopNavBar({ onMenuClick }: TopNavBarProps) {
         {mounted && (
           <div className="flex items-center gap-1">
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
               onClick={toggleLanguage}
-              className="text-on-surface-variant hover:text-primary transition-colors font-bold text-xs"
+              className="flex items-center gap-1.5 h-8 px-2.5 rounded-full border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary/30 transition-all font-bold text-xs bg-surface-container-lowest shadow-sm"
+              title={i18n.language?.startsWith('hi') ? 'Switch to English' : 'Switch to Hindi'}
             >
-              {i18n.language?.startsWith('hi') ? 'EN' : 'HI'}
+              <Globe className="w-3.5 h-3.5" />
+              <span>{i18n.language?.startsWith('hi') ? 'HI' : 'EN'}</span>
             </Button>
             <Button
               variant="ghost"
