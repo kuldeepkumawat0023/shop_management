@@ -9,6 +9,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { expenseService } from '@/lib/services/expense.services';
 import { useTranslation } from 'react-i18next';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { DeleteModal } from '@/components/common/DeleteModal';
+import toast from 'react-hot-toast';
 
 export default function ExpenseDetailView() {
   const router = useRouter();
@@ -32,44 +34,23 @@ export default function ExpenseDetailView() {
     if (id) fetchExpense();
   }, [id]);
 
-  if (loading) return <DetailViewSkeleton />;
-  if (!expense) return <div className="p-8">{t('expenses.expenseDetail.notFound')}</div>;
+  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
 
-  return (
-    <div className="flex flex-col h-full bg-background overflow-y-auto custom-scrollbar w-full ">
-      {/* Header Sticky */}
-      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex items-center gap-3">
-            <Button onClick={() => router.back()} variant="outline" className="w-10 h-10 p-0 rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary/50 transition-all">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-2xl font-black text-on-surface tracking-tight">EXP-{expense._id.slice(-6).toUpperCase()}</h2>
-                <StatusBadge status={expense.isActive ? 'Paid' : 'Pending'} />
-              </div>
-              <p className="text-sm font-medium text-on-surface-variant">{t('expenses.expenseDetail.loggedOn')}: {new Date(expense.expenseDate).toLocaleDateString()}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <Button variant="outline" className="flex-1 sm:flex-none border-outline-variant/30 text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-semibold gap-2 rounded-xl">
-              <Printer className="w-4 h-4" />
-  const { t } = useTranslation();
-
-  React.useEffect(() => {
-    const fetchExpense = async () => {
-      try {
-        const res = await expenseService.getExpenseById(id);
-        if (res.success) setExpense(res.data);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
+  const executeDelete = async () => {
+    try {
+      const res = await expenseService.deleteExpense(id);
+      if (res.success || (res as any).status === 200) {
+        toast.success(t('expenses.expenseDetail.expenseDeleted'));
+        router.push('/expenses');
+      } else {
+        toast.error((res as any).message || t('expenses.expenseDetail.deleteFailed'));
       }
-    };
-    if (id) fetchExpense();
-  }, [id]);
+    } catch (err) {
+      toast.error(t('expenses.expenseDetail.deleteError'), { id: 'error-deleting-expense' });
+    } finally {
+      setShowDeleteModal(false);
+    }
+  };
 
   if (loading) return <DetailViewSkeleton />;
   if (!expense) return <div className="p-8">{t('expenses.expenseDetail.notFound')}</div>;
@@ -200,7 +181,7 @@ export default function ExpenseDetailView() {
         {/* Delete Zone */}
         <div className="flex justify-end pt-4">
           <ActionGuard permission="expenses.delete">
-            <Button variant="ghost" className="text-error hover:bg-error/10 font-bold gap-2 rounded-xl">
+            <Button onClick={() => setShowDeleteModal(true)} variant="ghost" className="text-error hover:bg-error/10 font-bold gap-2 rounded-xl">
               <Trash2 className="w-4 h-4" />
               {t('expenses.expenseDetail.deleteExpense')}
             </Button>
@@ -208,6 +189,13 @@ export default function ExpenseDetailView() {
         </div>
 
       </div>
+
+      <DeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={executeDelete}
+        itemName={expense.expenseName || t('common.item')}
+      />
     </div>
   );
 }

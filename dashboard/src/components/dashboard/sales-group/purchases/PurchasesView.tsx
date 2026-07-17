@@ -11,6 +11,8 @@ import Link from 'next/link';
 import { purchaseService } from '@/lib/services/purchase.services';
 import { useTranslation } from 'react-i18next';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { DeleteModal } from '@/components/common/DeleteModal';
+import toast from 'react-hot-toast';
 
 // Dynamic KPIs will be calculated
 const getInitialKPIs = (t: any) => [
@@ -71,6 +73,29 @@ export default function PurchasesView() {
     fetchPurchases();
   }, []);
 
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string, name: string } | null>(null);
+
+  const executeDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      const res = await purchaseService.deletePurchase(deleteTarget.id);
+      if (res.success || (res as any).status === 200) {
+        toast.success(t('purchases.purchasesView.purchaseDeleted', 'Purchase order deleted successfully'));
+        setPurchasesList(prev => prev.filter(p => p._id !== deleteTarget.id));
+      } else {
+        toast.error((res as any).message || t('purchases.purchasesView.deleteFailed', 'Failed to delete purchase order'));
+      }
+    } catch (err) {
+      toast.error(t('purchases.purchasesView.deleteError', 'An error occurred while deleting the purchase order'));
+    } finally {
+      setDeleteTarget(null);
+    }
+  };
+
+  const handleDeleteClick = (id: string, name: string) => {
+    setDeleteTarget({ id, name });
+  };
+
   const filteredData = purchasesList.filter(p => 
     p.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.supplier.toLowerCase().includes(searchQuery.toLowerCase())
@@ -102,7 +127,7 @@ export default function PurchasesView() {
           </Button>
         </ActionGuard>
         <ActionGuard permission="purchases.delete">
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+          <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(row._id, row.id)} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
             <Trash2 className="w-4 h-4" />
           </Button>
         </ActionGuard>
@@ -157,6 +182,13 @@ export default function PurchasesView() {
           className="border-none shadow-none"
         />
       </div>
+
+      <DeleteModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={executeDelete}
+        itemName={deleteTarget?.name || t('common.item')}
+      />
     </div>
   );
 }

@@ -9,6 +9,7 @@ import { productionService } from '@/lib/services/production.services';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { DeleteModal } from '@/components/common/DeleteModal';
 
 interface ProductionDetailViewProps {
   productionId: string;
@@ -36,19 +37,21 @@ export default function ProductionDetailView({ productionId }: ProductionDetailV
     fetchProduction();
   }, [productionId]);
 
-  const handleDelete = async () => {
-    if (window.confirm(t('manufacturing.productionDetail.confirmDelete'))) {
-      try {
-        const res = await productionService.deleteProduction(productionId);
-        if (res.success) {
-          toast.success(t('manufacturing.productionDetail.productionDeleted'));
-          router.push('/manufacturing/productions');
-        } else {
-          toast.error(res.message || t('manufacturing.productionDetail.deleteFailed'));
-        }
-      } catch (err) {
-        toast.error(t('manufacturing.productionDetail.deleteError'), { id: 'error-deleting-production-log' });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const executeDelete = async () => {
+    try {
+      const res = await productionService.deleteProduction(productionId);
+      if (res.success) {
+        toast.success(t('manufacturing.productionDetail.productionDeleted'));
+        router.push('/manufacturing/productions');
+      } else {
+        toast.error(res.message || t('manufacturing.productionDetail.deleteFailed'));
       }
+    } catch (err) {
+      toast.error(t('manufacturing.productionDetail.deleteError'), { id: 'error-deleting-production-log' });
+    } finally {
+      setShowDeleteModal(false);
     }
   };
 
@@ -83,7 +86,7 @@ export default function ProductionDetailView({ productionId }: ProductionDetailV
         </div>
         <div className="flex items-center gap-2">
           <ActionGuard permission="productions.delete">
-            <Button onClick={handleDelete} variant="ghost" className="text-on-surface-variant hover:bg-error/10 hover:text-error rounded-xl">
+            <Button onClick={() => setShowDeleteModal(true)} variant="ghost" className="text-on-surface-variant hover:bg-error/10 hover:text-error rounded-xl">
               <Trash2 className="w-4 h-4 sm:mr-2" />
               <span className="hidden sm:inline">{t('manufacturing.productionDetail.revertDelete')}</span>
             </Button>
@@ -164,6 +167,13 @@ export default function ProductionDetailView({ productionId }: ProductionDetailV
         </div>
 
       </div>
+
+      <DeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={executeDelete}
+        itemName={productionData.recipeId?.finalProductId?.name || t('common.item')}
+      />
     </div>
   );
 }

@@ -13,6 +13,7 @@ import { productionService } from '@/lib/services/production.services';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { DeleteModal } from '@/components/common/DeleteModal';
 
 export default function ProductionsView() {
   const { t } = useTranslation();
@@ -51,20 +52,27 @@ export default function ProductionsView() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm(t('manufacturing.productionsView.confirmDelete'))) {
-      try {
-        const res = await productionService.deleteProduction(id);
-        if (res.success) {
-          toast.success(t('manufacturing.productionsView.productionDeleted'));
-          setProductionsData(prev => prev.filter(p => p.id !== id));
-        } else {
-          toast.error(res.message || t('manufacturing.productionsView.deleteFailed'));
-        }
-      } catch (err) {
-        toast.error(t('manufacturing.productionsView.deleteError'), { id: 'error-deleting-production-log' });
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string, name: string } | null>(null);
+
+  const executeDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      const res = await productionService.deleteProduction(deleteTarget.id);
+      if (res.success) {
+        toast.success(t('manufacturing.productionsView.productionDeleted'));
+        setProductionsData(prev => prev.filter(p => p.id !== deleteTarget.id));
+      } else {
+        toast.error(res.message || t('manufacturing.productionsView.deleteFailed'));
       }
+    } catch (err) {
+      toast.error(t('manufacturing.productionsView.deleteError'), { id: 'error-deleting-production-log' });
+    } finally {
+      setDeleteTarget(null);
     }
+  };
+
+  const handleDeleteClick = (id: string, name: string) => {
+    setDeleteTarget({ id, name });
   };
 
   const filteredData = productionsData.filter(p => {
@@ -96,7 +104,7 @@ export default function ProductionsView() {
             </Button>
           </Link>
           <ActionGuard permission="productions.delete">
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors" onClick={() => handleDelete(row.id)}>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors" onClick={() => handleDeleteClick(row.id, row.recipe)}>
               <Trash2 className="w-4 h-4" />
             </Button>
           </ActionGuard>
@@ -201,6 +209,13 @@ export default function ProductionsView() {
           className="border-none shadow-none"
         />
       </div>
+
+      <DeleteModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={executeDelete}
+        itemName={deleteTarget?.name || t('common.item')}
+      />
     </div>
   );
 }

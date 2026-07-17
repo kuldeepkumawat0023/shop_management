@@ -10,6 +10,7 @@ import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { DeleteModal } from '@/components/common/DeleteModal';
 
 export default function RolesListView() {
   const [roles, setRoles] = useState<CustomRoleData[]>([]);
@@ -34,18 +35,26 @@ export default function RolesListView() {
     }
   };
 
-  const handleDelete = async (id: string, roleName: string) => {
-    if (!window.confirm(`Are you sure you want to delete the role "${roleName}"?`)) return;
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string, name: string } | null>(null);
+
+  const executeDelete = async () => {
+    if (!deleteTarget) return;
     const toastId = toast.loading('Deleting role...');
     try {
-      const res = await roleService.deleteRole(id);
+      const res = await roleService.deleteRole(deleteTarget.id);
       if (res.success) {
         toast.success('Role deleted successfully', { id: toastId });
-        setRoles(roles.filter(r => r._id !== id));
+        setRoles(roles.filter(r => r._id !== deleteTarget.id));
       }
     } catch (error: any) {
       toast.error(error?.response?.data?.message || 'Failed to delete role', { id: toastId });
+    } finally {
+      setDeleteTarget(null);
     }
+  };
+
+  const handleDeleteClick = (id: string, roleName: string) => {
+    setDeleteTarget({ id, name: roleName });
   };
 
   if (loading) return <ViewPageSkeleton />;
@@ -136,7 +145,7 @@ export default function RolesListView() {
               <div className="flex gap-2">
                 {!role.isDefault && (
                   <ActionGuard permission="roles.delete">
-                    <Button onClick={() => handleDelete(role._id, role.roleName)} variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10" title="Delete Role">
+                    <Button onClick={() => handleDeleteClick(role._id, role.roleName)} variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10" title="Delete Role">
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </ActionGuard>
@@ -160,6 +169,13 @@ export default function RolesListView() {
             </ActionGuard>
           </div>
         )}
+      
+      <DeleteModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={executeDelete}
+        itemName={deleteTarget?.name || 'Role'}
+      />
     </div>
   );
 }

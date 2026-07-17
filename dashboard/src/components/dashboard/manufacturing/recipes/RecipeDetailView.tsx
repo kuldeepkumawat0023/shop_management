@@ -10,6 +10,7 @@ import { recipeService } from '@/lib/services/recipe.services';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { DeleteModal } from '@/components/common/DeleteModal';
 
 interface RecipeDetailViewProps {
   recipeId: string;
@@ -37,19 +38,21 @@ export default function RecipeDetailView({ recipeId }: RecipeDetailViewProps) {
     fetchRecipe();
   }, [recipeId]);
 
-  const handleDelete = async () => {
-    if (window.confirm(t('manufacturing.recipeDetail.confirmDelete'))) {
-      try {
-        const res = await recipeService.deleteRecipe(recipeId);
-        if (res.success) {
-          toast.success(t('manufacturing.recipeDetail.recipeDeleted'));
-          router.push('/manufacturing/recipes');
-        } else {
-          toast.error(res.message || t('manufacturing.recipeDetail.deleteFailed'));
-        }
-      } catch (err) {
-        toast.error(t('manufacturing.recipeDetail.deleteError'), { id: 'error-deleting-recipe' });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const executeDelete = async () => {
+    try {
+      const res = await recipeService.deleteRecipe(recipeId);
+      if (res.success) {
+        toast.success(t('manufacturing.recipeDetail.recipeDeleted'));
+        router.push('/manufacturing/recipes');
+      } else {
+        toast.error(res.message || t('manufacturing.recipeDetail.deleteFailed'));
       }
+    } catch (err) {
+      toast.error(t('manufacturing.recipeDetail.deleteError'), { id: 'error-deleting-recipe' });
+    } finally {
+      setShowDeleteModal(false);
     }
   };
 
@@ -91,7 +94,7 @@ export default function RecipeDetailView({ recipeId }: RecipeDetailViewProps) {
             </Link>
           </ActionGuard>
           <ActionGuard permission="recipes.delete">
-            <Button onClick={handleDelete} variant="ghost" className="text-on-surface-variant hover:bg-error/10 hover:text-error rounded-xl">
+            <Button onClick={() => setShowDeleteModal(true)} variant="ghost" className="text-on-surface-variant hover:bg-error/10 hover:text-error rounded-xl">
               <Trash2 className="w-4 h-4 sm:mr-2" />
               <span className="hidden sm:inline">{t('manufacturing.recipeDetail.delete')}</span>
             </Button>
@@ -171,6 +174,13 @@ export default function RecipeDetailView({ recipeId }: RecipeDetailViewProps) {
         </div>
 
       </div>
+
+      <DeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={executeDelete}
+        itemName={recipeData.recipeName || t('common.item')}
+      />
     </div>
   );
 }

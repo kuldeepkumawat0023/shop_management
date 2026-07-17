@@ -11,6 +11,7 @@ import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { DeleteModal } from '@/components/common/DeleteModal';
 
 export default function TeamMemberDetailView() {
   const { t } = useTranslation();
@@ -38,19 +39,21 @@ export default function TeamMemberDetailView() {
     fetchStaffData();
   }, [id]);
 
-  const handleDelete = async () => {
-    if (confirm(t('hr.teamMemberDetail.confirmDelete'))) {
-      try {
-        const res = await teamService.deleteStaff(id);
-        if (res.success) {
-          toast.success(t('hr.teamMemberDetail.memberDeleted'));
-          router.push('/team');
-        } else {
-          toast.error(res.message || t('hr.teamMemberDetail.deleteFailed'));
-        }
-      } catch (error) {
-        toast.error(t('hr.teamMemberDetail.deleteFailed'), { id: 'failed-to-remove-staff-member' });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const executeDelete = async () => {
+    try {
+      const res = await teamService.deleteStaff(id);
+      if (res.success) {
+        toast.success(t('hr.teamMemberDetail.memberDeleted'));
+        router.push('/team');
+      } else {
+        toast.error(res.message || t('hr.teamMemberDetail.deleteFailed'));
       }
+    } catch (error) {
+      toast.error(t('hr.teamMemberDetail.deleteFailed'), { id: 'failed-to-remove-staff-member' });
+    } finally {
+      setShowDeleteModal(false);
     }
   };
 
@@ -88,7 +91,7 @@ export default function TeamMemberDetailView() {
               </Link>
             </ActionGuard>
             <ActionGuard permission="team.delete">
-              <Button variant="outline" onClick={handleDelete} className="flex-1 sm:flex-none border-outline-variant/30 text-error hover:bg-error/10 font-semibold gap-2 rounded-xl transition-colors">
+              <Button variant="outline" onClick={() => setShowDeleteModal(true)} className="flex-1 sm:flex-none border-outline-variant/30 text-error hover:bg-error/10 font-semibold gap-2 rounded-xl transition-colors">
                 <Trash2 className="w-4 h-4" />
                 <span className="hidden sm:inline">{t('hr.teamMemberDetail.terminate')}</span>
               </Button>
@@ -249,6 +252,13 @@ export default function TeamMemberDetailView() {
         </div>
 
       </div>
+
+      <DeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={executeDelete}
+        itemName={staff.name || t('common.item')}
+      />
     </div>
   );
 }

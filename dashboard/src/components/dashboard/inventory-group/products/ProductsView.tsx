@@ -12,6 +12,8 @@ import { cn } from '@/utils/cn';
 import { productService } from '@/lib/services/product.services';
 import { useTranslation } from 'react-i18next';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { DeleteModal } from '@/components/common/DeleteModal';
+import toast from 'react-hot-toast';
 
 export default function ProductsView() {
   const { t } = useTranslation();
@@ -46,6 +48,29 @@ export default function ProductsView() {
     };
     fetchProducts();
   }, []);
+
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string, name: string } | null>(null);
+
+  const executeDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      const res = await productService.deleteProduct(deleteTarget.id);
+      if (res.success || (res as any).status === 200) {
+        toast.success(t('inventory.productsView.productDeleted', 'Product deleted successfully'));
+        setProductsData(prev => prev.filter(p => p.id !== deleteTarget.id));
+      } else {
+        toast.error((res as any).message || t('inventory.productsView.deleteFailed', 'Failed to delete product'));
+      }
+    } catch (err) {
+      toast.error(t('inventory.productsView.deleteError', 'An error occurred while deleting the product'));
+    } finally {
+      setDeleteTarget(null);
+    }
+  };
+
+  const handleDeleteClick = (id: string, name: string) => {
+    setDeleteTarget({ id, name });
+  };
 
   const filteredData = productsData.filter(item => {
     if (activeTab === t('inventory.productsView.allProducts')) return true;
@@ -139,7 +164,7 @@ export default function ProductsView() {
             </Button>
           </ActionGuard>
           <ActionGuard permission="products.delete">
-            <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10">
+            <Button size="icon" variant="ghost" onClick={() => handleDeleteClick(row.id, row.name)} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10">
               <Trash2 className="w-4 h-4" />
             </Button>
           </ActionGuard>
@@ -234,6 +259,13 @@ export default function ProductsView() {
           }
         />
       </div>
+
+      <DeleteModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={executeDelete}
+        itemName={deleteTarget?.name || t('common.item')}
+      />
     </div>
   );
 }

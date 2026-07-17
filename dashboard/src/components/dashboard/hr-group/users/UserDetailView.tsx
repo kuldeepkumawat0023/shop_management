@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import Link from 'next/link';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { DeleteModal } from '@/components/common/DeleteModal';
 
 export default function UserDetailView() {
   const { t } = useTranslation();
@@ -37,19 +38,21 @@ export default function UserDetailView() {
     fetchUser();
   }, [id]);
 
-  const handleSuspend = async () => {
-    if (confirm(t('hr.userDetail.confirmSuspend'))) {
-      try {
-        const res = await userService.deleteProfile(id);
-        if (res.success || (res as any).status === 200) {
-          toast.success(t('hr.userDetail.userSuspended'));
-          router.push('/users');
-        } else {
-          toast.error((res as any).message || t('hr.userDetail.suspendFailed'));
-        }
-      } catch (error) {
-        toast.error(t('hr.userDetail.suspendFailed'), { id: 'failed-to-suspend-user' });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const executeDelete = async () => {
+    try {
+      const res = await userService.deleteProfile(id);
+      if (res.success || (res as any).status === 200) {
+        toast.success(t('hr.userDetail.userSuspended'));
+        router.push('/users');
+      } else {
+        toast.error((res as any).message || t('hr.userDetail.suspendFailed'));
       }
+    } catch (error) {
+      toast.error(t('hr.userDetail.suspendFailed'), { id: 'failed-to-suspend-user' });
+    } finally {
+      setShowDeleteModal(false);
     }
   };
 
@@ -85,7 +88,7 @@ export default function UserDetailView() {
               </Link>
             </ActionGuard>
             <ActionGuard permission="users.delete">
-              <Button variant="outline" onClick={handleSuspend} className="flex-1 sm:flex-none border-outline-variant/30 text-error hover:bg-error/10 font-semibold gap-2 rounded-xl transition-colors">
+              <Button variant="outline" onClick={() => setShowDeleteModal(true)} className="flex-1 sm:flex-none border-outline-variant/30 text-error hover:bg-error/10 font-semibold gap-2 rounded-xl transition-colors">
                 <Trash2 className="w-4 h-4" />
                 <span className="hidden sm:inline">{t('hr.userDetail.suspendUser')}</span>
               </Button>
@@ -216,6 +219,13 @@ export default function UserDetailView() {
         </div>
 
       </div>
+
+      <DeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={executeDelete}
+        itemName={user.fullname || t('common.item')}
+      />
     </div>
   );
 }

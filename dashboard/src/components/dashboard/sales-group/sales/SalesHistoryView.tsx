@@ -11,6 +11,8 @@ import Link from 'next/link';
 import { saleService } from '@/lib/services/sale.services';
 import { useTranslation } from 'react-i18next';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { DeleteModal } from '@/components/common/DeleteModal';
+import toast from 'react-hot-toast';
 
 export default function SalesHistoryView() {
   const { t } = useTranslation();
@@ -65,6 +67,29 @@ export default function SalesHistoryView() {
     fetchSales();
   }, []);
 
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string, name: string } | null>(null);
+
+  const executeDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      const res = await saleService.deleteSale(deleteTarget.id);
+      if (res.success || (res as any).status === 200) {
+        toast.success(t('sales.salesHistory.saleDeleted', 'Sale record deleted successfully'));
+        setSalesList(prev => prev.filter(s => s._id !== deleteTarget.id));
+      } else {
+        toast.error((res as any).message || t('sales.salesHistory.deleteFailed', 'Failed to delete sale record'));
+      }
+    } catch (err) {
+      toast.error(t('sales.salesHistory.deleteError', 'An error occurred while deleting the sale record'));
+    } finally {
+      setDeleteTarget(null);
+    }
+  };
+
+  const handleDeleteClick = (id: string, name: string) => {
+    setDeleteTarget({ id, name });
+  };
+
   const filteredData = salesList.filter(s => 
     s.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.customer.toLowerCase().includes(searchQuery.toLowerCase())
@@ -92,7 +117,7 @@ export default function SalesHistoryView() {
           </Button>
         </ActionGuard>
         <ActionGuard permission="sales.delete">
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+          <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(row._id, row.id)} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
             <Trash2 className="w-4 h-4" />
           </Button>
         </ActionGuard>
@@ -147,6 +172,13 @@ export default function SalesHistoryView() {
           className="border-none shadow-none"
         />
       </div>
+
+      <DeleteModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={executeDelete}
+        itemName={deleteTarget?.name || t('common.item')}
+      />
     </div>
   );
 }

@@ -13,6 +13,7 @@ import { brandService, BrandData } from '@/lib/services/brand.services';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { DeleteModal } from '@/components/common/DeleteModal';
 
 export default function BrandsView() {
   const { t } = useTranslation();
@@ -43,20 +44,27 @@ export default function BrandsView() {
     fetchBrands();
   }, []);
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm(t('inventory.brandsView.confirmDelete'))) {
-      try {
-        const res = await brandService.deleteBrand(id);
-        if (res.success || (res as any).status === 200) {
-          toast.success(t('inventory.brandsView.brandDeleted'));
-          setBrandsData(prev => prev.filter(b => b.id !== id));
-        } else {
-          toast.error((res as any).message || t('inventory.brandsView.deleteFailed'));
-        }
-      } catch (err) {
-        toast.error(t('inventory.brandsView.deleteError'), { id: 'error-deleting-brand' });
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string, name: string } | null>(null);
+
+  const executeDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      const res = await brandService.deleteBrand(deleteTarget.id);
+      if (res.success || (res as any).status === 200) {
+        toast.success(t('inventory.brandsView.brandDeleted'));
+        setBrandsData(prev => prev.filter(b => b.id !== deleteTarget.id));
+      } else {
+        toast.error((res as any).message || t('inventory.brandsView.deleteFailed'));
       }
+    } catch (err) {
+      toast.error(t('inventory.brandsView.deleteError'), { id: 'error-deleting-brand' });
+    } finally {
+      setDeleteTarget(null);
     }
+  };
+
+  const handleDeleteClick = (id: string, name: string) => {
+    setDeleteTarget({ id, name });
   };
 
   const filteredData = brandsData.filter(brand => 
@@ -130,7 +138,7 @@ export default function BrandsView() {
             </Link>
           </ActionGuard>
           <ActionGuard permission="brands.delete">
-            <Button onClick={() => handleDelete(row.id)} variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+            <Button onClick={() => handleDeleteClick(row.id, row.name)} variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
               <Trash2 className="w-4 h-4" />
             </Button>
           </ActionGuard>
@@ -228,6 +236,13 @@ export default function BrandsView() {
           itemsPerPage={10}
         />
       </div>
+
+      <DeleteModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={executeDelete}
+        itemName={deleteTarget?.name || t('common.item')}
+      />
     </div>
   );
 }

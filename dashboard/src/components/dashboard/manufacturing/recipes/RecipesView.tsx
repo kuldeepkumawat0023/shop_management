@@ -13,6 +13,7 @@ import { recipeService } from '@/lib/services/recipe.services';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { DeleteModal } from '@/components/common/DeleteModal';
 
 export default function RecipesView() {
   const { t } = useTranslation();
@@ -57,20 +58,27 @@ export default function RecipesView() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm(t('manufacturing.recipesView.confirmDelete'))) {
-      try {
-        const res = await recipeService.deleteRecipe(id);
-        if (res.success) {
-          toast.success(t('manufacturing.recipesView.recipeDeleted'));
-          setRecipesData(prev => prev.filter(r => r.id !== id));
-        } else {
-          toast.error(res.message || t('manufacturing.recipesView.deleteFailed'));
-        }
-      } catch (err) {
-        toast.error(t('manufacturing.recipesView.deleteError'), { id: 'error-deleting-recipe' });
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string, name: string } | null>(null);
+
+  const executeDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      const res = await recipeService.deleteRecipe(deleteTarget.id);
+      if (res.success) {
+        toast.success(t('manufacturing.recipesView.recipeDeleted'));
+        setRecipesData(prev => prev.filter(r => r.id !== deleteTarget.id));
+      } else {
+        toast.error(res.message || t('manufacturing.recipesView.deleteFailed'));
       }
+    } catch (err) {
+      toast.error(t('manufacturing.recipesView.deleteError'), { id: 'error-deleting-recipe' });
+    } finally {
+      setDeleteTarget(null);
     }
+  };
+
+  const handleDeleteClick = (id: string, name: string) => {
+    setDeleteTarget({ id, name });
   };
 
   const filteredData = recipesData.filter(r => {
@@ -105,7 +113,7 @@ export default function RecipesView() {
             </Button>
           </Link>
           <ActionGuard permission="recipes.delete">
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors" onClick={() => handleDelete(row.id)}>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors" onClick={() => handleDeleteClick(row.id, row.name)}>
               <Trash2 className="w-4 h-4" />
             </Button>
           </ActionGuard>
@@ -210,6 +218,13 @@ export default function RecipesView() {
           className="border-none shadow-none"
         />
       </div>
+
+      <DeleteModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={executeDelete}
+        itemName={deleteTarget?.name || t('common.item')}
+      />
     </div>
   );
 }

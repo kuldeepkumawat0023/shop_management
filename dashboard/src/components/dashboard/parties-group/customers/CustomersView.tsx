@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import ActionGuard from '@/components/auth/ActionGuard';
 import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
+import { DeleteModal } from '@/components/common/DeleteModal';
 
 export default function CustomersView() {
   const { t } = useTranslation();
@@ -40,20 +41,27 @@ export default function CustomersView() {
     fetchCustomers();
   }, []);
 
-  const handleDelete = async (id: string) => {
-    if (confirm(t('parties.customersView.confirmDelete'))) {
-      try {
-        const res = await customerService.deleteCustomer(id);
-        if (res.success) {
-          toast.success(t('parties.customersView.deletedSuccess'));
-          fetchCustomers();
-        } else {
-          toast.error(res.message || t('parties.customersView.deleteFailed'));
-        }
-      } catch (error) {
-        toast.error(t('parties.customersView.deleteFailed'), { id: 'failed-to-delete-customer' });
+  const [deleteTarget, setDeleteTarget] = React.useState<{ id: string, name: string } | null>(null);
+
+  const executeDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      const res = await customerService.deleteCustomer(deleteTarget.id);
+      if (res.success) {
+        toast.success(t('parties.customersView.deletedSuccess'));
+        fetchCustomers();
+      } else {
+        toast.error(res.message || t('parties.customersView.deleteFailed'));
       }
+    } catch (error) {
+      toast.error(t('parties.customersView.deleteFailed'), { id: 'failed-to-delete-customer' });
+    } finally {
+      setDeleteTarget(null);
     }
+  };
+
+  const handleDeleteClick = (id: string, name: string) => {
+    setDeleteTarget({ id, name });
   };
   const columns = [
     { header: t('parties.customersView.name'), accessorKey: 'name', cell: (row: any) => <span className="font-semibold text-primary">{row.name}</span> },
@@ -81,7 +89,7 @@ export default function CustomersView() {
           </Link>
         </ActionGuard>
         <ActionGuard permission="customers.delete">
-          <Button variant="ghost" size="icon" onClick={() => handleDelete(row._id)} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+          <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(row._id, row.name)} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
             <Trash2 className="w-4 h-4" />
           </Button>
         </ActionGuard>
@@ -176,6 +184,13 @@ export default function CustomersView() {
           )}
         </div>
       </div>
+
+      <DeleteModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={executeDelete}
+        itemName={deleteTarget?.name || t('common.item')}
+      />
     </div>
   );
 }

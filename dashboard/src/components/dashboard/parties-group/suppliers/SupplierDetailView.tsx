@@ -12,6 +12,7 @@ import toast from 'react-hot-toast';
 import Link from 'next/link';
 import ActionGuard from '@/components/auth/ActionGuard';
 import { DetailViewSkeleton } from '@/components/common/DetailViewSkeleton';
+import { DeleteModal } from '@/components/common/DeleteModal';
 
 export default function SupplierDetailView({ id }: { id: string }) {
   const router = useRouter();
@@ -50,19 +51,21 @@ export default function SupplierDetailView({ id }: { id: string }) {
     if (id) fetchData();
   }, [id]);
 
-  const handleDelete = async () => {
-    if (confirm('Are you sure you want to delete this supplier?')) {
-      try {
-        const res = await supplierService.deleteSupplier(id);
-        if (res.success) {
-          toast.success('Supplier deleted successfully');
-          router.push('/suppliers');
-        } else {
-          toast.error(res.message || 'Failed to delete supplier');
-        }
-      } catch (error) {
-        toast.error('Failed to delete supplier', { id: 'failed-to-delete-supplier' });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const executeDelete = async () => {
+    try {
+      const res = await supplierService.deleteSupplier(id);
+      if (res.success) {
+        toast.success('Supplier deleted successfully');
+        router.push('/suppliers');
+      } else {
+        toast.error(res.message || 'Failed to delete supplier');
       }
+    } catch (error) {
+      toast.error('Failed to delete supplier', { id: 'failed-to-delete-supplier' });
+    } finally {
+      setShowDeleteModal(false);
     }
   };
 
@@ -96,7 +99,7 @@ export default function SupplierDetailView({ id }: { id: string }) {
               </Link>
             </ActionGuard>
             <ActionGuard permission="suppliers.delete">
-              <Button onClick={handleDelete} variant="outline" className="flex-1 sm:flex-none border-outline-variant/30 text-error hover:bg-error/10 font-semibold gap-2 rounded-xl transition-colors">
+              <Button onClick={() => setShowDeleteModal(true)} variant="outline" className="flex-1 sm:flex-none border-outline-variant/30 text-error hover:bg-error/10 font-semibold gap-2 rounded-xl transition-colors">
                 <Trash2 className="w-4 h-4" />
                 <span className="hidden sm:inline">{t('suppliers.supplierDetail.delete')}</span>
               </Button>
@@ -264,6 +267,13 @@ export default function SupplierDetailView({ id }: { id: string }) {
         </div>
 
       </div>
+
+      <DeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={executeDelete}
+        itemName={supplier.name || t('common.item')}
+      />
     </div>
   );
 }

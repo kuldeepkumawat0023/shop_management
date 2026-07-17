@@ -12,6 +12,7 @@ import { productService } from '@/lib/services/product.services';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { DeleteModal } from '@/components/common/DeleteModal';
 
 interface ProductDetailViewProps {
   productId: string;
@@ -43,19 +44,21 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
     fetchProduct();
   }, [productId]);
 
-  const handleDelete = async () => {
-    if (window.confirm(t('inventory.productDetail.confirmDelete'))) {
-      try {
-        const res = await productService.deleteProduct(productId);
-        if (res.success) {
-          toast.success(t('inventory.productDetail.productDeleted'));
-          router.push('/products');
-        } else {
-          toast.error(res.message || t('inventory.productDetail.deleteFailed'));
-        }
-      } catch (err) {
-        toast.error(t('inventory.productDetail.deleteError'), { id: 'error-deleting-product' });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const executeDelete = async () => {
+    try {
+      const res = await productService.deleteProduct(productId);
+      if (res.success) {
+        toast.success(t('inventory.productDetail.productDeleted'));
+        router.push('/products');
+      } else {
+        toast.error(res.message || t('inventory.productDetail.deleteFailed'));
       }
+    } catch (err) {
+      toast.error(t('inventory.productDetail.deleteError'), { id: 'error-deleting-product' });
+    } finally {
+      setShowDeleteModal(false);
     }
   };
 
@@ -98,7 +101,7 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
             </Link>
           </ActionGuard>
           <ActionGuard permission="products.delete">
-            <Button onClick={handleDelete} variant="ghost" className="text-on-surface-variant hover:bg-error/10 hover:text-error rounded-xl">
+            <Button onClick={() => setShowDeleteModal(true)} variant="ghost" className="text-on-surface-variant hover:bg-error/10 hover:text-error rounded-xl">
               <Trash2 className="w-4 h-4 sm:mr-2" />
               <span className="hidden sm:inline">{t('inventory.productDetail.delete')}</span>
             </Button>
@@ -219,6 +222,13 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
           </div>
         </div>
       </div>
+
+      <DeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={executeDelete}
+        itemName={productData.name || t('common.item')}
+      />
     </div>
   );
 }

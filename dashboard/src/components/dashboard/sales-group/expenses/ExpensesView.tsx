@@ -11,6 +11,8 @@ import Link from 'next/link';
 import { expenseService } from '@/lib/services/expense.services';
 import { useTranslation } from 'react-i18next';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { DeleteModal } from '@/components/common/DeleteModal';
+import toast from 'react-hot-toast';
 
 // Dynamic KPIs will be calculated
 const getInitialKPIs = (t: any) => [
@@ -24,6 +26,30 @@ const getInitialKPIs = (t: any) => [
 
 export default function ExpensesView() {
   const { t } = useTranslation();
+  
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string, name: string } | null>(null);
+
+  const executeDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      const res = await expenseService.deleteExpense(deleteTarget.id);
+      if (res.success || (res as any).status === 200) {
+        toast.success(t('expenses.expensesView.expenseDeleted'));
+        setExpensesList(prev => prev.filter(e => e.id !== deleteTarget.id));
+      } else {
+        toast.error((res as any).message || t('expenses.expensesView.deleteFailed'));
+      }
+    } catch (err) {
+      toast.error(t('expenses.expensesView.deleteError'), { id: 'error-deleting-expense' });
+    } finally {
+      setDeleteTarget(null);
+    }
+  };
+
+  const handleDeleteClick = (id: string, name: string) => {
+    setDeleteTarget({ id, name });
+  };
+
   const columns = [
     { header: t('expenses.expensesView.id'), accessorKey: 'id', cell: (row: any) => <span className="font-bold text-on-surface">{row.id.slice(-6).toUpperCase()}</span> },
     { header: t('expenses.expensesView.date'), accessorKey: 'date' },
@@ -45,7 +71,7 @@ export default function ExpensesView() {
           </Button>
         </ActionGuard>
         <ActionGuard permission="expenses.delete">
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+          <Button onClick={() => handleDeleteClick(row.id, row.payee)} variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
             <Trash2 className="w-4 h-4" />
           </Button>
         </ActionGuard>
@@ -162,6 +188,13 @@ export default function ExpensesView() {
           />
         </div>
       </div>
+
+      <DeleteModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={executeDelete}
+        itemName={deleteTarget?.name || t('common.item')}
+      />
     </div>
   );
 }

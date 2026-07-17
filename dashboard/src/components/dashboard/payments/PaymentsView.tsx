@@ -9,6 +9,9 @@ import { Plus, Download, Filter, Search, ArrowDownLeft, ArrowUpRight, Clock, Ale
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { DeleteModal } from '@/components/common/DeleteModal';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 // Mock Data
 const paymentList = [
@@ -21,6 +24,20 @@ const paymentList = [
 
 export default function PaymentsView() {
   const { t } = useTranslation();
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string, name: string } | null>(null);
+
+  const executeDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      // Mock delete
+      toast.success(t('common.deleted', 'Deleted successfully'));
+    } catch (error) {
+      toast.error(t('common.deleteFailed', 'Failed to delete'));
+    } finally {
+      setDeleteTarget(null);
+    }
+  };
+
   const paymentKPIs = [
     { title: t('finance.paymentsView.totalReceived'), value: "₹3,25,000", trend: t('finance.paymentsView.moneyInMonth'), isPositive: true, icon: ArrowDownLeft },
     { title: t('finance.paymentsView.totalPaid'), value: "₹1,45,000", trend: t('finance.paymentsView.moneyOutMonth'), isPositive: false, icon: ArrowUpRight },
@@ -61,7 +78,7 @@ export default function PaymentsView() {
           <Printer className="w-4 h-4" />
         </Button>
         <ActionGuard permission="payments.delete">
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+          <Button variant="ghost" size="icon" onClick={() => setDeleteTarget({ id: row.id, name: row.id })} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
             <Trash2 className="w-4 h-4" />
           </Button>
         </ActionGuard>
@@ -126,6 +143,13 @@ export default function PaymentsView() {
           />
         </div>
       </div>
+
+      <DeleteModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={executeDelete}
+        itemName={deleteTarget?.name || t('common.item')}
+      />
     </div>
   );
 }

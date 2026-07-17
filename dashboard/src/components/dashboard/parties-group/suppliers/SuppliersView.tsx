@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import ActionGuard from '@/components/auth/ActionGuard';
 import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
+import { DeleteModal } from '@/components/common/DeleteModal';
 
 export default function SuppliersView() {
   const [suppliers, setSuppliers] = React.useState<any[]>([]);
@@ -40,20 +41,27 @@ export default function SuppliersView() {
     fetchSuppliers();
   }, []);
 
-  const handleDelete = async (id: string) => {
-    if (confirm(t('suppliers.suppliersView.confirmDelete'))) {
-      try {
-        const res = await supplierService.deleteSupplier(id);
-        if (res.success) {
-          toast.success(t('suppliers.suppliersView.deleteSuccess'));
-          fetchSuppliers();
-        } else {
-          toast.error(res.message || t('suppliers.suppliersView.deleteFailed'));
-        }
-      } catch (error) {
-        toast.error(t('suppliers.suppliersView.deleteFailed'), { id: 'failed-to-delete-supplier' });
+  const [deleteTarget, setDeleteTarget] = React.useState<{ id: string, name: string } | null>(null);
+
+  const executeDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      const res = await supplierService.deleteSupplier(deleteTarget.id);
+      if (res.success) {
+        toast.success(t('suppliers.suppliersView.deleteSuccess'));
+        fetchSuppliers();
+      } else {
+        toast.error(res.message || t('suppliers.suppliersView.deleteFailed'));
       }
+    } catch (error) {
+      toast.error(t('suppliers.suppliersView.deleteFailed'), { id: 'failed-to-delete-supplier' });
+    } finally {
+      setDeleteTarget(null);
     }
+  };
+
+  const handleDeleteClick = (id: string, name: string) => {
+    setDeleteTarget({ id, name });
   };
   const columns = [
     { header: t('suppliers.suppliersView.company'), accessorKey: 'name', cell: (row: any) => (
@@ -86,7 +94,7 @@ export default function SuppliersView() {
           </Link>
         </ActionGuard>
         <ActionGuard permission="suppliers.delete">
-          <Button variant="ghost" size="icon" onClick={() => handleDelete(row._id)} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+          <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(row._id, row.name)} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
             <Trash2 className="w-4 h-4" />
           </Button>
         </ActionGuard>
@@ -179,6 +187,13 @@ export default function SuppliersView() {
           )}
         </div>
       </div>
+
+      <DeleteModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={executeDelete}
+        itemName={deleteTarget?.name || t('common.item')}
+      />
     </div>
   );
 }

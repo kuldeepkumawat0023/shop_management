@@ -12,6 +12,7 @@ import toast from 'react-hot-toast';
 import Link from 'next/link';
 import ActionGuard from '@/components/auth/ActionGuard';
 import { DetailViewSkeleton } from '@/components/common/DetailViewSkeleton';
+import { DeleteModal } from '@/components/common/DeleteModal';
 
 export default function CustomerDetailView({ id }: { id: string }) {
   const { t } = useTranslation();
@@ -52,19 +53,21 @@ export default function CustomerDetailView({ id }: { id: string }) {
     if (id) fetchData();
   }, [id]);
 
-  const handleDelete = async () => {
-    if (confirm(t('parties.customerDetailView.confirmDelete'))) {
-      try {
-        const res = await customerService.deleteCustomer(id);
-        if (res.success) {
-          toast.success(t('parties.customerDetailView.deletedSuccess'));
-          router.push('/customers');
-        } else {
-          toast.error(res.message || t('parties.customerDetailView.deleteFailed'));
-        }
-      } catch (error) {
-        toast.error(t('parties.customerDetailView.deleteFailed'), { id: 'failed-to-delete-customer' });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const executeDelete = async () => {
+    try {
+      const res = await customerService.deleteCustomer(id);
+      if (res.success) {
+        toast.success(t('parties.customerDetailView.deletedSuccess'));
+        router.push('/customers');
+      } else {
+        toast.error(res.message || t('parties.customerDetailView.deleteFailed'));
       }
+    } catch (error) {
+      toast.error(t('parties.customerDetailView.deleteFailed'), { id: 'failed-to-delete-customer' });
+    } finally {
+      setShowDeleteModal(false);
     }
   };
 
@@ -98,7 +101,7 @@ export default function CustomerDetailView({ id }: { id: string }) {
               </Link>
             </ActionGuard>
             <ActionGuard permission="customers.delete">
-              <Button onClick={handleDelete} variant="outline" className="flex-1 sm:flex-none border-outline-variant/30 text-error hover:bg-error/10 font-semibold gap-2 rounded-xl transition-colors">
+              <Button onClick={() => setShowDeleteModal(true)} variant="outline" className="flex-1 sm:flex-none border-outline-variant/30 text-error hover:bg-error/10 font-semibold gap-2 rounded-xl transition-colors">
                 <Trash2 className="w-4 h-4" />
                 <span className="hidden sm:inline">{t('parties.customerDetailView.delete')}</span>
               </Button>
@@ -250,6 +253,13 @@ export default function CustomerDetailView({ id }: { id: string }) {
         </div>
 
       </div>
+
+      <DeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={executeDelete}
+        itemName={customer.name || t('common.item')}
+      />
     </div>
   );
 }

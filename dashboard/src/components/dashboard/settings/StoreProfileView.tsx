@@ -27,7 +27,7 @@ import toast from 'react-hot-toast';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/store';
 import { updateUser } from '@/store/slices/authSlice';
-import { ConfirmModal } from '@/components/common/ConfirmModal';
+import { DeleteModal } from '@/components/common/DeleteModal';
 import ShopCreationModal from '../layout/ShopCreationModal';
 
 // Utility for classnames
@@ -646,13 +646,12 @@ export default function StoreProfileView() {
         </div>
       </div>
 
-      <ConfirmModal
+      <DeleteModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDeleteShop}
-        title="Deactivate Workspace"
-        message={`Are you sure you want to deactivate "${selectedShop?.name}"? Staff members will lose access immediately.`}
-        confirmText="Yes, Deactivate"
+        itemName={selectedShop?.name || 'Workspace'}
+        warningMessage="Are you sure you want to deactivate this workspace? Staff members will lose access immediately."
       />
 
       <ShopCreationModal

@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { cn } from '@/utils/cn';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { DeleteModal } from '@/components/common/DeleteModal';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -72,20 +73,27 @@ export default function TeamMembersView() {
     fetchStaff();
   }, []);
 
-  const handleDelete = async (id: string) => {
-    if (confirm(t('hr.teamMembersView.confirmDelete'))) {
-      try {
-        const res = await teamService.deleteStaff(id);
-        if (res.success) {
-          toast.success(t('hr.teamMembersView.memberDeleted'));
-          fetchStaff();
-        } else {
-          toast.error(res.message || t('hr.teamMembersView.deleteFailed'));
-        }
-      } catch (error) {
-        toast.error(t('hr.teamMembersView.deleteFailed'), { id: 'failed-to-remove-staff-member' });
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string, name: string } | null>(null);
+
+  const executeDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      const res = await teamService.deleteStaff(deleteTarget.id);
+      if (res.success) {
+        toast.success(t('hr.teamMembersView.memberDeleted'));
+        fetchStaff();
+      } else {
+        toast.error(res.message || t('hr.teamMembersView.deleteFailed'));
       }
+    } catch (error) {
+      toast.error(t('hr.teamMembersView.deleteFailed'), { id: 'failed-to-remove-staff-member' });
+    } finally {
+      setDeleteTarget(null);
     }
+  };
+
+  const handleDeleteClick = (id: string, name: string) => {
+    setDeleteTarget({ id, name });
   };
 
   const filteredStaff = staffList.filter((s) => 
@@ -130,7 +138,7 @@ export default function TeamMembersView() {
           </Link>
         </ActionGuard>
         <ActionGuard permission="team.delete">
-          <Button variant="ghost" size="icon" onClick={() => handleDelete(row._id)} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+          <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(row._id, row.name)} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
             <Trash2 className="w-4 h-4" />
           </Button>
         </ActionGuard>
@@ -218,6 +226,13 @@ export default function TeamMembersView() {
           />
         </div>
       </div>
+
+      <DeleteModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={executeDelete}
+        itemName={deleteTarget?.name || t('common.item')}
+      />
     </div>
   );
 }

@@ -14,6 +14,7 @@ import { productService } from '@/lib/services/product.services';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { DeleteModal } from '@/components/common/DeleteModal';
 
 interface CategoryDetailViewProps {
   categoryId: string;
@@ -65,19 +66,21 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
     fetchData();
   }, [categoryId]);
 
-  const handleDelete = async () => {
-    if (window.confirm(t('inventory.categoryDetail.confirmDelete'))) {
-      try {
-        const res = await categoryService.deleteCategory(categoryId);
-        if (res.success || (res as any).status === 200) {
-          toast.success(t('inventory.categoryDetail.categoryDeleted'));
-          router.push('/categories');
-        } else {
-          toast.error(res.message || t('inventory.categoryDetail.deleteFailed'));
-        }
-      } catch (err) {
-        toast.error(t('inventory.categoryDetail.deleteError'), { id: 'error-deleting-category' });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const executeDelete = async () => {
+    try {
+      const res = await categoryService.deleteCategory(categoryId);
+      if (res.success || (res as any).status === 200) {
+        toast.success(t('inventory.categoryDetail.categoryDeleted'));
+        router.push('/categories');
+      } else {
+        toast.error(res.message || t('inventory.categoryDetail.deleteFailed'));
       }
+    } catch (err) {
+      toast.error(t('inventory.categoryDetail.deleteError'), { id: 'error-deleting-category' });
+    } finally {
+      setShowDeleteModal(false);
     }
   };
 
@@ -221,7 +224,7 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
             </Link>
           </ActionGuard>
           <ActionGuard permission="categories.delete">
-            <Button onClick={handleDelete} variant="outline" className="flex-1 sm:flex-none text-error hover:bg-error/10 hover:border-error/30 shadow-sm rounded-xl">
+            <Button onClick={() => setShowDeleteModal(true)} variant="outline" className="flex-1 sm:flex-none text-error hover:bg-error/10 hover:border-error/30 shadow-sm rounded-xl">
               <Trash2 className="w-4 h-4 mr-2" /> {t('inventory.categoryDetail.delete')}
             </Button>
           </ActionGuard>
@@ -364,6 +367,12 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
         </div>
       )}
 
+      <DeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={executeDelete}
+        itemName={categoryData.name || t('common.item')}
+      />
     </div>
   );
 }

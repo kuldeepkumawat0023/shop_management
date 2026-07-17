@@ -11,7 +11,8 @@ import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import { saleService } from '@/lib/services/sale.services';
 import { formatCurrency } from '@/utils/formatCurrency';
 import toast from 'react-hot-toast';
-import InvoiceModal from '@/components/dashboard/pos/today-sales/InvoiceModal';
+import InvoiceModal from './InvoiceModal';
+import { DeleteModal } from '@/components/common/DeleteModal';
 import { useRouter } from 'next/navigation';
 import { usePOS } from '@/contexts/POSContext';
 import { useTranslation } from 'react-i18next';
@@ -62,19 +63,27 @@ export default function TodaySalesView() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm(t('pos.todaySales.confirmDeleteSale'))) return;
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string, invoiceNumber: string } | null>(null);
+
+  const executeDelete = async () => {
+    if (!deleteTarget) return;
 
     const toastId = toast.loading(t('pos.todaySales.deletingSale'));
     try {
-      const res = await saleService.deleteSale(id);
+      const res = await saleService.deleteSale(deleteTarget.id);
       if (res.success) {
         toast.success(t('pos.todaySales.saleDeleted'), { id: toastId });
-        setSales(sales.filter(s => s._id !== id));
+        setSales(sales.filter(s => s._id !== deleteTarget.id));
       }
     } catch (error) {
       toast.error(t('pos.todaySales.deleteSaleFailed'), { id: toastId });
+    } finally {
+      setDeleteTarget(null);
     }
+  };
+
+  const handleDeleteClick = (id: string, invoiceNumber: string) => {
+    setDeleteTarget({ id, invoiceNumber });
   };
 
   const handleEdit = async (sale: any) => {
@@ -150,7 +159,7 @@ export default function TodaySalesView() {
           <Button size="icon" variant="ghost" onClick={() => handleEdit(row)} className="h-8 w-8 text-on-surface-variant hover:text-warning hover:bg-warning/10 transition-colors">
             <Edit className="w-4 h-4" />
           </Button>
-          <Button size="icon" variant="ghost" onClick={() => handleDelete(row._id)} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+          <Button size="icon" variant="ghost" onClick={() => handleDeleteClick(row._id, row.invoiceNumber)} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
             <Trash2 className="w-4 h-4" />
           </Button>
         </div>
@@ -215,12 +224,20 @@ export default function TodaySalesView() {
           itemsPerPage={10}
         />
       </div>
+      {selectedSale && (
+        <InvoiceModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          sale={selectedSale}
+          items={saleItems}
+        />
+      )}
 
-      <InvoiceModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        sale={selectedSale}
-        items={saleItems}
+      <DeleteModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={executeDelete}
+        itemName={deleteTarget?.invoiceNumber || t('common.item')}
       />
     </div>
   );
