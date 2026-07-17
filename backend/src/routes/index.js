@@ -19,6 +19,9 @@ const dashboardRoutes = require('./dashboardRoutes');
 const reportRoutes = require('./reportRoutes');
 const recipeRoutes = require('./recipeRoutes');
 const productionRoutes = require('./productionRoutes');
+const teamRoutes = require('./teamRoutes');
+const settingsRoutes = require('./settingsRoutes');
+const damageRoutes = require('./damageRoutes');
 
 // Mount Routes
 router.use('/auth', authRoutes);
@@ -38,5 +41,8 @@ router.use('/dashboard', dashboardRoutes);
 router.use('/reports', reportRoutes);
 router.use('/recipes', recipeRoutes);
 router.use('/production', productionRoutes);
+router.use('/team', teamRoutes);
+router.use('/settings', settingsRoutes);
+router.use('/damages', damageRoutes);
 
 module.exports = router;
