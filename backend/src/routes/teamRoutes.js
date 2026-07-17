@@ -9,22 +9,24 @@ const { PERMISSIONS } = require('../config/permissions');
 router.use(protect);
 router.use(shopScope);
 
-// Only Super Admin or those with team manage permissions can manage staff directly
+// Staff CRUD
 router.post('/create', requirePermission(PERMISSIONS.TEAM_CREATE), addStaff);
 router.get('/all', requirePermission(PERMISSIONS.TEAM_VIEW), getStaff);
-router.get('/:id', requirePermission(PERMISSIONS.TEAM_VIEW), getStaffById);
-router.put('/update/:id', requirePermission(PERMISSIONS.TEAM_UPDATE), updateStaff);
-router.delete('/delete/:id', requirePermission(PERMISSIONS.TEAM_DELETE), deleteStaff);
 
-// Advances
+// Advances  ← must be before /:id wildcard
 router.post('/advance', requirePermission(PERMISSIONS.PAYROLL_CREATE), recordAdvance);
 router.get('/advance', requirePermission(PERMISSIONS.PAYROLL_VIEW), getAdvances);
 
-// Salaries
+// Salaries  ← must be before /:id wildcard
 router.post('/salary', requirePermission(PERMISSIONS.PAYROLL_CREATE), recordSalary);
 router.get('/salary', requirePermission(PERMISSIONS.PAYROLL_VIEW), getSalaries);
 
-// Expenses
+// Expenses  ← must be before /:id wildcard
 router.post('/expense', requirePermission(PERMISSIONS.EXPENSES_CREATE), recordExpense);
+
+// Wildcard /:id — must come LAST among GET routes
+router.get('/:id', requirePermission(PERMISSIONS.TEAM_VIEW), getStaffById);
+router.put('/update/:id', requirePermission(PERMISSIONS.TEAM_UPDATE), updateStaff);
+router.delete('/delete/:id', requirePermission(PERMISSIONS.TEAM_DELETE), deleteStaff);
 
 module.exports = router;
