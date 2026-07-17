@@ -10,22 +10,46 @@ import Link from 'next/link';
 import { payrollService } from '@/lib/services/payroll.services';
 import toast from 'react-hot-toast';
 import ActionGuard from '@/components/auth/ActionGuard';
+import { DeleteModal } from '@/components/common/DeleteModal';
 import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
+import { useTranslation } from 'react-i18next';
+import { cn } from '@/utils/cn';
 
 export default function SalaryAdvancesView() {
+  const { t } = useTranslation();
   const [advances, setAdvances] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+
+  // Tabs setup
+  const tabs = [
+    t('payroll.advancesView.tabs.all'),
+    t('payroll.advancesView.tabs.approved'),
+    t('payroll.advancesView.tabs.pending'),
+    t('payroll.advancesView.tabs.settled')
+  ];
+  const [activeTab, setActiveTab] = useState('All Advances');
+  React.useEffect(() => {
+    setActiveTab(t('payroll.advancesView.tabs.all'));
+  }, [t]);
 
   const fetchAdvances = async () => {
     setLoading(true);
     try {
       const res = await payrollService.getAdvances();
       if (res.success && res.data) {
-        setAdvances(res.data);
+        // Flatten data for DataTable search
+        const flatData = res.data.map((a: any) => ({
+          ...a,
+          id: a._id,
+          employeeName: a.staffId?.name || t('payroll.advancesView.columns.unknown'),
+          formattedDate: a.advanceDate ? new Date(a.advanceDate).toLocaleDateString() : '-',
+          displayId: a._id?.substring(a._id.length - 6).toUpperCase(),
+          repaymentTermsFormatted: a.repaymentTerm === 'EMI' ? `₹${a.emiAmount}/mo` : a.repaymentTerm
+        }));
+        setAdvances(flatData);
       }
     } catch (error) {
-      toast.error('Failed to load advances', { id: 'failed-to-load-advances' });
+      toast.error(t('payroll.advancesView.messages.loadFailed'), { id: 'failed-to-load-advances' });
     } finally {
       setLoading(false);
     }
@@ -35,37 +59,65 @@ export default function SalaryAdvancesView() {
     fetchAdvances();
   }, []);
 
-  const filteredAdvances = advances.filter((a) => 
-    (a.staffId?.name && a.staffId.name.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const filteredAdvances = advances.filter((a) => {
+    if (activeTab === t('payroll.advancesView.tabs.all')) return true;
+    if (activeTab === t('payroll.advancesView.tabs.approved')) return a.status === 'Approved';
+    if (activeTab === t('payroll.advancesView.tabs.pending')) return a.status === 'Pending';
+    if (activeTab === t('payroll.advancesView.tabs.settled')) return a.status === 'Settled';
+    return true;
+  });
 
-  // ponytail: client-side KPI aggregation to avoid unnecessary backend endpoints.
+  // KPI aggregation
   const totalAdvanceAmount = advances.filter(a => a.status === 'Approved' || a.status === 'Settled').reduce((sum, a) => sum + (Number(a.amount) || 0), 0);
   const pendingRequests = advances.filter(a => a.status === 'Pending').length;
   const approvedAdvances = advances.filter(a => a.status === 'Approved').length;
   const settledAdvances = advances.filter(a => a.status === 'Settled').length;
 
   const advanceKPIs = [
-    { title: "Total Advanced", value: `₹${totalAdvanceAmount.toLocaleString()}`, trend: "Lifetime disbursed", isPositive: true, icon: Banknote },
-    { title: "Active (Approved)", value: approvedAdvances.toString(), trend: "Awaiting settlement", isPositive: true, icon: HandCoins },
-    { title: "Pending Requests", value: pendingRequests.toString(), trend: "Needs review", isPositive: pendingRequests === 0, icon: UserMinus },
-    { title: "Settled", value: settledAdvances.toString(), trend: "Fully recovered", isPositive: true, icon: Plus }, // Use Plus or another suitable icon for settled
+    { title: t('payroll.advancesView.kpi.totalAdvanced'), value: `₹${totalAdvanceAmount.toLocaleString()}`, trend: t('payroll.advancesView.kpi.lifetimeDisbursed'), isPositive: true, icon: Banknote },
+    { title: t('payroll.advancesView.kpi.activeApproved'), value: approvedAdvances.toString(), trend: t('payroll.advancesView.kpi.awaitingSettlement'), isPositive: true, icon: HandCoins },
+    { title: t('payroll.advancesView.kpi.pendingRequests'), value: pendingRequests.toString(), trend: t('payroll.advancesView.kpi.needsReview'), isPositive: pendingRequests === 0, icon: UserMinus },
+    { title: t('payroll.advancesView.kpi.settled'), value: settledAdvances.toString(), trend: t('payroll.advancesView.kpi.fullyRecovered'), isPositive: true, icon: Plus }, 
   ];
 
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string, name: string } | null>(null);
+
+  const executeDelete = async () => {
+    if (!deleteTarget) return;
+    
+    try {
+      const res = await payrollService.deleteAdvance(deleteTarget.id);
+      if (res.success) {
+        toast.success(t('payroll.advancesView.messages.advanceDeleted'));
+        setAdvances(prev => prev.filter(p => p.id !== deleteTarget.id));
+      } else {
+        toast.error(res.message || t('payroll.advancesView.messages.deleteFailed'));
+      }
+    } catch (err) {
+      toast.error(t('payroll.advancesView.messages.deleteError'), { id: 'error-deleting-advance' });
+    } finally {
+      setDeleteTarget(null);
+    }
+  };
+
+  const handleDeleteClick = (id: string, name: string) => {
+    setDeleteTarget({ id, name });
+  };
+
   const columns = [
-    { header: 'Ref ID', accessorKey: '_id', cell: (row: any) => <span className="font-bold text-on-surface">{row._id?.substring(row._id.length - 6).toUpperCase()}</span> },
-    { header: 'Employee', accessorKey: 'staffId.name', cell: (row: any) => <span className="font-semibold text-primary">{row.staffId?.name || 'Unknown'}</span> },
-    { header: 'Amount', accessorKey: 'amount', cell: (row: any) => <span className="font-bold text-on-surface">₹{row.amount?.toLocaleString()}</span> },
-    { header: 'Date Requested', accessorKey: 'advanceDate', cell: (row: any) => <span className="text-sm text-on-surface-variant">{new Date(row.advanceDate).toLocaleDateString()}</span> },
-    { header: 'Repayment Terms', accessorKey: 'repaymentTerm', cell: (row: any) => <span className="text-sm font-medium text-on-surface">{row.repaymentTerm === 'EMI' ? `₹${row.emiAmount}/mo` : row.repaymentTerm}</span> },
-    { header: 'Status', accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
-    { header: 'Actions', accessorKey: 'actions', cell: (row: any) => (
+    { header: t('payroll.advancesView.columns.refId'), accessorKey: 'displayId', cell: (row: any) => <span className="font-bold text-on-surface">{row.displayId}</span> },
+    { header: t('payroll.advancesView.columns.employee'), accessorKey: 'employeeName', cell: (row: any) => <span className="font-semibold text-primary">{row.employeeName}</span> },
+    { header: t('payroll.advancesView.columns.amount'), accessorKey: 'amount', cell: (row: any) => <span className="font-bold text-on-surface">₹{row.amount?.toLocaleString()}</span> },
+    { header: t('payroll.advancesView.columns.dateRequested'), accessorKey: 'formattedDate' },
+    { header: t('payroll.advancesView.columns.repaymentTerms'), accessorKey: 'repaymentTermsFormatted', cell: (row: any) => <span className="text-sm font-medium text-on-surface">{row.repaymentTermsFormatted}</span> },
+    { header: t('payroll.advancesView.columns.status'), accessorKey: 'status', cell: (row: any) => <StatusBadge status={row.status} /> },
+    { header: t('payroll.advancesView.columns.actions'), accessorKey: 'actions', cell: (row: any) => (
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
           <Eye className="w-4 h-4" />
         </Button>
         <ActionGuard permission="payroll.delete">
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors" onClick={() => handleDeleteClick(row.id, row.displayId)}>
             <Trash2 className="w-4 h-4" />
           </Button>
         </ActionGuard>
@@ -73,26 +125,45 @@ export default function SalaryAdvancesView() {
     )},
   ];
 
+  const TabsComponent = (
+    <div className="flex space-x-1 bg-surface-container-low p-1 rounded-lg w-fit overflow-x-auto max-w-[calc(100vw-2rem)] no-scrollbar">
+      {tabs.map((tab) => (
+        <button
+          key={tab}
+          onClick={() => setActiveTab(tab)}
+          className={cn(
+            "px-4 py-1.5 text-xs font-black uppercase tracking-widest rounded-md transition-all whitespace-nowrap",
+            activeTab === tab
+              ? "gradient-button text-white shadow-md"
+              : "text-on-surface-variant hover:text-on-surface hover:bg-surface"
+          )}
+        >
+          {tab}
+        </button>
+      ))}
+    </div>
+  );
+
   if (loading) return <ViewPageSkeleton />;
 
   return (
-    <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full ">
+    <div className="flex flex-col bg-background p-4 md:p-6 lg:p-8 w-full ">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">Salary Advances</h2>
-          <p className="text-sm font-medium text-on-surface-variant">Manage employee advance requests and EMI deductions.</p>
+          <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">{t('payroll.advancesView.title')}</h2>
+          <p className="text-sm font-medium text-on-surface-variant">{t('payroll.advancesView.subtitle')}</p>
         </div>
-        <div className="flex gap-3 w-full md:w-auto">
-          <Button variant="outline" className="flex-1 md:flex-none bg-surface-container-lowest border-primary text-primary px-4 py-2 rounded-lg font-bold hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2 shadow-sm">
+        <div className="flex gap-3 w-full sm:w-auto">
+          <Button variant="outline" className="flex-1 sm:flex-none bg-surface-container-lowest border-primary text-primary px-4 py-2 rounded-lg font-bold hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2 shadow-sm">
             <Download className="w-4 h-4" />
-            Export Data
+            {t('payroll.advancesView.exportData')}
           </Button>
           <ActionGuard permission="payroll.create">
-            <Link href="/payroll/advances/new" className="flex-1 md:flex-none">
-              <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 border-none">
-                <Plus className="w-4 h-4" />
-                Grant Advance
+            <Link href="/payroll/advances/new" className="flex-1 sm:flex-none w-full sm:w-auto">
+              <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border-none whitespace-nowrap">
+                <Plus className="w-4 h-4 shrink-0" />
+                <span className="truncate">{t('payroll.advancesView.grantAdvance')}</span>
               </Button>
             </Link>
           </ActionGuard>
@@ -100,40 +171,38 @@ export default function SalaryAdvancesView() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 shrink-0">
         {advanceKPIs.map((kpi, idx) => (
           <StatsCard key={idx} {...kpi} />
         ))}
       </div>
 
       {/* Table Section */}
-      <div className="flex flex-col flex-1 min-h-0 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm overflow-hidden">
-        {/* Table Toolbar */}
-        <div className="p-4 md:p-5 border-b border-outline-variant/20 flex flex-col sm:flex-row justify-between items-center gap-4 bg-surface-container-lowest/50">
-          <div className="relative w-full sm:w-96">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
-            <input 
-              type="text"
-              placeholder="Search employee name..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface border border-outline-variant/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm font-medium transition-all text-on-surface placeholder:text-on-surface-variant/50"
-            />
-          </div>
-          <Button variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface bg-surface font-semibold gap-2">
-            <Filter className="w-4 h-4" />
-            Filters
-          </Button>
-        </div>
-
-        {/* Data Table */}
-        <div className="flex-1 overflow-auto custom-scrollbar">
-          <DataTable 
-            columns={columns} 
-            data={filteredAdvances} 
-          />
-        </div>
+      <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl shadow-sm overflow-hidden min-h-[400px] flex flex-col">
+        <DataTable 
+          data={filteredAdvances} 
+          columns={columns} 
+          searchPlaceholder={t('payroll.advancesView.searchPlaceholder')}
+          itemsPerPage={10}
+          headerContent={
+            <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 mb-2">
+              <div className="flex items-center gap-2">
+                <Banknote className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-bold text-on-surface">{t('payroll.advancesView.tableTitle')}</h3>
+              </div>
+              {TabsComponent}
+            </div>
+          }
+          className="border-none shadow-none"
+        />
       </div>
+
+      <DeleteModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={executeDelete}
+        itemName={deleteTarget?.name || t('common.item')}
+      />
     </div>
   );
 }

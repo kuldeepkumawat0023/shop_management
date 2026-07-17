@@ -141,6 +141,26 @@ exports.getAdvances = async (req, res, next) => {
   }
 };
 
+// @desc    Delete a salary advance
+// @route   DELETE /api/v1/team/advance/delete/:id
+// @access  Private (Payroll Delete Permission)
+exports.deleteAdvance = async (req, res, next) => {
+  try {
+    const advance = await SalaryAdvance.findOneAndDelete({ 
+      _id: req.params.id, 
+      shopId: req.scopedShopId 
+    });
+
+    if (!advance) {
+      return res.status(404).json({ success: false, message: 'Salary advance not found' });
+    }
+
+    res.status(200).json({ success: true, message: 'Salary advance deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc    Get all salary payments
 // @route   GET /api/v1/team/salary
 // @access  Private

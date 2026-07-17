@@ -1614,5 +1614,144 @@
       "invoiceTerms": "चालान नियम और शर्तें",
       "defaultTerms": "1. एक बार बेचा गया माल वापस नहीं लिया जाएगा।\\n2. स्थानीय अधिकार क्षेत्र के अधीन।\\n3. 30 दिनों के भीतर भुगतान न करने पर 18% प्रति वर्ष की दर से ब्याज लिया जाएगा।"
     }
+  },
+  "payroll": {
+    "salaryForm": {
+      "title": "वेतन संसाधित करें",
+      "subtitle": "कर्मचारी के लिए वेतन भुगतान रिकॉर्ड करें",
+      "payrollDetails": "पेरोल विवरण",
+      "employee": "कर्मचारी",
+      "selectEmployee": "कर्मचारी चुनें...",
+      "salaryMonth": "वेतन माह",
+      "baseSalary": "मूल वेतन (₹)",
+      "bonus": "बोनस (₹)",
+      "deductions": "कटौती (₹) उदा. अग्रिम, छुट्टियां",
+      "netSalaryPayable": "देय शुद्ध वेतन",
+      "paymentInfo": "भुगतान की जानकारी",
+      "paymentMethod": "भुगतान विधि",
+      "paymentDate": "भुगतान तिथि",
+      "internalRemarks": "आंतरिक टिप्पणियां",
+      "remarksPlaceholder": "उदा. UTR Number, या कटौती का कारण...",
+      "clearForm": "साफ़ करें",
+      "cancel": "रद्द करें",
+      "processing": "संसाधित किया जा रहा है...",
+      "confirmPayment": "भुगतान की पुष्टि करें",
+      "messages": {
+        "loadStaffFailed": "कर्मचारी सूची लोड करने में विफल",
+        "pleaseCorrectErrors": "कृपया त्रुटियों को ठीक करें",
+        "processingSalary": "वेतन संसाधित किया जा रहा है...",
+        "success": "वेतन सफलतापूर्वक संसाधित!",
+        "failed": "वेतन संसाधित करने में विफल"
+      }
+    },
+    "salaryView": {
+      "title": "स्टाफ वेतन",
+      "subtitle": "कर्मचारी पेरोल प्रबंधित करें और मासिक संवितरण को ट्रैक करें।",
+      "exportPayroll": "पेरोल निर्यात करें",
+      "processSalary": "वेतन संसाधित करें",
+      "tableTitle": "वेतन लॉग",
+      "searchPlaceholder": "कर्मचारी का नाम खोजें...",
+      "tabs": {
+        "all": "सभी वेतन",
+        "paid": "भुगतान किया",
+        "pending": "लंबित"
+      },
+      "kpi": {
+        "netDisbursed": "शुद्ध संवितरित",
+        "lifetimePaid": "आजीवन भुगतान",
+        "totalDeductions": "कुल कटौती",
+        "leavesAdvances": "छुट्टियां, अग्रिम आदि",
+        "pendingSalaries": "लंबित वेतन",
+        "awaitingPayment": "भुगतान की प्रतीक्षा में",
+        "salaryRecords": "वेतन रिकॉर्ड",
+        "totalProcessed": "कुल संसाधित"
+      },
+      "columns": {
+        "id": "आईडी",
+        "employee": "कर्मचारी",
+        "unknown": "अज्ञात",
+        "baseSalary": "मूल वेतन",
+        "deductions": "कटौती",
+        "netSalary": "शुद्ध वेतन",
+        "paymentDate": "भुगतान तिथि",
+        "status": "स्थिति",
+        "actions": "कार्रवाई"
+      },
+      "messages": {
+        "loadFailed": "वेतन लोड करने में विफल"
+      }
+    },
+    "advancesView": {
+      "title": "वेतन अग्रिम",
+      "subtitle": "कर्मचारी अग्रिम अनुरोधों और ईएमआई कटौती को प्रबंधित करें।",
+      "exportData": "डेटा निर्यात करें",
+      "grantAdvance": "अग्रिम दें",
+      "tableTitle": "अग्रिम लॉग",
+      "searchPlaceholder": "कर्मचारी का नाम खोजें...",
+      "tabs": {
+        "all": "सभी अग्रिम",
+        "approved": "स्वीकृत",
+        "pending": "लंबित",
+        "settled": "निपटाया गया"
+      },
+      "kpi": {
+        "totalAdvanced": "कुल अग्रिम",
+        "lifetimeDisbursed": "आजीवन संवितरित",
+        "activeApproved": "सक्रिय (स्वीकृत)",
+        "awaitingSettlement": "निपटान की प्रतीक्षा में",
+        "pendingRequests": "लंबित अनुरोध",
+        "needsReview": "समीक्षा की आवश्यकता",
+        "settled": "निपटाया गया",
+        "fullyRecovered": "पूरी तरह से वसूल"
+      },
+      "columns": {
+        "refId": "संदर्भ आईडी",
+        "employee": "कर्मचारी",
+        "amount": "राशि",
+        "dateRequested": "अनुरोध की तिथि",
+        "repaymentTerms": "चुकौती शर्तें",
+        "status": "स्थिति",
+        "actions": "कार्रवाई"
+      },
+      "messages": {
+        "loadFailed": "अग्रिम लोड करने में विफल",
+        "confirmDelete": "क्या आप वाकई इस अग्रिम को हटाना चाहते हैं?",
+        "advanceDeleted": "अग्रिम सफलतापूर्वक हटा दिया गया",
+        "deleteFailed": "अग्रिम हटाने में विफल",
+        "deleteError": "अग्रिम हटाते समय एक त्रुटि हुई"
+      }
+    },
+    "advanceForm": {
+      "grantAdvance": "अग्रिम दें",
+      "recordPaymentMsg": "किसी कर्मचारी को नया अग्रिम भुगतान रिकॉर्ड करें",
+      "advanceDetails": "अग्रिम विवरण",
+      "employee": "कर्मचारी",
+      "selectEmployee": "कर्मचारी चुनें...",
+      "advanceAmount": "अग्रिम राशि (₹)",
+      "dateRequested": "अनुरोध की तिथि",
+      "reasonStatus": "कारण और स्थिति",
+      "reasonForAdvance": "अग्रिम का कारण",
+      "reasonPlaceholder": "उदा. चिकित्सा आपातकाल, शादी...",
+      "approvalStatus": "स्वीकृति की स्थिति",
+      "approved": "स्वीकृत",
+      "pending": "लंबित",
+      "rejected": "अस्वीकृत",
+      "repaymentTerms": "चुकौती शर्तें",
+      "deductionPlan": "कटौती योजना",
+      "deductNextSalary": "अगले वेतन से कटौती करें",
+      "deductEmi": "मासिक ईएमआई के माध्यम से कटौती करें",
+      "emiAmount": "प्रति माह ईएमआई राशि (₹)",
+      "emiWarning": "यह राशि कर्मचारी के वेतन से हर महीने स्वचालित रूप से काटी जाएगी जब तक कि अग्रिम पूरी तरह से वसूल नहीं हो जाता।",
+      "nextSalaryWarning": "आगामी वेतन भुगतान से पूरी अग्रिम राशि काट ली जाएगी।",
+      "clearForm": "साफ़ करें",
+      "cancel": "रद्द करें",
+      "saving": "सहेजा जा रहा है...",
+      "saveRequest": "अनुरोध सहेजें",
+      "loadError": "कर्मचारी सूची लोड करने में विफल",
+      "pleaseCorrectErrors": "कृपया त्रुटियों को ठीक करें",
+      "savingRequest": "अग्रिम अनुरोध सहेजा जा रहा है...",
+      "requestSaved": "अग्रिम अनुरोध सफलतापूर्वक सहेजा गया!",
+      "failedToSave": "अग्रिम अनुरोध सहेजने में विफल"
+    }
   }
 }

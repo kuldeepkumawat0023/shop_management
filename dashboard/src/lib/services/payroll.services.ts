@@ -49,6 +49,14 @@ export const payrollService = {
   },
 
   /**
+   * Delete an advance
+   */
+  deleteAdvance: async (id: string): Promise<ApiResponse<any>> => {
+    const response = await apiClient.delete(`/team/advance/delete/${id}`);
+    return response.data;
+  },
+
+  /**
    * Process a salary payment
    */
   processSalary: async (data: SalaryPayload): Promise<ApiResponse<any>> => {

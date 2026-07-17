@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { addStaff, getStaff, getStaffById, updateStaff, recordAdvance, getAdvances, recordExpense, deleteStaff, recordSalary, getSalaries } = require('../controllers/teamController');
+const { addStaff, getStaff, getStaffById, updateStaff, recordAdvance, getAdvances, deleteAdvance, recordExpense, deleteStaff, recordSalary, getSalaries } = require('../controllers/teamController');
 const { protect } = require('../middlewares/authMiddleware');
 const shopScope = require('../middlewares/shopScope');
 const requirePermission = require('../middlewares/requirePermission');
@@ -16,6 +16,7 @@ router.get('/all', requirePermission(PERMISSIONS.TEAM_VIEW), getStaff);
 // Advances  ← must be before /:id wildcard
 router.post('/advance', requirePermission(PERMISSIONS.PAYROLL_CREATE), recordAdvance);
 router.get('/advance', requirePermission(PERMISSIONS.PAYROLL_VIEW), getAdvances);
+router.delete('/advance/delete/:id', requirePermission(PERMISSIONS.PAYROLL_DELETE), deleteAdvance);
 
 // Salaries  ← must be before /:id wildcard
 router.post('/salary', requirePermission(PERMISSIONS.PAYROLL_CREATE), recordSalary);

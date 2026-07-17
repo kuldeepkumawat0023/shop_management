@@ -1614,5 +1614,144 @@
       "invoiceTerms": "Invoice Terms & Conditions",
       "defaultTerms": "1. Goods once sold will not be taken back.\\n2. Subject to local jurisdiction.\\n3. Interest @18% p.a. will be charged if not paid within 30 days."
     }
+  },
+  "payroll": {
+    "salaryForm": {
+      "title": "Process Salary",
+      "subtitle": "Record salary payment for an employee",
+      "payrollDetails": "Payroll Details",
+      "employee": "Employee",
+      "selectEmployee": "Select employee...",
+      "salaryMonth": "Salary Month",
+      "baseSalary": "Base Salary (₹)",
+      "bonus": "Bonuses / Allowances (₹)",
+      "deductions": "Deductions (₹) e.g. Advance, Leaves",
+      "netSalaryPayable": "Net Salary Payable",
+      "paymentInfo": "Payment Information",
+      "paymentMethod": "Payment Method",
+      "paymentDate": "Payment Date",
+      "internalRemarks": "Internal Remarks",
+      "remarksPlaceholder": "e.g. UTR Number, or reasoning for deductions...",
+      "clearForm": "Clear Form",
+      "cancel": "Cancel",
+      "processing": "Processing...",
+      "confirmPayment": "Confirm Payment",
+      "messages": {
+        "loadStaffFailed": "Failed to load staff list",
+        "pleaseCorrectErrors": "Please correct the errors",
+        "processingSalary": "Processing salary...",
+        "success": "Salary processed successfully!",
+        "failed": "Failed to process salary"
+      }
+    },
+    "salaryView": {
+      "title": "Staff Salary",
+      "subtitle": "Manage employee payroll and track monthly disbursements.",
+      "exportPayroll": "Export Payroll",
+      "processSalary": "Process Salary",
+      "tableTitle": "Salary Log",
+      "searchPlaceholder": "Search employee name...",
+      "tabs": {
+        "all": "All Salaries",
+        "paid": "Paid",
+        "pending": "Pending"
+      },
+      "kpi": {
+        "netDisbursed": "Net Disbursed",
+        "lifetimePaid": "Lifetime paid",
+        "totalDeductions": "Total Deductions",
+        "leavesAdvances": "Leaves, advances, etc",
+        "pendingSalaries": "Pending Salaries",
+        "awaitingPayment": "Awaiting payment",
+        "salaryRecords": "Salary Records",
+        "totalProcessed": "Total processed"
+      },
+      "columns": {
+        "id": "ID",
+        "employee": "Employee",
+        "unknown": "Unknown",
+        "baseSalary": "Base Salary",
+        "deductions": "Deductions",
+        "netSalary": "Net Salary",
+        "paymentDate": "Payment Date",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "messages": {
+        "loadFailed": "Failed to load salaries"
+      }
+    },
+    "advancesView": {
+      "title": "Salary Advances",
+      "subtitle": "Manage employee advance requests and EMI deductions.",
+      "exportData": "Export Data",
+      "grantAdvance": "Grant Advance",
+      "tableTitle": "Advances Log",
+      "searchPlaceholder": "Search employee name...",
+      "tabs": {
+        "all": "All Advances",
+        "approved": "Approved",
+        "pending": "Pending",
+        "settled": "Settled"
+      },
+      "kpi": {
+        "totalAdvanced": "Total Advanced",
+        "lifetimeDisbursed": "Lifetime disbursed",
+        "activeApproved": "Active (Approved)",
+        "awaitingSettlement": "Awaiting settlement",
+        "pendingRequests": "Pending Requests",
+        "needsReview": "Needs review",
+        "settled": "Settled",
+        "fullyRecovered": "Fully recovered"
+      },
+      "columns": {
+        "refId": "Ref ID",
+        "employee": "Employee",
+        "amount": "Amount",
+        "dateRequested": "Date Requested",
+        "repaymentTerms": "Repayment Terms",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "messages": {
+        "loadFailed": "Failed to load advances",
+        "confirmDelete": "Are you sure you want to delete this advance?",
+        "advanceDeleted": "Advance deleted successfully",
+        "deleteFailed": "Failed to delete advance",
+        "deleteError": "An error occurred while deleting advance"
+      }
+    },
+    "advanceForm": {
+      "grantAdvance": "Grant Advance",
+      "recordPaymentMsg": "Record a new advance payment to an employee",
+      "advanceDetails": "Advance Details",
+      "employee": "Employee",
+      "selectEmployee": "Select employee...",
+      "advanceAmount": "Advance Amount (₹)",
+      "dateRequested": "Date Requested",
+      "reasonStatus": "Reason & Status",
+      "reasonForAdvance": "Reason for Advance",
+      "reasonPlaceholder": "e.g. Medical emergency, wedding...",
+      "approvalStatus": "Approval Status",
+      "approved": "Approved",
+      "pending": "Pending",
+      "rejected": "Rejected",
+      "repaymentTerms": "Repayment Terms",
+      "deductionPlan": "Deduction Plan",
+      "deductNextSalary": "Deduct from Next Salary",
+      "deductEmi": "Deduct via monthly EMI",
+      "emiAmount": "EMI Amount per month (₹)",
+      "emiWarning": "This amount will be deducted automatically from the employee's salary each month until the advance is fully recovered.",
+      "nextSalaryWarning": "The entire advance amount will be deducted from the upcoming salary payment.",
+      "clearForm": "Clear Form",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "saveRequest": "Save Request",
+      "loadError": "Failed to load staff list",
+      "pleaseCorrectErrors": "Please correct the errors",
+      "savingRequest": "Saving advance request...",
+      "requestSaved": "Advance request saved successfully!",
+      "failedToSave": "Failed to save advance request"
+    }
   }
 }
