@@ -113,8 +113,14 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
         
         {/* Product Profile Header */}
         <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col md:flex-row gap-6 md:gap-8 items-start">
-          <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black text-3xl md:text-5xl shrink-0 border border-primary/20 shadow-inner">
-            {productData.name.substring(0, 2).toUpperCase()}
+          <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl shrink-0 border border-primary/20 shadow-inner overflow-hidden">
+            {productData.image ? (
+              <img src={productData.image} alt={productData.name} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-primary/10 text-primary flex items-center justify-center font-black text-3xl md:text-5xl">
+                {productData.name.substring(0, 2).toUpperCase()}
+              </div>
+            )}
           </div>
           <div className="flex-1 space-y-4">
             <div>

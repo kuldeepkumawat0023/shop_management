@@ -6,7 +6,8 @@ const {
   getProductByBarcode, 
   updateProduct, 
   adjustStock, 
-  deleteProduct 
+  deleteProduct,
+  getProductStockHistory
 } = require('../controllers/productController');
 
 const { protect } = require('../middlewares/authMiddleware');
@@ -24,5 +25,6 @@ router.get('/barcode/:barcode', requirePermission(PERMISSIONS.PRODUCTS_VIEW), ge
 router.put('/update/:id', requirePermission(PERMISSIONS.PRODUCTS_UPDATE), upload.single('image'), updateProduct);
 router.put('/adjust-stock/:id', requirePermission(PERMISSIONS.PRODUCTS_UPDATE), adjustStock);
 router.delete('/delete/:id', requirePermission(PERMISSIONS.PRODUCTS_DELETE), deleteProduct);
+router.get('/:id/stock-history', requirePermission(PERMISSIONS.PRODUCTS_VIEW), getProductStockHistory);
 
 module.exports = router;

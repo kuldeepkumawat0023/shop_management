@@ -131,3 +131,18 @@ exports.deleteProduct = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getProductStockHistory = async (req, res, next) => {
+  try {
+    const history = await StockHistory.find({ 
+      productId: req.params.id, 
+      shopId: req.scopedShopId 
+    })
+    .populate('userId', 'firstName lastName email')
+    .sort('-createdAt');
+
+    res.status(200).json({ success: true, count: history.length, data: history });
+  } catch (error) {
+    next(error);
+  }
+};

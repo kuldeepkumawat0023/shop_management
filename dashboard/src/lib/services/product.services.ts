@@ -13,7 +13,20 @@ export const productService = {
       minStock: data.minStockLevel || 5,
       openingStock: data.currentStock || 0
     };
-    const response = await apiClient.post('/products/create', payload);
+    const formData = new FormData();
+    Object.keys(payload).forEach(key => {
+      if (payload[key] !== null && payload[key] !== undefined) {
+        formData.append(key, payload[key]);
+      }
+    });
+
+    if (data.image) {
+      formData.append('image', data.image);
+    }
+
+    const response = await apiClient.post('/products/create', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
     return response.data;
   },
   getProducts: async (): Promise<ApiResponse<any>> => {
@@ -25,7 +38,20 @@ export const productService = {
     return response.data;
   },
   updateProduct: async (id: string, data: any): Promise<ApiResponse<any>> => {
-    const response = await apiClient.put(`/products/update/${id}`, data);
+    const formData = new FormData();
+    Object.keys(data).forEach(key => {
+      if (key !== 'image' && data[key] !== null && data[key] !== undefined) {
+        formData.append(key, data[key]);
+      }
+    });
+
+    if (data.image) {
+      formData.append('image', data.image);
+    }
+
+    const response = await apiClient.put(`/products/update/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
     return response.data;
   },
   adjustStock: async (id: string, data: any): Promise<ApiResponse<any>> => {
@@ -34,6 +60,10 @@ export const productService = {
   },
   deleteProduct: async (id: string): Promise<ApiResponse<any>> => {
     const response = await apiClient.delete(`/products/delete/${id}`);
+    return response.data;
+  },
+  getProductStockHistory: async (id: string): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get(`/products/${id}/stock-history`);
     return response.data;
   },
 };

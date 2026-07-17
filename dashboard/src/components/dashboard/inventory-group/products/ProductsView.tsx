@@ -86,8 +86,11 @@ export default function ProductsView() {
       cell: (row: any) => (
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-surface-container border border-outline-variant/20 flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden text-on-surface-variant">
-            {/* Fallback avatar/image block */}
-            {row.name.substring(0, 2).toUpperCase()}
+            {row.image ? (
+              <img src={row.image} alt={row.name} className="w-full h-full object-cover" />
+            ) : (
+              row.name.substring(0, 2).toUpperCase()
+            )}
           </div>
           <div>
             <div className="font-bold text-on-surface truncate max-w-[200px] lg:max-w-[300px]">{row.name}</div>

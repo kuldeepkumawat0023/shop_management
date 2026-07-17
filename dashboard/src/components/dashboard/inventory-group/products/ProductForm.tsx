@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/common/Button';
-import { ArrowLeft, Save, UploadCloud, Tag, FileText, Banknote, Package, Layers, RefreshCcw } from 'lucide-react';
+import { ArrowLeft, Save, UploadCloud, Tag, FileText, Banknote, Package, Layers, RefreshCcw, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
 import { cn } from '@/utils/cn';
@@ -23,6 +23,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [existingImage, setExistingImage] = useState<string>('');
   const [categories, setCategories] = useState<any[]>([]);
   const [brands, setBrands] = useState<any[]>([]);
   
@@ -70,6 +71,9 @@ export default function ProductForm({ editId }: ProductFormProps) {
             brand: prod.brandId?._id || prod.brandId || prod.brand || '',
             isActive: prod.isActive !== false
           });
+          if (prod.image) {
+            setExistingImage(prod.image);
+          }
         }
       }
       setInitialLoading(false);
@@ -138,7 +142,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
-      if (file.size <= 5 * 1024 * 1024) { // 5MB limit
+      if (file.size <= 5 * 1024 * 1024) {
         setSelectedFile(file);
       } else {
         toast.error(t('inventory.productForm.fileSizeError'), { id: 'file-size-should-not-exceed-5m' });
@@ -149,7 +153,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      if (file.size <= 5 * 1024 * 1024) { // 5MB limit
+      if (file.size <= 5 * 1024 * 1024) {
         setSelectedFile(file);
       } else {
         toast.error(t('inventory.productForm.fileSizeError'), { id: 'file-size-should-not-exceed-5m' });
@@ -167,6 +171,9 @@ export default function ProductForm({ editId }: ProductFormProps) {
       taxRate: Number(formData.taxRate) || 0,
       currentStock: Number(formData.currentStock) || 0,
       minStockLevel: Number(formData.minStockLevel) || 10,
+      images: undefined,
+      image: selectedFile || undefined,
+      existingImages: undefined
     };
 
     const validationResult = productSchema.safeParse(submissionData);
@@ -434,6 +441,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
             onChange={handleFileChange}
             className="hidden"
             accept=".svg,.png,.jpg,.jpeg,.gif"
+            multiple
           />
           <div 
             onClick={() => fileInputRef.current?.click()}
@@ -456,6 +464,24 @@ export default function ProductForm({ editId }: ProductFormProps) {
               {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB` : t('inventory.productForm.max5mb')}
             </p>
           </div>
+
+          {/* Image Preview */}
+          {(existingImage || selectedFile) && (
+            <div className="mt-6 relative group rounded-2xl overflow-hidden border border-outline-variant/20 bg-surface-container" style={{ maxWidth: 200, height: 200 }}>
+              <img 
+                src={selectedFile ? URL.createObjectURL(selectedFile) : existingImage} 
+                alt="Preview" 
+                className="w-full h-full object-cover" 
+              />
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setSelectedFile(null); setExistingImage(''); }}
+                className="absolute top-2 right-2 bg-error/90 text-on-error p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Status */}

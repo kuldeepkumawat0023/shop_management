@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import ActionGuard from '@/components/auth/ActionGuard';
 import { DeleteModal } from '@/components/common/DeleteModal';
 import toast from 'react-hot-toast';
+import Link from 'next/link';
 
 export default function InventoryView() {
   const { t } = useTranslation();
@@ -94,8 +95,14 @@ export default function InventoryView() {
       accessorKey: 'name',
       cell: (row: any) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
-            {row.name.substring(0, 2).toUpperCase()}
+          <div className="w-8 h-8 rounded-full border border-primary/20 flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden">
+            {row.image ? (
+              <img src={row.image} alt={row.name} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-primary/10 text-primary flex items-center justify-center">
+                {row.name.substring(0, 2).toUpperCase()}
+              </div>
+            )}
           </div>
           <div>
             <div className="font-bold text-on-surface truncate max-w-[200px] lg:max-w-[300px]">{row.name}</div>
@@ -147,9 +154,11 @@ export default function InventoryView() {
       accessorKey: 'id',
       cell: (row: any) => (
         <div className="flex items-center gap-2">
-          <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10">
-            <Eye className="w-4 h-4" />
-          </Button>
+          <Link href={`/inventory/${row.id}`}>
+            <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10">
+              <Eye className="w-4 h-4" />
+            </Button>
+          </Link>
           <ActionGuard permission="products.update">
             <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10">
               <Edit className="w-4 h-4" />
