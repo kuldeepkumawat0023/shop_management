@@ -71,7 +71,6 @@ exports.getRoles = async (req, res, next) => {
     
     // Convert object of default roles to array and inject IDs
     const { ADMIN_DEFAULT_ROLES } = require('../config/permissions');
-    console.log("ADMIN_DEFAULT_ROLES:", ADMIN_DEFAULT_ROLES);
     const defaultRoles = Object.entries(ADMIN_DEFAULT_ROLES)
       .filter(([key]) => req.user.role === 'super_admin' || key !== 'SUPER_ADMIN')
       .map(([key, role]) => ({
