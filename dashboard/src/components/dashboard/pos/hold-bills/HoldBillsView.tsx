@@ -10,9 +10,10 @@ import { usePOS } from '@/contexts/POSContext';
 import { useRouter } from 'next/navigation';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { useTranslation } from 'react-i18next';
+import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 
 export default function HoldBillsView() {
-  const { heldBills, resumeBill } = usePOS();
+  const { heldBills, resumeBill, loadingProducts } = usePOS();
   const router = useRouter();
   const { t } = useTranslation();
 
@@ -94,6 +95,8 @@ export default function HoldBillsView() {
       )
     }
   ];
+
+  if (loadingProducts) return <ViewPageSkeleton />;
 
   return (
     <div className="flex flex-col h-full bg-background p-4 md:p-6 overflow-y-auto custom-scrollbar">

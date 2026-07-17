@@ -12,6 +12,7 @@ import { usePOS } from '@/contexts/POSContext';
 import { Button } from '@/components/common/Button';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 
 export default function NewSaleView() {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -22,7 +23,7 @@ export default function NewSaleView() {
   const barcodeRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
 
-  const { searchQuery, setSearchQuery, cart, products, addToCart } = usePOS();
+  const { searchQuery, setSearchQuery, cart, products, addToCart, loadingProducts } = usePOS();
 
   const handleBarcodeScan = async () => {
     if (!barcodeInput.trim()) return;
@@ -63,6 +64,8 @@ export default function NewSaleView() {
   };
 
   const cartItemCount = cart.reduce((s, i) => s + i.quantity, 0);
+
+  if (loadingProducts) return <ViewPageSkeleton />;
 
   return (
     <div className="flex w-full flex-1 overflow-hidden relative">
