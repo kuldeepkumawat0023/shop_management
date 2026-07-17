@@ -14,6 +14,7 @@ import { DeleteModal } from '@/components/common/DeleteModal';
 
 export default function RolesListView() {
   const [roles, setRoles] = useState<CustomRoleData[]>([]);
+  const [modules, setModules] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -23,9 +24,15 @@ export default function RolesListView() {
 
   const fetchRoles = async () => {
     try {
-      const res = await roleService.getRoles();
-      if (res.success) {
-        setRoles(res.data);
+      const [resRoles, resModules] = await Promise.all([
+        roleService.getRoles(),
+        roleService.getPermissions()
+      ]);
+      if (resRoles.success) {
+        setRoles(resRoles.data);
+      }
+      if (resModules.success) {
+        setModules(resModules.data);
       }
     } catch (error: any) {
       console.error("Roles fetch error:", error);
@@ -33,6 +40,21 @@ export default function RolesListView() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const calculatePermissionCount = (permissions: string[]) => {
+    if (permissions.includes('*') || permissions.includes('all')) return 'Full System Access';
+    let count = 0;
+    modules.forEach(mod => {
+      if (permissions.includes(`${mod.module}.*`)) {
+        count += mod.permissions.length;
+      } else {
+        mod.permissions.forEach((p: any) => {
+          if (permissions.includes(p.key)) count++;
+        });
+      }
+    });
+    return `${count} Permissions`;
   };
 
   const [deleteTarget, setDeleteTarget] = useState<{ id: string, name: string } | null>(null);
@@ -125,8 +147,8 @@ export default function RolesListView() {
                 <span className="text-on-surface-variant font-bold flex items-center gap-2">
                   <Key className="w-4 h-4" /> Access Level
                 </span>
-                <span className="text-on-surface font-bold truncate max-w-[150px]" title={`${role.permissions.length} Permissions`}>
-                  {role.permissions.includes('*') || role.permissions.includes('all') ? 'Full System Access' : `${role.permissions.length} Permissions`}
+                <span className="text-on-surface font-bold truncate max-w-[150px]" title={calculatePermissionCount(role.permissions)}>
+                  {calculatePermissionCount(role.permissions)}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">

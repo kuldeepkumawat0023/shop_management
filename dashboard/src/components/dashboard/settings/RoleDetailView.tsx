@@ -63,6 +63,19 @@ export default function RoleDetailView({ roleId }: RoleDetailViewProps) {
   const permissions = role.permissions || [];
   const hasGlobalWildcard = permissions.includes('*') || permissions.includes('all');
 
+  let exactPermissionCount = 0;
+  if (!hasGlobalWildcard) {
+    modules.forEach(mod => {
+      if (permissions.includes(`${mod.module}.*`)) {
+        exactPermissionCount += mod.permissions.length;
+      } else {
+        mod.permissions.forEach(p => {
+          if (permissions.includes(p.key)) exactPermissionCount++;
+        });
+      }
+    });
+  }
+
   return (
     <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full mx-auto max-w-7xl">
       {/* Header */}
@@ -122,7 +135,7 @@ export default function RoleDetailView({ roleId }: RoleDetailViewProps) {
                 <div>
                   <div className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Access Level</div>
                   <div className="font-black text-on-surface">
-                    {hasGlobalWildcard ? 'Full System Access' : `${permissions.length} Permissions`}
+                    {hasGlobalWildcard ? 'Full System Access' : `${exactPermissionCount} Permissions`}
                   </div>
                 </div>
               </div>
