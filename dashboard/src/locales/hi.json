@@ -66,10 +66,10 @@
     "salesAnalytics": "बिक्री विश्लेषण",
     "thisYear": "इस वर्ष",
     "lastYear": "पिछले वर्ष",
-    "revenueBreakdown": "आय का विवरण",
+    "revenueBreakdown": "राजस्व का विवरण",
     "total": "कुल",
     "cash": "नकद",
-    "upi": "यूपीआई (UPI)",
+    "upi": "UPI",
     "card": "कार्ड",
     "bankTransfer": "बैंक ट्रांसफर",
     "inventoryStatus": "इन्वेंटरी स्थिति",
@@ -100,11 +100,11 @@
     "overdue": "अतिदेय (Overdue)",
     "expenseSummary": "खर्च सारांश",
     "viewDetails": "विवरण देखें",
-    "activityTimeline": "गतिविधि टाइमलाइन",
+    "activityTimeline": "गतिविधि समयरेखा",
     "addedBy": "द्वारा जोड़ा गया",
     "added": "जोड़ा गया",
     "paymentOf": "का भुगतान",
-    "receivedFrom": "से प्राप्त",
+    "receivedFrom": "से प्राप्त हुआ",
     "expenseOf": "का खर्च",
     "addedFor": "के लिए जोड़ा गया",
     "calendar": "कैलेंडर",
@@ -117,7 +117,11 @@
       "thu": "गुरु",
       "fri": "शुक्र",
       "sat": "शनि"
-    }
+    },
+    "lowStockAlertFor": "के लिए कम स्टॉक अलर्ट",
+    "newOrder": "नया ऑर्डर",
+    "received": "प्राप्त हुआ",
+    "banktransfer": "बैंक ट्रांसफर"
   },
   "pos": {
     "newSale": {

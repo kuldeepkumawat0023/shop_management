@@ -67,7 +67,7 @@
     "thisYear": "This Year",
     "lastYear": "Last Year",
     "revenueBreakdown": "Revenue Breakdown",
-    "total": "Total",
+    "total": "TOTAL",
     "cash": "Cash",
     "upi": "UPI",
     "card": "Card",
@@ -89,7 +89,7 @@
     "time": "Time",
     "completed": "Completed",
     "lowStockAlerts": "Low Stock Alerts",
-    "left": "Left",
+    "left": "left",
     "orderNow": "Order Now",
     "customerDue": "Customer Due",
     "totalOutstanding": "Total Outstanding",
@@ -117,7 +117,11 @@
       "thu": "Thu",
       "fri": "Fri",
       "sat": "Sat"
-    }
+    },
+    "lowStockAlertFor": "Low stock alert for",
+    "newOrder": "New order",
+    "received": "received",
+    "banktransfer": "Bank Transfer"
   },
   "pos": {
     "newSale": {
