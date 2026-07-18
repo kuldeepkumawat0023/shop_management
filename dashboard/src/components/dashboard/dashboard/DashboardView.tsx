@@ -16,8 +16,11 @@ import toast from 'react-hot-toast';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell } from 'recharts';
 import CalendarWidget from './CalendarWidget';
 import { formatDistanceToNow, format } from 'date-fns';
+import { useAuth } from '@/hooks/useAuth';
+
 export default function DashboardView() {
     const { t } = useTranslation();
+    const { user } = useAuth();
     const [loading, setLoading] = React.useState(true);
     const [stats, setStats] = React.useState<any>(null);
 
@@ -58,10 +61,10 @@ export default function DashboardView() {
                     </div>
                     <div className="relative z-10">
                         <h2 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
-                            Dashboard Overview <span className="text-2xl">👋</span>
+                            {t('dashboard.welcome')}, {user?.fullname?.split(' ')[0] || 'User'} <span className="text-2xl">👋</span>
                         </h2>
                         <p className="text-white/80 text-base">
-                            {t('dashboard.welcome')}, Raj! {t('dashboard.welcomeDesc')}
+                            {t('dashboard.welcomeDesc')}
                         </p>
                     </div>
                     <div className="relative z-10 flex flex-wrap items-center gap-3">
