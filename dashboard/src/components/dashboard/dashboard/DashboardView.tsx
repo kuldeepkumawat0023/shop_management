@@ -187,7 +187,7 @@ export default function DashboardView() {
                                         <Tooltip
                                             contentStyle={{ backgroundColor: 'var(--color-surface)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '8px' }}
                                             itemStyle={{ fontSize: '12px', fontWeight: 'bold' }}
-                                            formatter={(value: number) => [`₹${value.toLocaleString('en-IN')}`]}
+                                            formatter={(value: any) => [`₹${Number(value).toLocaleString('en-IN')}`, '']}
                                             labelStyle={{ color: '#8b8d97', marginBottom: '4px' }}
                                         />
                                         <Line
@@ -259,7 +259,9 @@ export default function DashboardView() {
                                         <div key={idx} className="flex items-center justify-between text-xs">
                                             <div className="flex items-center gap-2">
                                                 <span className={`w-2.5 h-2.5 rounded-full ${colors[idx % colors.length]}`}></span>
-                                                <span className="text-on-surface-variant font-medium">{t(`dashboard.${item.name.toLowerCase().replace(' ', '')}`, item.name)}</span>
+                                                <span className="text-on-surface-variant font-medium">
+                                                    {t(`dashboard.${item?.name?.toLowerCase().replace(/\s+/g, '') || 'unknown'}`, { defaultValue: item?.name || 'Unknown' })}
+                                                </span>
                                             </div>
                                             <div className="flex gap-2 items-center">
                                                 <span className="font-semibold text-on-surface">{formatCurrency(item.value)}</span>
