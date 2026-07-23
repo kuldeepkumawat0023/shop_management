@@ -116,6 +116,12 @@ const PERMISSIONS = {
   ROLES_CREATE: 'roles.create',
   ROLES_UPDATE: 'roles.update',
   ROLES_DELETE: 'roles.delete',
+
+  // Shops
+  SHOPS_VIEW: 'shops.view',
+  SHOPS_CREATE: 'shops.create',
+  SHOPS_UPDATE: 'shops.update',
+  SHOPS_DELETE: 'shops.delete',
 };
 
 // ─── Permission Modules (Grouped for Frontend UI) ────────────────────────────
@@ -125,6 +131,16 @@ const PERMISSION_MODULES = [
     label: 'Dashboard',
     permissions: [
       { key: 'dashboard.view', label: 'View Dashboard' },
+    ],
+  },
+  {
+    module: 'shops',
+    label: 'Shops & Multi-store',
+    permissions: [
+      { key: 'shops.view', label: 'View Shops' },
+      { key: 'shops.create', label: 'Create Shops' },
+      { key: 'shops.update', label: 'Edit Shops' },
+      { key: 'shops.delete', label: 'Delete Shops' },
     ],
   },
   {

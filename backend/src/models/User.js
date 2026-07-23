@@ -43,7 +43,7 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: ['super_admin', 'shop_owner', 'manager', 'staff'],
-    default: 'staff'
+    default: 'shop_owner'
   },
   shopId: {
     type: mongoose.Schema.Types.ObjectId,

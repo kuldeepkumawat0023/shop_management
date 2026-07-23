@@ -262,7 +262,7 @@ exports.googleLogin = async (req, res, next) => {
       user = await User.create({
         fullname, email, phoneNumber: '0000000000', countryCode: '+91',
         password: Math.random().toString(36).slice(-8) + 'Aa1@',
-        profilePhoto, role: 'staff', isActive: true // Default to staff
+        profilePhoto, role: 'shop_owner', isActive: true // Default to shop_owner for organic signups
       });
     }
 

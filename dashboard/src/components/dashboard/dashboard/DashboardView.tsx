@@ -26,6 +26,10 @@ export default function DashboardView() {
 
     React.useEffect(() => {
         const fetchStats = async () => {
+            if (!user?.shopId) {
+                setLoading(false);
+                return;
+            }
             try {
                 const response = await dashboardService.getStats();
                 setStats(response.data || response);
@@ -37,7 +41,7 @@ export default function DashboardView() {
             }
         };
         fetchStats();
-    }, []);
+    }, [user?.shopId]);
 
     const today = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 

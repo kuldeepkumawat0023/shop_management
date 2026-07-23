@@ -17,6 +17,12 @@ const requirePermission = (requiredPermission) => {
         return next();
       }
 
+      // Allow any user (even default staff) with NO assigned shops to create their first shop.
+      // This solves issues for existing users who registered before the default role was changed to shop_owner.
+      if (requiredPermission === 'shops.create' && !req.user.shopId && (!req.user.assignedShops || req.user.assignedShops.length === 0)) {
+        return next();
+      }
+
       let defaultPermissions = [];
       
       if (req.user.customRoleId) {
@@ -26,12 +32,16 @@ const requirePermission = (requiredPermission) => {
           defaultPermissions = role.permissions || [];
         }
       } else {
-        // Fallback to Default Role Permissions
-        if (req.user.role === 'manager') {
-          defaultPermissions = ADMIN_DEFAULT_ROLES.MANAGER.permissions;
-        } else if (req.user.role === 'staff') {
-          defaultPermissions = ADMIN_DEFAULT_ROLES.STAFF.permissions;
+        // Fallback to Default Role Permissions (Dynamic)
+        const roleKey = req.user.role ? req.user.role.toUpperCase() : null;
+        if (roleKey && ADMIN_DEFAULT_ROLES[roleKey]) {
+          defaultPermissions = ADMIN_DEFAULT_ROLES[roleKey].permissions;
         }
+      }
+
+      if (!requiredPermission) {
+        console.error('requirePermission called without a valid permission string');
+        return res.status(500).json({ success: false, message: 'Server configuration error' });
       }
 
       const hasGlobalWildcard = defaultPermissions.includes('*');

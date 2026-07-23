@@ -1,0 +1,106 @@
+﻿Folder PATH listing for volume New Volume
+Volume serial number is 0000027D BCAF:9806
+D:\DINESHTHORI\SHOP_MANAGEMENT\BACKEND\SRC
+|   app.js
+|   
++---config
+|       cloudinary.js
+|       db.js
+|       email.js
+|       permissions.js
+|       socket.js
+|       
++---controllers
+|       authController.js
+|       brandController.js
+|       categoryController.js
+|       customerController.js
+|       damageController.js
+|       dashboardController.js
+|       expenseController.js
+|       paymentController.js
+|       productController.js
+|       productionController.js
+|       purchaseController.js
+|       recipeController.js
+|       reportController.js
+|       roleController.js
+|       saleController.js
+|       settingsController.js
+|       shopController.js
+|       supplierController.js
+|       teamController.js
+|       userController.js
+|       
++---middlewares
+|       authMiddleware.js
+|       csrfMiddleware.js
+|       errorHandler.js
+|       rateLimiter.js
+|       rbacMiddleware.js
+|       requirePermission.js
+|       shopScope.js
+|       upload.js
+|       validateRequest.js
+|       
++---models
+|       AuditLog.js
+|       Brand.js
+|       Category.js
+|       Customer.js
+|       CustomRole.js
+|       Damage.js
+|       Expense.js
+|       Payment.js
+|       Product.js
+|       Production.js
+|       Purchase.js
+|       PurchaseItem.js
+|       Recipe.js
+|       Return.js
+|       SalaryAdvance.js
+|       SalaryPayment.js
+|       Sale.js
+|       SaleItem.js
+|       Settings.js
+|       Shop.js
+|       Staff.js
+|       StaffExpense.js
+|       StockHistory.js
+|       Supplier.js
+|       User.js
+|       
++---routes
+|       authRoutes.js
+|       brandRoutes.js
+|       categoryRoutes.js
+|       customerRoutes.js
+|       damageRoutes.js
+|       dashboardRoutes.js
+|       expenseRoutes.js
+|       index.js
+|       paymentRoutes.js
+|       productionRoutes.js
+|       productRoutes.js
+|       purchaseRoutes.js
+|       recipeRoutes.js
+|       reportRoutes.js
+|       roleRoutes.js
+|       saleRoutes.js
+|       settingsRoutes.js
+|       shopRoutes.js
+|       supplierRoutes.js
+|       teamRoutes.js
+|       userRoutes.js
+|       
++---services
+|       excelService.js
+|       pdfService.js
+|       syncService.js
+|       
+\---utils
+        apiError.js
+        emailTemplates.js
+        formatHelpers.js
+        logger.js
+        

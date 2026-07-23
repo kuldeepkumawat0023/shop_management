@@ -1,9 +1,10 @@
-Folder PATH listing for volume New Volume
-Volume serial number is 00000174 BCAF:9806
+﻿Folder PATH listing for volume New Volume
+Volume serial number is 000001D3 BCAF:9806
 D:\DINESHTHORI\SHOP_MANAGEMENT\DASHBOARD\SRC
 |   middleware.ts
 |   
 +---app
+|   |   error.tsx
 |   |   favicon.ico
 |   |   globals.css
 |   |   layout.tsx
@@ -18,7 +19,13 @@ D:\DINESHTHORI\SHOP_MANAGEMENT\DASHBOARD\SRC
 |   |   +---login
 |   |   |       page.tsx
 |   |   |       
-|   |   \---reset-password
+|   |   +---register
+|   |   |       page.tsx
+|   |   |       
+|   |   +---reset-password
+|   |   |       page.tsx
+|   |   |       
+|   |   \---verify-otp
 |   |           page.tsx
 |   |           
 |   \---(dashboard)
@@ -28,9 +35,13 @@ D:\DINESHTHORI\SHOP_MANAGEMENT\DASHBOARD\SRC
 |       +---brands
 |       |   |   page.tsx
 |       |   |   
-|       |   \---new
-|       |           page.tsx
-|       |           
+|       |   +---new
+|       |   |       page.tsx
+|       |   |       
+|       |   \---[id]
+|       |       \---edit
+|       |               page.tsx
+|       |               
 |       +---categories
 |       |   |   page.tsx
 |       |   |   
@@ -38,8 +49,11 @@ D:\DINESHTHORI\SHOP_MANAGEMENT\DASHBOARD\SRC
 |       |   |       page.tsx
 |       |   |       
 |       |   \---[id]
-|       |           page.tsx
-|       |           
+|       |       |   page.tsx
+|       |       |   
+|       |       \---edit
+|       |               page.tsx
+|       |               
 |       +---customers
 |       |   |   page.tsx
 |       |   |   
@@ -47,8 +61,11 @@ D:\DINESHTHORI\SHOP_MANAGEMENT\DASHBOARD\SRC
 |       |   |       page.tsx
 |       |   |       
 |       |   \---[id]
-|       |           page.tsx
-|       |           
+|       |       |   page.tsx
+|       |       |   
+|       |       \---edit
+|       |               page.tsx
+|       |               
 |       +---expenses
 |       |   |   page.tsx
 |       |   |   
@@ -59,19 +76,28 @@ D:\DINESHTHORI\SHOP_MANAGEMENT\DASHBOARD\SRC
 |       |           page.tsx
 |       |           
 |       +---inventory
-|       |       page.tsx
-|       |       
+|       |   |   page.tsx
+|       |   |   
+|       |   \---[id]
+|       |           page.tsx
+|       |           
 |       +---manufacturing
 |       |   +---productions
 |       |   |   |   page.tsx
 |       |   |   |   
-|       |   |   \---new
+|       |   |   +---new
+|       |   |   |       page.tsx
+|       |   |   |       
+|       |   |   \---[id]
 |       |   |           page.tsx
 |       |   |           
 |       |   \---recipes
 |       |       |   page.tsx
 |       |       |   
-|       |       \---new
+|       |       +---new
+|       |       |       page.tsx
+|       |       |       
+|       |       \---[id]
 |       |               page.tsx
 |       |               
 |       +---payments
@@ -97,6 +123,7 @@ D:\DINESHTHORI\SHOP_MANAGEMENT\DASHBOARD\SRC
 |       |               page.tsx
 |       |               
 |       +---pos
+|       |   |   layout.tsx
 |       |   |   page.tsx
 |       |   |   
 |       |   +---hold-bills
@@ -112,8 +139,11 @@ D:\DINESHTHORI\SHOP_MANAGEMENT\DASHBOARD\SRC
 |       |   |       page.tsx
 |       |   |       
 |       |   \---[id]
-|       |           page.tsx
-|       |           
+|       |       |   page.tsx
+|       |       |   
+|       |       \---edit
+|       |               page.tsx
+|       |               
 |       +---purchases
 |       |   |   page.tsx
 |       |   |   
@@ -147,8 +177,17 @@ D:\DINESHTHORI\SHOP_MANAGEMENT\DASHBOARD\SRC
 |       |   |       page.tsx
 |       |   |       
 |       |   +---roles
-|       |   |       page.tsx
-|       |   |       
+|       |   |   |   page.tsx
+|       |   |   |   
+|       |   |   +---new
+|       |   |   |       page.tsx
+|       |   |   |       
+|       |   |   \---[id]
+|       |   |       |   page.tsx
+|       |   |       |   
+|       |   |       \---edit
+|       |   |               page.tsx
+|       |   |               
 |       |   \---store
 |       |           page.tsx
 |       |           
@@ -159,8 +198,11 @@ D:\DINESHTHORI\SHOP_MANAGEMENT\DASHBOARD\SRC
 |       |   |       page.tsx
 |       |   |       
 |       |   \---[id]
-|       |           page.tsx
-|       |           
+|       |       |   page.tsx
+|       |       |   
+|       |       \---edit
+|       |               page.tsx
+|       |               
 |       +---team
 |       |   |   page.tsx
 |       |   |   
@@ -168,8 +210,11 @@ D:\DINESHTHORI\SHOP_MANAGEMENT\DASHBOARD\SRC
 |       |   |       page.tsx
 |       |   |       
 |       |   \---[id]
-|       |           page.tsx
-|       |           
+|       |       |   page.tsx
+|       |       |   
+|       |       \---edit
+|       |               page.tsx
+|       |               
 |       \---users
 |           |   page.tsx
 |           |   
@@ -181,11 +226,16 @@ D:\DINESHTHORI\SHOP_MANAGEMENT\DASHBOARD\SRC
 |                   
 +---components
 |   +---auth
+|   |       ActionGuard.tsx
 |   |       AuthGuard.tsx
+|   |       AuthSplitLayout.tsx
 |   |       ForgotPasswordForm.tsx
 |   |       LoginForm.tsx
+|   |       RegisterForm.tsx
 |   |       ResetPasswordForm.tsx
 |   |       RoleGuard.tsx
+|   |       RoutePermissionGuard.tsx
+|   |       VerifyOtpForm.tsx
 |   |       
 |   +---common
 |   |       AutoScrollToTop.tsx
@@ -193,114 +243,147 @@ D:\DINESHTHORI\SHOP_MANAGEMENT\DASHBOARD\SRC
 |   |       Card.tsx
 |   |       ConfirmModal.tsx
 |   |       DataTable.tsx
+|   |       DeleteModal.tsx
+|   |       DetailViewSkeleton.tsx
 |   |       FormDrawer.tsx
 |   |       Input.tsx
 |   |       InstallPWAButton.tsx
 |   |       PageHeader.tsx
 |   |       Pagination.tsx
+|   |       Skeleton.tsx
 |   |       StatsCard.tsx
 |   |       StatusBadge.tsx
+|   |       ViewPageSkeleton.tsx
 |   |       
 |   \---dashboard
-|       +---brands
-|       |       BrandForm.tsx
-|       |       BrandsView.tsx
-|       |       
-|       +---categories
-|       |       CategoriesView.tsx
-|       |       CategoryDetailView.tsx
-|       |       CategoryForm.tsx
-|       |       
-|       +---customers
-|       |       CustomerDetailView.tsx
-|       |       CustomerForm.tsx
-|       |       CustomersView.tsx
-|       |       
 |       +---dashboard
+|       |       CalendarWidget.tsx
 |       |       DashboardView.tsx
+|       |       DashboardView.tsx.backup
 |       |       
-|       +---expenses
-|       |       ExpenseDetailView.tsx
-|       |       ExpenseForm.tsx
-|       |       ExpensesView.tsx
-|       |       
-|       +---inventory
-|       |       InventoryView.tsx
-|       |       
+|       +---hr-group
+|       |   +---team
+|       |   |       TeamMemberDetailView.tsx
+|       |   |       TeamMemberForm.tsx
+|       |   |       TeamMembersView.tsx
+|       |   |       
+|       |   \---users
+|       |           UserDetailView.tsx
+|       |           UserForm.tsx
+|       |           UsersView.tsx
+|       |           
+|       +---inventory-group
+|       |   +---brands
+|       |   |       BrandForm.tsx
+|       |   |       BrandsView.tsx
+|       |   |       
+|       |   +---categories
+|       |   |       CategoriesView.tsx
+|       |   |       CategoryDetailView.tsx
+|       |   |       CategoryForm.tsx
+|       |   |       
+|       |   +---inventory
+|       |   |       InventoryDetailView.tsx
+|       |   |       InventoryView.tsx
+|       |   |       
+|       |   \---products
+|       |           ProductDetailView.tsx
+|       |           ProductForm.tsx
+|       |           ProductsView.tsx
+|       |           
 |       +---layout
 |       |       DashboardLayout.tsx
+|       |       ShopCreationModal.tsx
 |       |       ShopSwitcher.tsx
 |       |       SideNavBar.tsx
 |       |       TopNavBar.tsx
 |       |       
 |       +---manufacturing
-|       |       ProductionForm.tsx
-|       |       ProductionsView.tsx
-|       |       RecipeForm.tsx
-|       |       RecipesView.tsx
-|       |       
+|       |   +---productions
+|       |   |       ProductionDetailView.tsx
+|       |   |       ProductionForm.tsx
+|       |   |       ProductionsView.tsx
+|       |   |       
+|       |   \---recipes
+|       |           RecipeDetailView.tsx
+|       |           RecipeForm.tsx
+|       |           RecipesView.tsx
+|       |           
+|       +---parties-group
+|       |   +---customers
+|       |   |       CustomerDetailView.tsx
+|       |   |       CustomerForm.tsx
+|       |   |       CustomersView.tsx
+|       |   |       
+|       |   \---suppliers
+|       |           SupplierDetailView.tsx
+|       |           SupplierForm.tsx
+|       |           SuppliersView.tsx
+|       |           
 |       +---payments
 |       |       PaymentDetailView.tsx
 |       |       PaymentForm.tsx
 |       |       PaymentsView.tsx
 |       |       
 |       +---payroll
-|       |       AdvanceForm.tsx
-|       |       PaySalaryForm.tsx
-|       |       SalaryAdvancesView.tsx
-|       |       StaffSalaryView.tsx
-|       |       
+|       |   +---advances
+|       |   |       AdvanceForm.tsx
+|       |   |       SalaryAdvancesView.tsx
+|       |   |       
+|       |   \---salary
+|       |           PaySalaryForm.tsx
+|       |           StaffSalaryView.tsx
+|       |           
 |       +---pos
-|       |       BarcodeScanner.tsx
-|       |       CartPanel.tsx
-|       |       CategoryFilter.tsx
-|       |       CustomerSelection.tsx
-|       |       HoldBillModal.tsx
-|       |       HoldBillsView.tsx
-|       |       PaymentModal.tsx
-|       |       ProductGrid.tsx
-|       |       TodaySalesView.tsx
-|       |       
-|       +---products
-|       |       NewProductView.tsx
-|       |       ProductDetailView.tsx
-|       |       ProductsView.tsx
-|       |       
-|       +---purchases
-|       |       NewPurchaseView.tsx
-|       |       PurchaseDetailView.tsx
-|       |       PurchasesView.tsx
-|       |       
+|       |   |   BarcodeScanner.tsx
+|       |   |   CartPanel.tsx
+|       |   |   CategoryFilter.tsx
+|       |   |   CustomerCreateModal.tsx
+|       |   |   CustomerSelection.tsx
+|       |   |   CustomItemModal.tsx
+|       |   |   HoldBillModal.tsx
+|       |   |   NewSaleView.tsx
+|       |   |   PaymentModal.tsx
+|       |   |   ProductGrid.tsx
+|       |   |   
+|       |   +---hold-bills
+|       |   |       HoldBillsView.tsx
+|       |   |       
+|       |   \---today-sales
+|       |           InvoiceModal.tsx
+|       |           TodaySalesView.tsx
+|       |           
 |       +---reports
 |       |       GstReportView.tsx
 |       |       ProfitReportView.tsx
 |       |       
-|       +---sales
-|       |       SaleDetailView.tsx
-|       |       SalesHistoryView.tsx
-|       |       
-|       +---settings
-|       |       PreferencesView.tsx
-|       |       RolesPermissionsView.tsx
-|       |       StoreProfileView.tsx
-|       |       TaxBillingView.tsx
-|       |       UserProfileView.tsx
-|       |       
-|       +---suppliers
-|       |       SupplierDetailView.tsx
-|       |       SupplierForm.tsx
-|       |       SuppliersView.tsx
-|       |       
-|       +---team
-|       |       TeamMemberDetailView.tsx
-|       |       TeamMemberForm.tsx
-|       |       TeamMembersView.tsx
-|       |       
-|       \---users
-|               UserDetailView.tsx
-|               UserForm.tsx
-|               UsersView.tsx
+|       +---sales-group
+|       |   +---expenses
+|       |   |       ExpenseDetailView.tsx
+|       |   |       ExpenseForm.tsx
+|       |   |       ExpensesView.tsx
+|       |   |       
+|       |   +---purchases
+|       |   |       PurchaseDetailView.tsx
+|       |   |       PurchaseForm.tsx
+|       |   |       PurchasesView.tsx
+|       |   |       
+|       |   \---sales
+|       |           SaleDetailView.tsx
+|       |           SalesHistoryView.tsx
+|       |           
+|       \---settings
+|               PreferencesView.tsx
+|               RoleDetailView.tsx
+|               RoleFormView.tsx
+|               RolesListView.tsx
+|               StoreProfileView.tsx
+|               TaxBillingView.tsx
+|               UserProfileView.tsx
 |               
++---contexts
+|       POSContext.tsx
+|       
 +---hooks
 |       useAuth.ts
 |       useDebounce.ts
@@ -324,6 +407,7 @@ D:\DINESHTHORI\SHOP_MANAGEMENT\DASHBOARD\SRC
 |           expense.services.ts
 |           manufacturing.services.ts
 |           payment.services.ts
+|           payroll.services.ts
 |           product.services.ts
 |           production.services.ts
 |           purchase.services.ts
@@ -337,9 +421,14 @@ D:\DINESHTHORI\SHOP_MANAGEMENT\DASHBOARD\SRC
 |           team.services.ts
 |           user.services.ts
 |           
++---locales
+|       en.json
+|       hi.json
+|       
 +---provider
 |       GoogleAuthProvider.tsx
 |       HydrationGuard.tsx
+|       I18nProvider.tsx
 |       StoreProvider.tsx
 |       ThemeProvider.tsx
 |       
@@ -351,9 +440,11 @@ D:\DINESHTHORI\SHOP_MANAGEMENT\DASHBOARD\SRC
 |   |       
 |   \---slices
 |           authSlice.ts
-|           shopSlice.ts
 |           
 \---utils
         cn.ts
+        formatCurrency.ts
+        i18n.ts
         seoConfig.ts
+        validations.ts
         
