@@ -2,10 +2,9 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/common/Button';
-import { ArrowLeft, Save, UploadCloud, Tag, FileText, Globe, User, RefreshCcw } from 'lucide-react';
+import { ArrowLeft, Save, Tag, FileText, User, RefreshCcw } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useRef } from 'react';
 import { cn } from '@/utils/cn';
 import { brandSchema } from '@/utils/validations';
 import { brandService } from '@/lib/services/brand.services';
@@ -19,13 +18,9 @@ interface BrandFormProps {
 export default function BrandForm({ editId }: BrandFormProps) {
   const { t } = useTranslation();
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [dragActive, setDragActive] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   
   const [formData, setFormData] = useState({
     name: '',
-    website: '',
     contactPerson: '',
     category: '',
     description: '',
@@ -44,7 +39,6 @@ export default function BrandForm({ editId }: BrandFormProps) {
           if (brand) {
             setFormData({
               name: brand.name || '',
-              website: (brand as any).website || '',
               contactPerson: (brand as any).contactPerson || '',
               category: (brand as any).categoryId || (brand as any).category || '',
               description: (brand as any).description || '',
@@ -77,48 +71,12 @@ export default function BrandForm({ editId }: BrandFormProps) {
   const handleClear = () => {
     setFormData({
       name: '',
-      website: '',
       contactPerson: '',
       category: '',
       description: '',
       status: 'Active'
     });
     setErrors({});
-  };
-
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      if (file.size <= 5 * 1024 * 1024) { // 5MB limit
-        setSelectedFile(file);
-      } else {
-        toast.error(t('inventory.categoryForm.fileSizeError'), { id: 'file-size-should-not-exceed-5m' });
-      }
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      if (file.size <= 5 * 1024 * 1024) { // 5MB limit
-        setSelectedFile(file);
-      } else {
-        toast.error(t('inventory.categoryForm.fileSizeError'), { id: 'file-size-should-not-exceed-5m' });
-      }
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -207,25 +165,6 @@ export default function BrandForm({ editId }: BrandFormProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                <Globe className="w-3.5 h-3.5" /> {t('inventory.brandForm.websiteUrl')} <span className="text-error">*</span>
-              </label>
-              <input 
-                type="text" 
-                name="website"
-                value={formData.website}
-                onChange={handleChange}
-                aria-invalid={!!errors.website}
-                placeholder="https://example.com" 
-                className={cn(
-                  "w-full h-11 px-4 bg-surface-container-low border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all",
-                  errors.website ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
-                )}
-              />
-              {errors.website && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.website}</p>}
-            </div>
-            
-            <div className="space-y-2">
-              <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
                 <User className="w-3.5 h-3.5" /> {t('inventory.brandForm.primaryContact')} <span className="text-error">*</span>
               </label>
               <input 
@@ -242,28 +181,28 @@ export default function BrandForm({ editId }: BrandFormProps) {
               />
               {errors.contactPerson && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.contactPerson}</p>}
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-              <Tag className="w-3.5 h-3.5" /> {t('inventory.brandForm.categoryFocus')} <span className="text-error">*</span>
-            </label>
-            <select 
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              className={cn(
-                "w-full h-11 px-4 bg-surface-container-low border rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 transition-all appearance-none cursor-pointer",
-                errors.category ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
-              )}
-            >
-              <option value="">{t('inventory.brandForm.selectCategory')}</option>
-              <option value="Electronics">Electronics</option>
-              <option value="Fashion">Fashion</option>
-              <option value="Groceries">Groceries</option>
-              <option value="Home Decor">Home Decor</option>
-            </select>
-            {errors.category && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.category}</p>}
+            <div className="space-y-2">
+              <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
+                <Tag className="w-3.5 h-3.5" /> {t('inventory.brandForm.categoryFocus')} <span className="text-error">*</span>
+              </label>
+              <select 
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                className={cn(
+                  "w-full h-11 px-4 bg-surface-container-low border rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 transition-all appearance-none cursor-pointer",
+                  errors.category ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                )}
+              >
+                <option value="">{t('inventory.brandForm.selectCategory')}</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Fashion">Fashion</option>
+                <option value="Groceries">Groceries</option>
+                <option value="Home Decor">Home Decor</option>
+              </select>
+              {errors.category && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.category}</p>}
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -281,42 +220,6 @@ export default function BrandForm({ editId }: BrandFormProps) {
               )}
             ></textarea>
             {errors.description && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.description}</p>}
-          </div>
-        </div>
-
-        <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6">
-          <div className="flex items-center gap-2 mb-6">
-            <UploadCloud className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-bold text-on-surface">{t('inventory.brandForm.brandLogo')}</h2>
-          </div>
-          
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            className="hidden"
-            accept=".png,.jpg,.jpeg"
-          />
-          <div 
-            onClick={() => fileInputRef.current?.click()}
-            className={cn(
-              "relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-2xl transition-all cursor-pointer bg-surface-container-low",
-              dragActive ? "border-primary bg-primary/5 scale-[0.98]" : "border-outline-variant/30 hover:border-primary/40 hover:bg-surface-container"
-            )}
-            onDragEnter={handleDrag}
-            onDragLeave={handleDrag}
-            onDragOver={handleDrag}
-            onDrop={handleDrop}
-          >
-            <div className="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center mb-4 shadow-sm border border-outline-variant/20 text-on-surface-variant">
-              <UploadCloud className="w-6 h-6" />
-            </div>
-            <p className="text-sm font-bold text-on-surface text-center mb-1">
-              {selectedFile ? selectedFile.name : t('inventory.brandForm.uploadBrandLogo')}
-            </p>
-            <p className="text-xs text-on-surface-variant text-center">
-              {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB` : t('inventory.brandForm.max5mb')}
-            </p>
           </div>
         </div>
 

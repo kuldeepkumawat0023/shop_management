@@ -11,14 +11,7 @@ const brandSchema = new mongoose.Schema({
     ref: 'Shop',
     required: true
   },
-  logo: {
-    type: String,
-    default: null
-  },
-  website: {
-    type: String,
-    trim: true
-  },
+
   contactPerson: {
     type: String,
     trim: true

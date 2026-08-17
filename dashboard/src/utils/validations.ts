@@ -71,7 +71,6 @@ export const resetPasswordSchema = z.object({
 
 export const brandSchema = z.object({
   name: z.string().min(1, 'Brand Name is required / ब्रांड का नाम आवश्यक है').max(100, 'Brand Name is too long / ब्रांड का नाम बहुत लंबा है'),
-  website: z.union([z.literal(''), z.string().regex(urlRegex, 'Invalid URL format / अमान्य URL प्रारूप')]).optional(),
   contactPerson: z.string().max(100).optional(),
   category: z.string().optional(),
   description: z.string().max(500, 'Description is too long / विवरण बहुत लंबा है').optional(),

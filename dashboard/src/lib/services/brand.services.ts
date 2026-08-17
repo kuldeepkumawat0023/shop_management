@@ -4,7 +4,6 @@ export interface BrandData {
   _id?: string;
   name: string;
   shopId?: string;
-  logo?: string | null;
   isActive?: boolean;
   createdAt?: string;
   updatedAt?: string;

@@ -1,5 +1,4 @@
 const Brand = require('../models/Brand');
-const { uploadToCloudinary, deleteFromCloudinary } = require('../config/cloudinary');
 
 exports.createBrand = async (req, res, next) => {
   try {
@@ -9,11 +8,7 @@ exports.createBrand = async (req, res, next) => {
     const exists = await Brand.findOne({ name, shopId: req.scopedShopId });
     if (exists) return res.status(400).json({ success: false, message: 'Brand already exists in this shop' });
 
-    const brandData = { name, shopId: req.scopedShopId };
-    if (req.file) {
-      const result = await uploadToCloudinary(req.file.buffer, 'shop_management/brands', 'image');
-      brandData.logo = result.secure_url;
-    }
+    const brandData = { ...req.body, name, shopId: req.scopedShopId };
 
     const brand = await Brand.create(brandData);
     res.status(201).json({ success: true, data: brand });
@@ -38,11 +33,6 @@ exports.updateBrand = async (req, res, next) => {
     if (!brand || !brand.isActive) return res.status(404).json({ success: false, message: 'Brand not found' });
 
     const updateData = { ...req.body };
-    if (req.file) {
-      if (brand.logo) await deleteFromCloudinary(brand.logo);
-      const result = await uploadToCloudinary(req.file.buffer, 'shop_management/brands', 'image');
-      updateData.logo = result.secure_url;
-    }
 
     brand = await Brand.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true });
     res.status(200).json({ success: true, data: brand });
