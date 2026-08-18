@@ -33,8 +33,8 @@ export default function ProductsView() {
           setProductsData(res.data.map((p: any) => ({
             ...p,
             id: p._id,
-            brand: p.brand?.name || t('inventory.productsView.general'),
-            category: p.category?.name || t('inventory.inventoryView.uncategorized'),
+            brand: p.brandId?.name || p.brand?.name || t('inventory.productsView.general'),
+            category: p.categoryId?.name || p.category?.name || t('inventory.inventoryView.uncategorized'),
             stock: p.currentStock || 0,
             price: p.sellingPrice || 0,
             status: p.isActive !== false ? t('inventory.productsView.published') : t('inventory.productsView.draft')

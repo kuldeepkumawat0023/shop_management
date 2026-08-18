@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/common/Button';
-import { ArrowLeft, Save, UploadCloud, Tag, FileText, Banknote, Package, Layers, RefreshCcw, X } from 'lucide-react';
+import { ArrowLeft, Save, UploadCloud, Tag, FileText, Banknote, Package, Layers, RefreshCcw, X, Plus } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
 import { cn } from '@/utils/cn';
@@ -46,14 +47,18 @@ export default function ProductForm({ editId }: ProductFormProps) {
   const [initialLoading, setInitialLoading] = useState(!!editId);
 
   useEffect(() => {
-    // Fetch categories and brands for dropdowns
+    // Fetch categories and brands dynamically for dropdowns
     Promise.all([
       categoryService.getCategories(),
       brandService.getBrands(),
       editId ? productService.getProducts() : Promise.resolve(null)
     ]).then(([catRes, brandRes, prodRes]) => {
-      if (catRes.success) setCategories(catRes.data);
-      if (brandRes.success) setBrands(brandRes.data);
+      if (catRes && catRes.success) {
+        setCategories(catRes.data || []);
+      }
+      if (brandRes && brandRes.success) {
+        setBrands(brandRes.data || []);
+      }
       
       if (prodRes && prodRes.success) {
         const prod = prodRes.data.find((p: any) => p._id === editId);
@@ -62,13 +67,13 @@ export default function ProductForm({ editId }: ProductFormProps) {
             name: prod.name || '',
             description: prod.description || '',
             sku: prod.sku || prod.barcode || '',
-            sellingPrice: prod.sellingPrice || '',
-            costPrice: prod.purchasePrice || prod.costPrice || '',
-            taxRate: prod.gstRate || prod.taxRate || '18',
-            currentStock: prod.currentStock || prod.openingStock || '',
-            minStockLevel: prod.minStock || prod.minStockLevel || '10',
-            category: prod.categoryId?._id || prod.categoryId || prod.category || '',
-            brand: prod.brandId?._id || prod.brandId || prod.brand || '',
+            sellingPrice: prod.sellingPrice?.toString() || '',
+            costPrice: (prod.purchasePrice || prod.costPrice || '')?.toString() || '',
+            taxRate: (prod.gstRate || prod.taxRate || '18')?.toString(),
+            currentStock: (prod.currentStock || prod.openingStock || '')?.toString() || '',
+            minStockLevel: (prod.minStock || prod.minStockLevel || '10')?.toString() || '10',
+            category: prod.categoryId?._id || prod.categoryId || prod.category?._id || prod.category || '',
+            brand: prod.brandId?._id || prod.brandId || prod.brand?._id || prod.brand || '',
             isActive: prod.isActive !== false
           });
           if (prod.image) {
@@ -76,6 +81,9 @@ export default function ProductForm({ editId }: ProductFormProps) {
           }
         }
       }
+      setInitialLoading(false);
+    }).catch((err) => {
+      console.error('Error fetching form data:', err);
       setInitialLoading(false);
     });
   }, [editId]);
@@ -86,6 +94,16 @@ export default function ProductForm({ editId }: ProductFormProps) {
     let parsedValue: any = value;
     if (type === 'checkbox') {
       parsedValue = (e.target as HTMLInputElement).checked;
+    } else if (['sellingPrice', 'costPrice'].includes(name)) {
+      // Allow only numbers and a single decimal point
+      if (value !== '' && !/^\d*\.?\d*$/.test(value)) {
+        return;
+      }
+    } else if (['currentStock', 'minStockLevel'].includes(name)) {
+      // Allow only integer digits
+      if (value !== '' && !/^\d*$/.test(value)) {
+        return;
+      }
     }
     
     setFormData(prev => ({ ...prev, [name]: parsedValue }));
@@ -93,7 +111,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
     // Quick validation
     let validationVal = parsedValue;
     if (['sellingPrice', 'costPrice', 'taxRate', 'currentStock', 'minStockLevel'].includes(name)) {
-      validationVal = Number(value);
+      validationVal = value === '' ? undefined : Number(value);
     }
     
     const result = productSchema.safeParse({ ...formData, [name]: validationVal });
@@ -142,7 +160,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
-      if (file.size <= 5 * 1024 * 1024) {
+      if (file.size <= 5 * 1024 * 1024) { // 5MB limit
         setSelectedFile(file);
       } else {
         toast.error(t('inventory.productForm.fileSizeError'), { id: 'file-size-should-not-exceed-5m' });
@@ -153,7 +171,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      if (file.size <= 5 * 1024 * 1024) {
+      if (file.size <= 5 * 1024 * 1024) { // 5MB limit
         setSelectedFile(file);
       } else {
         toast.error(t('inventory.productForm.fileSizeError'), { id: 'file-size-should-not-exceed-5m' });
@@ -166,11 +184,11 @@ export default function ProductForm({ editId }: ProductFormProps) {
 
     const submissionData = {
       ...formData,
-      sellingPrice: Number(formData.sellingPrice) || 0,
-      costPrice: Number(formData.costPrice) || 0,
-      taxRate: Number(formData.taxRate) || 0,
-      currentStock: Number(formData.currentStock) || 0,
-      minStockLevel: Number(formData.minStockLevel) || 10,
+      sellingPrice: formData.sellingPrice === '' ? undefined : Number(formData.sellingPrice),
+      costPrice: formData.costPrice === '' ? undefined : Number(formData.costPrice),
+      taxRate: formData.taxRate === '' ? 18 : Number(formData.taxRate),
+      currentStock: formData.currentStock === '' ? undefined : Number(formData.currentStock),
+      minStockLevel: formData.minStockLevel === '' ? undefined : Number(formData.minStockLevel),
       images: undefined,
       image: selectedFile || undefined,
       existingImages: undefined
@@ -198,10 +216,10 @@ export default function ProductForm({ editId }: ProductFormProps) {
         toast.success(editId ? t('inventory.productForm.productUpdated') : t('inventory.productForm.productSaved'), { id: toastId });
         router.push(editId ? `/products/${editId}` : '/products');
       } else {
-        toast.error((res as any).error || t('inventory.productForm.failedToSave'), { id: toastId });
+        toast.error((res as any).error || (res as any).message || t('inventory.productForm.failedToSave'), { id: toastId });
       }
-    } catch (error) {
-      toast.error(t('inventory.productForm.unexpectedError'), { id: toastId });
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || t('inventory.productForm.unexpectedError'), { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -274,7 +292,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
           </div>
         </div>
 
-        {/* Organization */}
+        {/* Organization (Dynamic Categories & Brands) */}
         <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
           <div className="flex items-center gap-2 mb-2">
             <Layers className="w-5 h-5 text-primary" />
@@ -283,26 +301,43 @@ export default function ProductForm({ editId }: ProductFormProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                <Tag className="w-3.5 h-3.5" /> {t('inventory.productForm.category')}
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
+                  <Tag className="w-3.5 h-3.5" /> {t('inventory.productForm.category')} <span className="text-error">*</span>
+                </label>
+                <Link href="/categories/new" className="text-xs font-bold text-primary hover:underline flex items-center gap-1">
+                  <Plus className="w-3 h-3" /> {t('inventory.categoriesView.addCategory', 'Add Category')}
+                </Link>
+              </div>
               <select 
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full h-11 px-4 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 focus:border-primary/50 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
+                className={cn(
+                  "w-full h-11 px-4 bg-surface-container-low border rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 transition-all appearance-none cursor-pointer",
+                  errors.category ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                )}
               >
                 <option value="">{t('inventory.productForm.selectCategory')}</option>
-                {categories.map(c => (
+                {categories.map((c: any) => (
                   <option key={c._id} value={c._id}>{c.name}</option>
                 ))}
               </select>
+              {errors.category && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.category}</p>}
+              {categories.length === 0 && (
+                <p className="text-[11px] text-on-surface-variant/70">No categories found. Please create a category first.</p>
+              )}
             </div>
             
             <div className="space-y-2">
-              <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                <Tag className="w-3.5 h-3.5" /> {t('inventory.productForm.brand')}
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
+                  <Tag className="w-3.5 h-3.5" /> {t('inventory.productForm.brand')}
+                </label>
+                <Link href="/brands/new" className="text-xs font-bold text-primary hover:underline flex items-center gap-1">
+                  <Plus className="w-3 h-3" /> {t('inventory.brandsView.addNewBrand', 'Add Brand')}
+                </Link>
+              </div>
               <select 
                 name="brand"
                 value={formData.brand}
@@ -310,10 +345,13 @@ export default function ProductForm({ editId }: ProductFormProps) {
                 className="w-full h-11 px-4 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 focus:border-primary/50 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
               >
                 <option value="">{t('inventory.productForm.selectBrand')}</option>
-                {brands.map(b => (
+                {brands.map((b: any) => (
                   <option key={b._id} value={b._id}>{b.name}</option>
                 ))}
               </select>
+              {brands.length === 0 && (
+                <p className="text-[11px] text-on-surface-variant/70">No brands found. You can optionally create brands to organize items.</p>
+              )}
             </div>
           </div>
         </div>
@@ -325,13 +363,14 @@ export default function ProductForm({ editId }: ProductFormProps) {
             <h2 className="text-lg font-bold text-on-surface">{t('inventory.productForm.pricingInventory')}</h2>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div className="space-y-2">
               <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
                 {t('inventory.productForm.sellingPrice')} <span className="text-error">*</span>
               </label>
               <input 
-                type="number" 
+                type="text" 
+                inputMode="decimal"
                 name="sellingPrice"
                 value={formData.sellingPrice}
                 onChange={handleChange}
@@ -346,39 +385,26 @@ export default function ProductForm({ editId }: ProductFormProps) {
             
             <div className="space-y-2">
               <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                {t('inventory.productForm.costPrice')}
+                {t('inventory.productForm.costPrice')} <span className="text-error">*</span>
               </label>
               <input 
-                type="number" 
+                type="text" 
+                inputMode="decimal"
                 name="costPrice"
                 value={formData.costPrice}
                 onChange={handleChange}
                 placeholder="0.00" 
-                className="w-full h-11 px-4 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:border-primary/50 focus:ring-primary/20 transition-all"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                {t('inventory.productForm.skuBarcode')} <span className="text-error">*</span>
-              </label>
-              <input 
-                type="text" 
-                name="sku"
-                value={formData.sku}
-                onChange={handleChange}
-                placeholder="e.g. SKU-12345" 
                 className={cn(
-                  "w-full h-11 px-4 bg-surface-container-low border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all font-mono",
-                  errors.sku ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                  "w-full h-11 px-4 bg-surface-container-low border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all",
+                  errors.costPrice ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
                 )}
               />
-              {errors.sku && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.sku}</p>}
+              {errors.costPrice && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.costPrice}</p>}
             </div>
             
             <div className="space-y-2">
               <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                {t('inventory.productForm.taxRate')}
+                {t('inventory.productForm.taxRate')} <span className="text-error">*</span>
               </label>
               <select 
                 name="taxRate"
@@ -400,29 +426,39 @@ export default function ProductForm({ editId }: ProductFormProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="space-y-2">
                 <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                  {t('inventory.productForm.initialStock')}
+                  {t('inventory.productForm.initialStock')} <span className="text-error">*</span>
                 </label>
                 <input 
-                  type="number" 
+                  type="text" 
+                  inputMode="numeric"
                   name="currentStock"
                   value={formData.currentStock}
                   onChange={handleChange}
                   placeholder="0" 
-                  className="w-full h-11 px-4 bg-surface border border-outline-variant/30 rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:border-primary/50 focus:ring-primary/20 transition-all"
+                  className={cn(
+                    "w-full h-11 px-4 bg-surface border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all",
+                    errors.currentStock ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                  )}
                 />
+                {errors.currentStock && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.currentStock}</p>}
               </div>
               <div className="space-y-2">
                 <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                  {t('inventory.productForm.lowStockAlert')}
+                  {t('inventory.productForm.lowStockAlert')} <span className="text-error">*</span>
                 </label>
                 <input 
-                  type="number" 
+                  type="text" 
+                  inputMode="numeric"
                   name="minStockLevel"
                   value={formData.minStockLevel}
                   onChange={handleChange}
                   placeholder="10" 
-                  className="w-full h-11 px-4 bg-surface border border-outline-variant/30 rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:border-primary/50 focus:ring-primary/20 transition-all"
+                  className={cn(
+                    "w-full h-11 px-4 bg-surface border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all",
+                    errors.minStockLevel ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                  )}
                 />
+                {errors.minStockLevel && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.minStockLevel}</p>}
               </div>
             </div>
           </div>
@@ -441,7 +477,6 @@ export default function ProductForm({ editId }: ProductFormProps) {
             onChange={handleFileChange}
             className="hidden"
             accept=".svg,.png,.jpg,.jpeg,.gif"
-            multiple
           />
           <div 
             onClick={() => fileInputRef.current?.click()}

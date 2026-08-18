@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { DetailViewSkeleton } from '@/components/common/DetailViewSkeleton';
 import { cn } from '@/utils/cn';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { productService } from '@/lib/services/product.services';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
@@ -17,33 +17,41 @@ import { formatCurrency } from '@/utils/formatCurrency';
 import { formatDistanceToNow } from 'date-fns';
 
 interface InventoryDetailViewProps {
-  productId: string;
+  productId?: string;
 }
 
 export default function InventoryDetailView({ productId }: InventoryDetailViewProps) {
   const { t } = useTranslation();
   const router = useRouter();
+  const params = useParams();
+  const activeProductId = productId || (params?.id as string);
+
   const [productData, setProductData] = useState<any>(null);
   const [stockHistory, setStockHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!activeProductId || activeProductId === 'undefined') {
+      setLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
       try {
         setLoading(true);
         // Fetch Product Info
         const res = await productService.getProducts();
         if (res.success) {
-          const product = res.data.find((p: any) => p._id === productId);
+          const product = res.data.find((p: any) => p._id === activeProductId);
           if (product) {
             setProductData(product);
           }
         }
         
         // Fetch Stock History
-        const historyRes = await productService.getProductStockHistory(productId);
+        const historyRes = await productService.getProductStockHistory(activeProductId);
         if (historyRes.success) {
-          setStockHistory(historyRes.data);
+          setStockHistory(historyRes.data || []);
         }
       } catch (err) {
         console.error(err);
@@ -52,7 +60,7 @@ export default function InventoryDetailView({ productId }: InventoryDetailViewPr
       }
     };
     fetchData();
-  }, [productId]);
+  }, [activeProductId]);
 
   if (loading) return <DetailViewSkeleton />;
 

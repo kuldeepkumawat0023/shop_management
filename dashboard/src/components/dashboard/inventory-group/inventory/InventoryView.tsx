@@ -3,16 +3,13 @@
 import React, { useState } from 'react';
 import { DataTable } from '@/components/common/DataTable';
 import { Button } from '@/components/common/Button';
-import { Package, AlertTriangle, AlertCircle, Banknote, Edit, Eye, Trash2 } from 'lucide-react';
+import { Package, AlertTriangle, AlertCircle, Banknote, Eye } from 'lucide-react';
 import { StatsCard } from '@/components/common/StatsCard';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import { cn } from '@/utils/cn';
 import { productService } from '@/lib/services/product.services';
 import { useTranslation } from 'react-i18next';
-import ActionGuard from '@/components/auth/ActionGuard';
-import { DeleteModal } from '@/components/common/DeleteModal';
-import toast from 'react-hot-toast';
 import Link from 'next/link';
 
 export default function InventoryView() {
@@ -41,7 +38,7 @@ export default function InventoryView() {
               ...p,
               id: p._id,
               name: p.name,
-              category: p.category?.name || t('inventory.inventoryView.uncategorized'),
+              category: p.categoryId?.name || p.category?.name || t('inventory.inventoryView.uncategorized'),
               sku: p.sku || t('inventory.inventoryView.na'),
               stock: stock,
               minStock: minStock,
@@ -59,29 +56,6 @@ export default function InventoryView() {
     fetchProducts();
   }, []);
 
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string, name: string } | null>(null);
-
-  const executeDelete = async () => {
-    if (!deleteTarget) return;
-    try {
-      const res = await productService.deleteProduct(deleteTarget.id);
-      if (res.success || (res as any).status === 200) {
-        toast.success(t('inventory.inventoryView.productDeleted', 'Product deleted successfully'));
-        setInventoryData(prev => prev.filter(p => p.id !== deleteTarget.id));
-      } else {
-        toast.error((res as any).message || t('inventory.inventoryView.deleteFailed', 'Failed to delete product'));
-      }
-    } catch (err) {
-      toast.error(t('inventory.inventoryView.deleteError', 'An error occurred while deleting the product'));
-    } finally {
-      setDeleteTarget(null);
-    }
-  };
-
-  const handleDeleteClick = (id: string, name: string) => {
-    setDeleteTarget({ id, name });
-  };
-
   const filteredData = inventoryData.filter(item => {
     if (activeTab === t('inventory.inventoryView.allItems')) return true;
     if (activeTab === t('inventory.inventoryView.lowStock')) return item.status === t('inventory.inventoryView.lowStock');
@@ -90,8 +64,8 @@ export default function InventoryView() {
   });
 
   const columns = [
-    { 
-      header: t('inventory.inventoryView.productDetails'), 
+    {
+      header: t('inventory.inventoryView.productDetails'),
       accessorKey: 'name',
       cell: (row: any) => (
         <div className="flex items-center gap-3">
@@ -111,8 +85,8 @@ export default function InventoryView() {
         </div>
       )
     },
-    { 
-      header: t('inventory.inventoryView.sku'), 
+    {
+      header: t('inventory.inventoryView.sku'),
       accessorKey: 'sku',
       cell: (row: any) => (
         <span className="text-xs font-mono font-medium text-on-surface-variant bg-surface-container px-2 py-1 rounded-md border border-outline-variant/10">
@@ -120,8 +94,8 @@ export default function InventoryView() {
         </span>
       )
     },
-    { 
-      header: t('inventory.inventoryView.stock'), 
+    {
+      header: t('inventory.inventoryView.stock'),
       accessorKey: 'stock',
       cell: (row: any) => (
         <div className="flex flex-col">
@@ -135,8 +109,8 @@ export default function InventoryView() {
         </div>
       )
     },
-    { 
-      header: t('inventory.inventoryView.unitPrice'), 
+    {
+      header: t('inventory.inventoryView.unitPrice'),
       accessorKey: 'price',
       cell: (row: any) => (
         <span className="font-bold text-on-surface">₹{row.price.toFixed(2)}</span>
@@ -159,16 +133,6 @@ export default function InventoryView() {
               <Eye className="w-4 h-4" />
             </Button>
           </Link>
-          <ActionGuard permission="products.update">
-            <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10">
-              <Edit className="w-4 h-4" />
-            </Button>
-          </ActionGuard>
-          <ActionGuard permission="products.delete">
-            <Button size="icon" variant="ghost" onClick={() => handleDeleteClick(row.id, row.name)} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10">
-              <Trash2 className="w-4 h-4" />
-            </Button>
-          </ActionGuard>
         </div>
       )
     }
@@ -208,28 +172,28 @@ export default function InventoryView() {
 
       {/* Stats Cards Row */}
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 shrink-0">
-        <StatsCard 
+        <StatsCard
           title={t('inventory.inventoryView.totalProducts')}
           value={inventoryData.length}
           icon={Package}
           trendLabel={t('inventory.inventoryView.uniqueItems')}
           colorTheme="primary"
         />
-        <StatsCard 
+        <StatsCard
           title={t('inventory.inventoryView.totalStockValue')}
           value={`₹${inventoryData.reduce((acc, curr) => acc + (curr.price * curr.stock), 0).toLocaleString('en-IN')}`}
           icon={Banknote}
           trendLabel={t('inventory.inventoryView.currentEstimate')}
           colorTheme="purple"
         />
-        <StatsCard 
+        <StatsCard
           title={t('inventory.inventoryView.lowStock')}
           value={inventoryData.filter(i => i.status === t('inventory.inventoryView.lowStock')).length}
           icon={AlertTriangle}
           trendLabel={t('inventory.inventoryView.needsReorder')}
           colorTheme="warning"
         />
-        <StatsCard 
+        <StatsCard
           title={t('inventory.inventoryView.outOfStock')}
           value={inventoryData.filter(i => i.status === t('inventory.inventoryView.outOfStock')).length}
           icon={AlertCircle}
@@ -239,7 +203,7 @@ export default function InventoryView() {
       </div>
 
       <div className="w-full bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 flex flex-col min-h-[400px]">
-        <DataTable 
+        <DataTable
           data={filteredData}
           columns={columns}
           headerContent={
@@ -256,13 +220,6 @@ export default function InventoryView() {
           itemsPerPage={10}
         />
       </div>
-
-      <DeleteModal
-        isOpen={!!deleteTarget}
-        onClose={() => setDeleteTarget(null)}
-        onConfirm={executeDelete}
-        itemName={deleteTarget?.name || t('common.item')}
-      />
     </div>
   );
 }

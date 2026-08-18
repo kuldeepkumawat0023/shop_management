@@ -11,14 +11,9 @@ const brandSchema = new mongoose.Schema({
     ref: 'Shop',
     required: true
   },
-
   contactPerson: {
     type: String,
     trim: true
-  },
-  categoryId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Category'
   },
   description: {
     type: String,

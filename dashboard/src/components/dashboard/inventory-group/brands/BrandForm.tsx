@@ -22,7 +22,6 @@ export default function BrandForm({ editId }: BrandFormProps) {
   const [formData, setFormData] = useState({
     name: '',
     contactPerson: '',
-    category: '',
     description: '',
     status: 'Active' as 'Active' | 'Inactive'
   });
@@ -40,7 +39,6 @@ export default function BrandForm({ editId }: BrandFormProps) {
             setFormData({
               name: brand.name || '',
               contactPerson: (brand as any).contactPerson || '',
-              category: (brand as any).categoryId || (brand as any).category || '',
               description: (brand as any).description || '',
               status: brand.isActive !== false ? 'Active' : 'Inactive'
             });
@@ -72,7 +70,6 @@ export default function BrandForm({ editId }: BrandFormProps) {
     setFormData({
       name: '',
       contactPerson: '',
-      category: '',
       description: '',
       status: 'Active'
     });
@@ -143,29 +140,29 @@ export default function BrandForm({ editId }: BrandFormProps) {
             <h2 className="text-lg font-bold text-on-surface">{t('inventory.brandForm.brandDetails')}</h2>
           </div>
           
-          <div className="space-y-2">
-            <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-              <Tag className="w-3.5 h-3.5" /> {t('inventory.brandForm.brandName')} <span className="text-error">*</span>
-            </label>
-            <input 
-              type="text" 
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              aria-invalid={!!errors.name}
-              placeholder="e.g. SonicAudio, FitLife Gear" 
-              className={cn(
-                "w-full h-11 px-4 bg-surface-container-low border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all",
-                errors.name ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
-              )}
-            />
-            {errors.name && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.name}</p>}
-          </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                <User className="w-3.5 h-3.5" /> {t('inventory.brandForm.primaryContact')} <span className="text-error">*</span>
+                <Tag className="w-3.5 h-3.5" /> {t('inventory.brandForm.brandName')} <span className="text-error">*</span>
+              </label>
+              <input 
+                type="text" 
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                aria-invalid={!!errors.name}
+                placeholder="e.g. SonicAudio, FitLife Gear" 
+                className={cn(
+                  "w-full h-11 px-4 bg-surface-container-low border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all",
+                  errors.name ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                )}
+              />
+              {errors.name && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.name}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
+                <User className="w-3.5 h-3.5" /> {t('inventory.brandForm.primaryContact')}
               </label>
               <input 
                 type="text" 
@@ -180,28 +177,6 @@ export default function BrandForm({ editId }: BrandFormProps) {
                 )}
               />
               {errors.contactPerson && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.contactPerson}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                <Tag className="w-3.5 h-3.5" /> {t('inventory.brandForm.categoryFocus')} <span className="text-error">*</span>
-              </label>
-              <select 
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className={cn(
-                  "w-full h-11 px-4 bg-surface-container-low border rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 transition-all appearance-none cursor-pointer",
-                  errors.category ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
-                )}
-              >
-                <option value="">{t('inventory.brandForm.selectCategory')}</option>
-                <option value="Electronics">Electronics</option>
-                <option value="Fashion">Fashion</option>
-                <option value="Groceries">Groceries</option>
-                <option value="Home Decor">Home Decor</option>
-              </select>
-              {errors.category && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.category}</p>}
             </div>
           </div>
 

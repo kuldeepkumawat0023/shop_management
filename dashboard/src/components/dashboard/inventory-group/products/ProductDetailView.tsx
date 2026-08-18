@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { DetailViewSkeleton } from '@/components/common/DetailViewSkeleton';
 import { cn } from '@/utils/cn';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { productService } from '@/lib/services/product.services';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
@@ -15,22 +15,30 @@ import ActionGuard from '@/components/auth/ActionGuard';
 import { DeleteModal } from '@/components/common/DeleteModal';
 
 interface ProductDetailViewProps {
-  productId: string;
+  productId?: string;
 }
 
 export default function ProductDetailView({ productId }: ProductDetailViewProps) {
   const { t } = useTranslation();
   const router = useRouter();
+  const params = useParams();
+  const activeProductId = productId || (params?.id as string);
+
   const [activeTab, setActiveTab] = useState('Overview');
   const [productData, setProductData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!activeProductId || activeProductId === 'undefined') {
+      setLoading(false);
+      return;
+    }
+
     const fetchProduct = async () => {
       try {
         const res = await productService.getProducts();
         if (res.success) {
-          const product = res.data.find((p: any) => p._id === productId);
+          const product = res.data.find((p: any) => p._id === activeProductId);
           if (product) {
             setProductData(product);
           }
@@ -42,13 +50,13 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
       }
     };
     fetchProduct();
-  }, [productId]);
+  }, [activeProductId]);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const executeDelete = async () => {
     try {
-      const res = await productService.deleteProduct(productId);
+      const res = await productService.deleteProduct(activeProductId);
       if (res.success) {
         toast.success(t('inventory.productDetail.productDeleted'));
         router.push('/products');
@@ -76,7 +84,7 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
   }
 
   const sellingPrice = productData.sellingPrice || 0;
-  const costPrice = productData.costPrice || 0;
+  const costPrice = productData.purchasePrice || productData.costPrice || 0;
   const currentStock = productData.currentStock || 0;
 
   return (
@@ -93,7 +101,7 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
         </div>
         <div className="flex items-center gap-2">
           <ActionGuard permission="products.update">
-            <Link href={`/products/${productId}/edit`}>
+            <Link href={`/products/${activeProductId}/edit`}>
               <Button variant="ghost" className="text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-xl">
                 <Edit className="w-4 h-4 sm:mr-2" />
                 <span className="hidden sm:inline">{t('inventory.productDetail.edit')}</span>
@@ -136,9 +144,9 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
               </div>
               <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">{productData.name}</h1>
               <div className="flex items-center gap-2 text-sm text-on-surface-variant font-medium mt-1">
-                <span className="bg-surface-container-low px-2.5 py-1 rounded-md border border-outline-variant/10">{productData.category?.name || 'Uncategorized'}</span>
+                <span className="bg-surface-container-low px-2.5 py-1 rounded-md border border-outline-variant/10">{productData.categoryId?.name || productData.category?.name || 'Uncategorized'}</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-outline-variant/40" />
-                <span className="bg-surface-container-low px-2.5 py-1 rounded-md border border-outline-variant/10">{productData.brand?.name || 'No Brand'}</span>
+                <span className="bg-surface-container-low px-2.5 py-1 rounded-md border border-outline-variant/10">{productData.brandId?.name || productData.brand?.name || 'No Brand'}</span>
               </div>
             </div>
             <p className="text-sm text-on-surface-variant leading-relaxed ">
@@ -211,7 +219,7 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-outline-variant/10">
                   <span className="text-sm font-medium text-on-surface-variant">{t('inventory.productDetail.taxRate')}</span>
-                  <span className="text-sm font-bold text-on-surface">{productData.taxRate || 18}%</span>
+                  <span className="text-sm font-bold text-on-surface">{productData.gstRate || productData.taxRate || 18}%</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-outline-variant/10">
                   <span className="text-sm font-medium text-on-surface-variant">{t('inventory.productDetail.createdOn')}</span>

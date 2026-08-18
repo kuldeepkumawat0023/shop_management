@@ -44,7 +44,7 @@ export default function CategoriesView() {
       }
     };
     fetchCategories();
-  }, []);
+  }, [t]);
 
   const [deleteTarget, setDeleteTarget] = useState<{ id: string, name: string } | null>(null);
 
@@ -95,15 +95,6 @@ export default function CategoriesView() {
       )
     },
     {
-      header: t('inventory.categoriesView.slug'),
-      accessorKey: 'slug',
-      cell: (row: any) => (
-        <span className="text-xs font-mono font-medium text-on-surface-variant bg-surface-container px-2 py-1 rounded-md border border-outline-variant/10">
-          /{row.slug}
-        </span>
-      )
-    },
-    {
       header: t('inventory.categoriesView.totalProducts'),
       accessorKey: 'totalProducts',
       cell: (row: any) => (
@@ -135,9 +126,11 @@ export default function CategoriesView() {
             </Button>
           </Link>
           <ActionGuard permission="categories.update">
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
-              <Edit className="w-4 h-4" />
-            </Button>
+            <Link href={`/categories/${row.id}/edit`}>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
+                <Edit className="w-4 h-4" />
+              </Button>
+            </Link>
           </ActionGuard>
           <ActionGuard permission="categories.delete">
             <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(row.id, row.name)} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">

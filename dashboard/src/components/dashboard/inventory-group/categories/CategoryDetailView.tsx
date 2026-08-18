@@ -5,7 +5,7 @@ import { Button } from '@/components/common/Button';
 import { DataTable } from '@/components/common/DataTable';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { DetailViewSkeleton } from '@/components/common/DetailViewSkeleton';
-import { ArrowLeft, Tag, Layers, Search, Filter, Download, MoreVertical, Edit, Trash2, Globe, Archive, Package, Plus, ImageIcon, Type, Link as LinkIcon, Eye, CheckCircle2, AlertCircle, FolderTree, LayoutGrid, FileText } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, Package, Plus, Eye, FolderTree, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/utils/cn';
@@ -162,9 +162,11 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
             </Button>
           </Link>
           <ActionGuard permission="products.update">
-            <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10">
-              <Edit className="w-4 h-4" />
-            </Button>
+            <Link href={`/products/${row.id}/edit`}>
+              <Button size="icon" variant="ghost" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10">
+                <Edit className="w-4 h-4" />
+              </Button>
+            </Link>
           </ActionGuard>
         </div>
       )
@@ -195,8 +197,8 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
           </Button>
           
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-surface-container-low border border-outline-variant/20 flex items-center justify-center shadow-sm">
-              <ImageIcon className="w-8 h-8 text-on-surface-variant/50" />
+            <div className="w-14 h-14 rounded-2xl gradient-button flex items-center justify-center font-bold text-white text-lg shadow-sm">
+              {categoryData.name.substring(0, 2).toUpperCase()}
             </div>
             <div>
               <div className="flex items-center gap-3">
@@ -207,10 +209,6 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
                   colorTheme={categoryData.isActive !== false ? 'success' : 'error'} 
                 />
               </div>
-              <p className="text-sm font-medium text-on-surface-variant mt-1 flex items-center gap-2">
-                <FolderTree className="w-4 h-4" /> 
-                {categoryData.parentCategory?.name || t('inventory.categoryDetail.topLevelCategory')}
-              </p>
             </div>
           </div>
         </div>
@@ -233,7 +231,7 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
 
       {/* Tabs */}
       <div className="flex space-x-1 bg-surface-container-low p-1 rounded-xl w-fit mb-6">
-        {[t('inventory.categoryDetail.overview'), t('inventory.categoryDetail.products'), t('inventory.categoryDetail.settings')].map((tab) => (
+        {[t('inventory.categoryDetail.overview'), t('inventory.categoryDetail.products')].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -353,17 +351,6 @@ export default function CategoryDetailView({ categoryId }: CategoryDetailViewPro
               </div>
             }
           />
-        </div>
-      )}
-
-      {activeTab === t('inventory.categoryDetail.settings') && (
-        <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl shadow-sm p-6 text-center py-20">
-          <AlertCircle className="w-12 h-12 text-on-surface-variant/50 mb-4" />
-          <h2 className="text-xl font-bold text-on-surface mb-2">{t('inventory.categoryDetail.categorySettings')}</h2>
-          <p className="text-on-surface-variant max-w-md mb-6">
-            {t('inventory.categoryDetail.categorySettingsMsg')}
-          </p>
-          <Button variant="outline">{t('inventory.categoryDetail.editConfig')}</Button>
         </div>
       )}
 

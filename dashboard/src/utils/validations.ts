@@ -70,51 +70,51 @@ export const resetPasswordSchema = z.object({
 // --- Dashboard Schemas ---
 
 export const brandSchema = z.object({
-  name: z.string().min(1, 'Brand Name is required / ब्रांड का नाम आवश्यक है').max(100, 'Brand Name is too long / ब्रांड का नाम बहुत लंबा है'),
+  name: z.string().min(1, 'Brand Name is required').max(100, 'Brand Name is too long'),
   contactPerson: z.string().max(100).optional(),
-  category: z.string().optional(),
-  description: z.string().max(500, 'Description is too long / विवरण बहुत लंबा है').optional(),
+  description: z.string().max(500, 'Description is too long').optional(),
   status: z.enum(['Active', 'Inactive']),
 });
 
 export const categorySchema = z.object({
-  name: z.string().min(1, 'Category Name is required / श्रेणी का नाम आवश्यक है').max(100, 'Category Name is too long / श्रेणी का नाम बहुत लंबा है'),
-  description: z.string().max(500, 'Description is too long / विवरण बहुत लंबा है').optional(),
+  name: z.string().min(1, 'Category Name is required').max(100, 'Category Name is too long'),
+  description: z.string().max(500, 'Description is too long').optional(),
+  status: z.enum(['Active', 'Inactive']).optional(),
 });
 
 export const customerSchema = z.object({
-  name: z.string().min(1, 'Customer Name is required / ग्राहक का नाम आवश्यक है').max(100, 'Customer Name is too long / ग्राहक का नाम बहुत लंबा है'),
-  phone: z.string().min(1, 'Phone number is required / फ़ोन नंबर आवश्यक है').regex(phoneRegex, 'Invalid phone number / अमान्य फ़ोन नंबर'),
-  email: z.union([z.literal(''), z.string().email('Invalid email address / अमान्य ईमेल पता')]).optional(),
+  name: z.string().min(1, 'Customer Name is required').max(100, 'Customer Name is too long'),
+  phone: z.string().min(1, 'Phone number is required').regex(phoneRegex, 'Invalid phone number'),
+  email: z.union([z.literal(''), z.string().email('Invalid email address')]).optional(),
   company: z.string().optional(),
   notes: z.string().optional(),
-  address: z.string().max(500, 'Address is too long / पता बहुत लंबा है').optional(),
+  address: z.string().max(500, 'Address is too long').optional(),
 });
 
 export const supplierSchema = z.object({
-  name: z.string().min(1, 'Supplier Name is required / आपूर्तिकर्ता का नाम आवश्यक है').max(100, 'Supplier Name is too long / आपूर्तिकर्ता का नाम बहुत लंबा है'),
-  contactPerson: z.string().min(1, 'Contact Person is required / संपर्क व्यक्ति आवश्यक है').max(100),
-  phone: z.string().min(1, 'Phone number is required / फ़ोन नंबर आवश्यक है').regex(phoneRegex, 'Invalid phone number / अमान्य फ़ोन नंबर'),
-  email: z.union([z.literal(''), z.string().email('Invalid email address / अमान्य ईमेल पता')]).optional(),
+  name: z.string().min(1, 'Supplier Name is required').max(100, 'Supplier Name is too long'),
+  contactPerson: z.string().min(1, 'Contact Person is required').max(100),
+  phone: z.string().min(1, 'Phone number is required').regex(phoneRegex, 'Invalid phone number'),
+  email: z.union([z.literal(''), z.string().email('Invalid email address')]).optional(),
   gstNumber: z.union([
     z.literal(''),
-    z.string().regex(gstRegex, 'Invalid GST number format / अमान्य GST नंबर प्रारूप')
+    z.string().regex(gstRegex, 'Invalid GST number format')
   ]).optional(),
   paymentTerms: z.string().optional(),
   notes: z.string().optional(),
-  address: z.string().max(500, 'Address is too long / पता बहुत लंबा है').optional(),
+  address: z.string().max(500, 'Address is too long').optional(),
 });
 
 export const productSchema = z.object({
-  name: z.string().min(1, 'Product Name is required / उत्पाद का नाम आवश्यक है').max(100),
-  description: z.string().optional(),
-  sku: z.string().min(1, 'SKU is required / SKU आवश्यक है'),
-  sellingPrice: z.number().min(0, 'Price must be positive / मूल्य सकारात्मक होना चाहिए'),
-  costPrice: z.number().min(0).optional(),
-  taxRate: z.number().min(0).optional(),
-  currentStock: z.number().min(0).optional(),
-  minStockLevel: z.number().min(0).optional(),
-  category: z.string().optional(),
+  name: z.string().min(1, 'Product Name is required').max(100, 'Product Name is too long'),
+  description: z.string().max(500, 'Description is too long').optional(),
+  sku: z.string().optional(),
+  sellingPrice: z.number().min(0, 'Price must be positive'),
+  costPrice: z.number().min(0, 'Cost price must be positive'),
+  taxRate: z.number().min(0).default(18),
+  currentStock: z.number().min(0, 'Stock must be 0 or more'),
+  minStockLevel: z.number().min(0, 'Min stock must be 0 or more'),
+  category: z.string().min(1, 'Category is required'),
   brand: z.string().optional(),
   isActive: z.boolean().optional(),
 });

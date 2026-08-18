@@ -31,7 +31,6 @@ export default function BrandsView() {
             id: b._id,
             status: b.isActive !== false ? 'Active' : 'Inactive',
             totalProducts: 0, // Fallback
-            category: 'General', // Fallback if no category association
             lastUpdated: new Date(b.updatedAt || new Date()).toLocaleDateString()
           })));
         }
@@ -68,8 +67,7 @@ export default function BrandsView() {
   };
 
   const filteredData = brandsData.filter(brand => 
-    brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    brand.category.toLowerCase().includes(searchQuery.toLowerCase())
+    brand.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const columns = [
@@ -86,15 +84,6 @@ export default function BrandsView() {
             <span className="text-xs text-on-surface-variant">ID: BRD-{row.id.padStart(4, '0')}</span>
           </div>
         </div>
-      )
-    },
-    {
-      header: t('inventory.brandsView.categoryFocus'),
-      accessorKey: 'category',
-      cell: (row: any) => (
-        <span className="text-sm font-medium text-on-surface-variant bg-surface-container px-2.5 py-1 rounded-md border border-outline-variant/10">
-          {row.category}
-        </span>
       )
     },
     {

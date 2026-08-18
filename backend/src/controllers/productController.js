@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Product = require('../models/Product');
 const StockHistory = require('../models/StockHistory');
 const { uploadToCloudinary, deleteFromCloudinary } = require('../config/cloudinary');
@@ -5,7 +6,16 @@ const { uploadToCloudinary, deleteFromCloudinary } = require('../config/cloudina
 exports.createProduct = async (req, res, next) => {
   try {
     const productData = { ...req.body, shopId: req.scopedShopId };
-    
+
+    // Auto-generate unique barcode and SKU if not provided
+    if (!productData.barcode) {
+      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+      productData.barcode = `PRD${Date.now().toString().slice(-6)}${randomSuffix}`;
+    }
+    if (!productData.sku) {
+      productData.sku = productData.barcode;
+    }
+
     // Default current stock to opening stock
     if (productData.openingStock) {
       productData.currentStock = productData.openingStock;
@@ -134,8 +144,13 @@ exports.deleteProduct = async (req, res, next) => {
 
 exports.getProductStockHistory = async (req, res, next) => {
   try {
+    const { id } = req.params;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(200).json({ success: true, count: 0, data: [] });
+    }
+
     const history = await StockHistory.find({ 
-      productId: req.params.id, 
+      productId: id, 
       shopId: req.scopedShopId 
     })
     .populate('userId', 'firstName lastName email')

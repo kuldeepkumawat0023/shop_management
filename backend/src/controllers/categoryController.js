@@ -1,33 +1,28 @@
 const Category = require('../models/Category');
-const { uploadToCloudinary, deleteFromCloudinary } = require('../config/cloudinary');
 
 // @desc    Create a Category
-// @route   POST /api/v1/categories
-// @access  Private (Manager, Admin, Owner)
+// @route   POST /api/v1/categories/create
+// @access  Private
 exports.createCategory = async (req, res, next) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, status, isActive } = req.body;
     
-    if (!name) {
+    if (!name || !name.trim()) {
       return res.status(400).json({ success: false, message: 'Category name is required' });
     }
 
     // Check if category already exists in this shop
-    const exists = await Category.findOne({ name, shopId: req.scopedShopId });
+    const exists = await Category.findOne({ name: name.trim(), shopId: req.scopedShopId });
     if (exists) {
       return res.status(400).json({ success: false, message: 'Category already exists in this shop' });
     }
 
     const categoryData = {
-      name,
-      description,
+      name: name.trim(),
+      description: description ? description.trim() : undefined,
+      isActive: status === 'Inactive' || isActive === false ? false : true,
       shopId: req.scopedShopId
     };
-
-    if (req.file) {
-      const result = await uploadToCloudinary(req.file.buffer, 'shop_management/categories', 'image');
-      categoryData.image = result.secure_url;
-    }
 
     const category = await Category.create(categoryData);
 
@@ -41,7 +36,7 @@ exports.createCategory = async (req, res, next) => {
 };
 
 // @desc    Get all Categories
-// @route   GET /api/v1/categories
+// @route   GET /api/v1/categories/all
 // @access  Private
 exports.getCategories = async (req, res, next) => {
   try {
@@ -54,7 +49,7 @@ exports.getCategories = async (req, res, next) => {
 };
 
 // @desc    Update a Category
-// @route   PUT /api/v1/categories/:id
+// @route   PUT /api/v1/categories/update/:id
 // @access  Private
 exports.updateCategory = async (req, res, next) => {
   try {
@@ -64,13 +59,13 @@ exports.updateCategory = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Category not found' });
     }
 
-    const updateData = { ...req.body };
+    const { name, description, status, isActive } = req.body;
+    const updateData = {};
 
-    if (req.file) {
-      if (category.image) await deleteFromCloudinary(category.image);
-      const result = await uploadToCloudinary(req.file.buffer, 'shop_management/categories', 'image');
-      updateData.image = result.secure_url;
-    }
+    if (name !== undefined) updateData.name = name.trim();
+    if (description !== undefined) updateData.description = description.trim();
+    if (status !== undefined) updateData.isActive = status === 'Active';
+    if (isActive !== undefined) updateData.isActive = isActive;
 
     category = await Category.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true });
 
@@ -84,7 +79,7 @@ exports.updateCategory = async (req, res, next) => {
 };
 
 // @desc    Delete (Soft) a Category
-// @route   DELETE /api/v1/categories/:id
+// @route   DELETE /api/v1/categories/delete/:id
 // @access  Private
 exports.deleteCategory = async (req, res, next) => {
   try {

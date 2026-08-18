@@ -3,9 +3,7 @@ import apiClient, { ApiResponse } from '../apiClient';
 export interface CategoryData {
   _id?: string;
   name: string;
-  slug?: string;
   shopId?: string;
-  image?: string | null;
   description?: string;
   isActive?: boolean;
   createdAt?: string;
