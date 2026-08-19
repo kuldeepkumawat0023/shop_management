@@ -5,8 +5,10 @@ import { X, CreditCard, Banknote, Smartphone, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/common/Button';
 import { cn } from '@/utils/cn';
 import { usePOS } from '@/contexts/POSContext';
-import { formatCurrency } from '@/utils/formatCurrency';
 import { useTranslation } from 'react-i18next';
+
+const formatCurrency = (val: number) =>
+  '₹' + Number(val || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 interface PaymentModalProps {
   onClose: () => void;
@@ -28,7 +30,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
   const [amountReceived, setAmountReceived] = useState<string>(netAmount.toString());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { t } = useTranslation();
-  
+
   const received = parseFloat(amountReceived) || 0;
   const changeDue = received > netAmount ? received - netAmount : 0;
 
@@ -42,14 +44,14 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" 
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
-      
+
       {/* Modal */}
       <div className="relative w-full max-w-md bg-surface rounded-2xl shadow-2xl border border-outline-variant/20 overflow-hidden animate-in zoom-in-95 duration-200">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-outline-variant/20 bg-surface-container-low/50">
           <h2 className="text-lg font-bold text-on-surface">{t('pos.paymentModal.completePayment')}</h2>
@@ -59,7 +61,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
         </div>
 
         <div className="p-5 space-y-6">
-          
+
           <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex flex-col items-center justify-center text-center">
             <span className="text-sm font-semibold text-on-surface-variant mb-1">{t('pos.paymentModal.totalPayable')}</span>
             <span className="text-3xl font-black text-primary">{formatCurrency(netAmount)}</span>
@@ -95,7 +97,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
           {method === 'cash' && (
             <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
               <label className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">{t('pos.paymentModal.amountReceived')}</label>
-              
+
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-bold text-on-surface-variant">₹</span>
                 <input
@@ -105,7 +107,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                   className="w-full pl-8 pr-4 py-3 text-lg font-bold bg-surface-container-low border border-outline-variant/30 rounded-xl text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                 />
               </div>
-              
+
               {/* Quick Cash Buttons */}
               <div className="flex gap-2">
                 {QUICK_CASH.map((amt) => (
@@ -130,7 +132,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
         </div>
 
         <div className="p-4 border-t border-outline-variant/20 bg-surface-container-low/50">
-          <Button 
+          <Button
             className="w-full h-12 text-base font-bold bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 disabled:opacity-50"
             onClick={handleCheckout}
             disabled={isSubmitting || (method === 'cash' && received < netAmount)}
@@ -139,7 +141,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
             {isSubmitting ? t('pos.paymentModal.processing') : t('pos.paymentModal.completeSale')}
           </Button>
         </div>
-        
+
       </div>
     </div>
   );
