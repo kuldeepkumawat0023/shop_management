@@ -217,7 +217,6 @@ export default function InventoryView() {
           }
           searchPlaceholder={t('inventory.inventoryView.searchPlaceholder')}
           className="border-none shadow-none bg-transparent"
-          itemsPerPage={10}
         />
       </div>
     </div>

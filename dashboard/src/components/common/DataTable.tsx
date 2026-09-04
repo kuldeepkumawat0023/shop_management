@@ -4,6 +4,9 @@ import { Search } from 'lucide-react';
 import { Input } from '@/components/common/Input';
 import { Pagination } from '@/components/common/Pagination';
 
+const envLimit = Number(process.env.NEXT_PUBLIC_ITEMS_PER_PAGE);
+const DEFAULT_ITEMS_PER_PAGE = !isNaN(envLimit) && envLimit > 0 ? envLimit : 10;
+
 interface ColumnDef {
   header: string | React.ReactNode;
   accessorKey: string;
@@ -17,11 +20,30 @@ interface DataTableProps {
   headerContent?: React.ReactNode;
   className?: string;
   itemsPerPage?: number;
+  paginate?: boolean;
 }
 
-export function DataTable({ data, columns, searchPlaceholder, headerContent, className, itemsPerPage }: DataTableProps) {
+export function DataTable({ 
+  data, 
+  columns, 
+  searchPlaceholder, 
+  headerContent, 
+  className, 
+  itemsPerPage,
+  paginate = true 
+}: DataTableProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Pagination limit controlled centrally by NEXT_PUBLIC_ITEMS_PER_PAGE from .env.local
+  // If itemsPerPage is passed as legacy 10 or omitted, use the .env.local setting
+  const effectiveItemsPerPage = useMemo(() => {
+    if (!paginate) return 0;
+    if (itemsPerPage !== undefined && itemsPerPage !== 10) {
+      return itemsPerPage;
+    }
+    return DEFAULT_ITEMS_PER_PAGE;
+  }, [itemsPerPage, paginate]);
 
   // Reset to first page when search changes
   useEffect(() => {
@@ -40,22 +62,24 @@ export function DataTable({ data, columns, searchPlaceholder, headerContent, cla
 
   // Pagination logic
   const paginatedData = useMemo(() => {
-    if (!itemsPerPage) return filteredData;
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredData.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredData, currentPage, itemsPerPage]);
+    if (!effectiveItemsPerPage || effectiveItemsPerPage <= 0) return filteredData;
+    const startIndex = (currentPage - 1) * effectiveItemsPerPage;
+    return filteredData.slice(startIndex, startIndex + effectiveItemsPerPage);
+  }, [filteredData, currentPage, effectiveItemsPerPage]);
 
-  const totalPages = itemsPerPage ? Math.ceil(filteredData.length / itemsPerPage) : 1;
+  const totalPages = effectiveItemsPerPage && effectiveItemsPerPage > 0 
+    ? Math.ceil(filteredData.length / effectiveItemsPerPage) 
+    : 1;
 
   return (
-    <div className={cn("flex flex-col w-full bg-surface-container-lowest border border-outline-variant/20 rounded-2xl overflow-hidden shadow-sm", className)}>
+    <div className={cn("flex flex-col w-full min-w-0 max-w-full bg-surface-container-lowest border border-outline-variant/20 rounded-2xl overflow-hidden shadow-sm", className)}>
       {(searchPlaceholder || headerContent) && (
-        <div className="p-4 border-b border-outline-variant/10 flex flex-col sm:flex-row items-center justify-between gap-4 bg-surface/50">
-          <div className="flex-1 w-full flex overflow-x-auto">
+        <div className="p-4 border-b border-outline-variant/10 flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-4 bg-surface/50 min-w-0">
+          <div className="flex-1 w-full min-w-0">
             {headerContent}
           </div>
           {searchPlaceholder && (
-            <div className="relative w-full sm:max-w-sm shrink-0">
+            <div className="relative w-full xl:max-w-xs 2xl:max-w-sm shrink-0">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant" />
               <input
                 type="text"
@@ -69,7 +93,7 @@ export function DataTable({ data, columns, searchPlaceholder, headerContent, cla
         </div>
       )}
       
-      <div className="w-full overflow-x-auto">
+      <div className="w-full min-w-0 overflow-x-auto custom-scrollbar">
         <table className="w-full text-left border-collapse">
           <thead className="sticky top-0 bg-surface-container border-b border-outline-variant/10 z-10">
             <tr>
@@ -115,7 +139,7 @@ export function DataTable({ data, columns, searchPlaceholder, headerContent, cla
       </div>
 
       {/* Pagination Footer */}
-      {itemsPerPage && totalPages > 1 && (
+      {effectiveItemsPerPage > 0 && totalPages > 1 && (
         <div className="border-t border-outline-variant/10 bg-surface/50 px-4">
           <Pagination 
             currentPage={currentPage}
