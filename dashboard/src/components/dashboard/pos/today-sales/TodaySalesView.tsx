@@ -11,7 +11,7 @@ import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import { saleService } from '@/lib/services/sale.services';
 import { formatCurrency } from '@/utils/formatCurrency';
 import toast from 'react-hot-toast';
-import InvoiceModal from './InvoiceModal';
+import POSInvoiceModal from '@/components/dashboard/pos/new-sale/POSInvoiceModal';
 import { DeleteModal } from '@/components/common/DeleteModal';
 import { useRouter } from 'next/navigation';
 import { usePOS } from '@/contexts/POSContext';
@@ -225,7 +225,7 @@ export default function TodaySalesView() {
         />
       </div>
       {selectedSale && (
-        <InvoiceModal
+        <POSInvoiceModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           sale={selectedSale}

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/common/Button';
 import { DataTable } from '@/components/common/DataTable';
 import { PlayCircle, Trash2, Clock, Users, Banknote, ListPlus } from 'lucide-react';
@@ -11,11 +11,13 @@ import { useRouter } from 'next/navigation';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { useTranslation } from 'react-i18next';
 import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
+import { DeleteModal } from '@/components/common/DeleteModal';
 
 export default function HoldBillsView() {
-  const { heldBills, resumeBill, loadingProducts } = usePOS();
+  const { heldBills, resumeBill, deleteHeldBill, loadingProducts } = usePOS();
   const router = useRouter();
   const { t } = useTranslation();
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   const totalValue = heldBills.reduce((sum, bill) => 
     sum + bill.cart.reduce((s, item) => s + (item.sellingPrice * item.quantity), 0), 0
@@ -88,8 +90,18 @@ export default function HoldBillsView() {
             variant="ghost" 
             className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10"
             onClick={() => handleResume(row.id)}
+            title="Resume Bill / जारी रखें"
           >
             <PlayCircle className="w-4 h-4" />
+          </Button>
+          <Button 
+            size="icon" 
+            variant="ghost" 
+            className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10"
+            onClick={() => setDeleteTarget(row.id)}
+            title="Discard Bill / हटाएं"
+          >
+            <Trash2 className="w-4 h-4" />
           </Button>
         </div>
       )
@@ -164,6 +176,16 @@ export default function HoldBillsView() {
           />
         )}
       </div>
+
+      <DeleteModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          if (deleteTarget) deleteHeldBill(deleteTarget);
+          setDeleteTarget(null);
+        }}
+        itemName="Held Order / होल्ड किया गया बिल"
+      />
     </div>
   );
 }

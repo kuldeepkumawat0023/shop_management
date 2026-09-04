@@ -25,9 +25,9 @@ interface CartItem {
 }
 
 interface Customer {
-  _id: string;
+  _id?: string;
   name: string;
-  phone: string;
+  phone?: string;
 }
 
 interface HeldBill {
@@ -63,10 +63,11 @@ interface POSContextType {
   netAmount: number;
   editSaleId: string | null;
   setEditSaleId: (id: string | null) => void;
-  checkout: (paymentMethod: string, paidAmount: number, customerId?: string) => Promise<boolean>;
+  checkout: (paymentMethod: string, paidAmount: number, customerId?: string) => Promise<{ success: boolean; data?: any }>;
   heldBills: HeldBill[];
   holdBill: (note: string) => void;
   resumeBill: (billId: string) => void;
+  deleteHeldBill: (billId: string) => void;
 }
 
 const POSContext = createContext<POSContextType | undefined>(undefined);
@@ -182,11 +183,16 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
     toast.success('Bill resumed! / बिल फिर से शुरू!');
   };
 
+  const deleteHeldBill = (billId: string) => {
+    setHeldBills(prev => prev.filter(b => b.id !== billId));
+    toast.success('Held bill deleted / होल्ड बिल हटाया गया');
+  };
+
   const subtotal = cart.reduce((sum, item) => sum + (item.sellingPrice * item.quantity), 0);
   const netAmount = subtotal - discount + tax;
 
-  const checkout = async (paymentMethod: string, paidAmount: number, customerId?: string) => {
-    if (cart.length === 0) return false;
+  const checkout = async (paymentMethod: string, paidAmount: number, customerId?: string): Promise<{ success: boolean; data?: any }> => {
+    if (cart.length === 0) return { success: false };
     const toastId = toast.loading('Processing sale...');
     try {
       const saleData = {
@@ -215,12 +221,12 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
         clearCart();
         setEditSaleId(null);
         fetchProducts(); // Refresh stock
-        return true;
+        return { success: true, data: res.data };
       }
-      return false;
+      return { success: false };
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Checkout failed / चेकआउट विफल रहा', { id: toastId });
-      return false;
+      return { success: false };
     }
   };
 
@@ -250,7 +256,8 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
     checkout,
     heldBills,
     holdBill,
-    resumeBill
+    resumeBill,
+    deleteHeldBill
   };
 
   return <POSContext.Provider value={value}>{children}</POSContext.Provider>;

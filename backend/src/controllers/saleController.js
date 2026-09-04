@@ -127,8 +127,16 @@ exports.createSale = async (req, res, next) => {
     const sale = await processSingleSale(req.body, req.scopedShopId, req.user.id, session);
     await session.commitTransaction();
     session.endSession();
+    const populatedSale = await Sale.findById(sale._id)
+      .populate('customerId', 'name mobile address')
+      .populate('userId', 'fullname');
+    const items = await SaleItem.find({ saleId: sale._id }).populate('productId', 'name sku unit');
 
-    res.status(201).json({ success: true, message: 'Sale recorded successfully', data: sale });
+    res.status(201).json({ 
+      success: true, 
+      message: 'Sale recorded successfully', 
+      data: { sale: populatedSale || sale, items: items || [] } 
+    });
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
