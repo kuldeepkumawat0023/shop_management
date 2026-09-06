@@ -7,14 +7,15 @@ interface DeleteModalProps {
   onClose: () => void;
   onConfirm: () => void;
   itemName: string;
+  warningMessage?: string;
 }
 
-export function DeleteModal({ isOpen, onClose, onConfirm, itemName }: DeleteModalProps) {
+export function DeleteModal({ isOpen, onClose, onConfirm, itemName, warningMessage }: DeleteModalProps) {
   const { t } = useTranslation();
 
   // Using optional chaining or default fallbacks for translations in case they aren't defined yet
   const title = t('common.delete', 'Delete') + ' ' + itemName;
-  const message = `${t('common.deleteConfirmation', 'Are you sure you want to delete this')} ${itemName}? ${t('common.cannotBeUndone', 'This action cannot be undone.')}`;
+  const message = warningMessage || `${t('common.deleteConfirmation', 'Are you sure you want to delete this')} ${itemName}? ${t('common.cannotBeUndone', 'This action cannot be undone.')}`;
   
   return (
     <ConfirmModal

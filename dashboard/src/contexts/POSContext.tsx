@@ -54,7 +54,7 @@ interface POSContextType {
   cart: CartItem[];
   setCart: React.Dispatch<React.SetStateAction<CartItem[]>>;
   addToCart: (product: Product) => void;
-  updateQuantity: (productId: string, delta: number) => void;
+  updateQuantity: (productId: string, deltaOrQuantity: number, isDirect?: boolean) => void;
   removeFromCart: (productId: string) => void;
   clearCart: () => void;
   subtotal: number;
@@ -104,45 +104,51 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
 
   const addToCart = (product: Product) => {
     if (product.currentStock <= 0) {
-      toast.error('Product out of stock! / उत्पाद स्टॉक में नहीं है!');
+      toast.error('Product out of stock! / उत्पाद स्टॉक में नहीं है!', { id: 'stock-out-error' });
       return;
     }
     
-    setCart(prev => {
-      const existing = prev.find(item => item.productId === product._id);
-      if (existing) {
-        if (existing.quantity >= product.currentStock) {
-          toast.error(`Only ${product.currentStock} in stock / स्टॉक में केवल ${product.currentStock} उपलब्ध हैं`);
-          return prev;
-        }
-        return prev.map(item => 
-          item.productId === product._id ? { ...item, quantity: item.quantity + 1 } : item
-        );
+    const existing = cart.find(item => item.productId === product._id);
+    if (existing) {
+      if (existing.quantity >= product.currentStock) {
+        toast.error(`Only ${product.currentStock} in stock / स्टॉक में केवल ${product.currentStock} उपलब्ध हैं`, {
+          id: 'stock-limit-error'
+        });
+        return;
       }
-      return [...prev, { 
-        productId: product._id, 
-        name: product.name,
-        sellingPrice: product.sellingPrice,
-        quantity: 1,
-        stock: product.currentStock,
-        image: product.image
-      }];
-    });
+      setCart(prev => prev.map(item => 
+        item.productId === product._id ? { ...item, quantity: item.quantity + 1 } : item
+      ));
+      return;
+    }
+
+    setCart(prev => [...prev, { 
+      productId: product._id, 
+      name: product.name,
+      sellingPrice: product.sellingPrice,
+      quantity: 1,
+      stock: product.currentStock,
+      image: product.image
+    }]);
   };
 
-  const updateQuantity = (productId: string, delta: number) => {
-    setCart(prev => prev.map(item => {
-      if (item.productId === productId) {
-        const newQty = item.quantity + delta;
-        if (newQty < 1) return item;
-        if (newQty > item.stock) {
-          toast.error(`Only ${item.stock} in stock / स्टॉक में केवल ${item.stock} उपलब्ध हैं`);
-          return item;
-        }
-        return { ...item, quantity: newQty };
-      }
-      return item;
-    }));
+  const updateQuantity = (productId: string, deltaOrQuantity: number, isDirect = false) => {
+    const item = cart.find(i => i.productId === productId);
+    if (!item) return;
+
+    const newQty = isDirect ? deltaOrQuantity : item.quantity + deltaOrQuantity;
+    if (newQty < 0) return;
+    if (!isDirect && newQty < 1) return;
+
+    if (item.stock > 0 && newQty > item.stock) {
+      toast.error(`Only ${item.stock} in stock / स्टॉक में केवल ${item.stock} उपलब्ध हैं`, {
+        id: 'stock-limit-error'
+      });
+      setCart(prev => prev.map(i => i.productId === productId ? { ...i, quantity: item.stock } : i));
+      return;
+    }
+
+    setCart(prev => prev.map(i => i.productId === productId ? { ...i, quantity: newQty } : i));
   };
 
   const removeFromCart = (productId: string) => {

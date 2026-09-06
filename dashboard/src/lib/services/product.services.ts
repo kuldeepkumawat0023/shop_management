@@ -83,13 +83,13 @@ export const productService = {
 
   getProductStockHistory: async (id: string): Promise<ApiResponse<any>> => {
     if (!id || id === 'undefined') {
-      return { success: true, data: [] };
+      return { success: true, message: '', statusCode: 200, data: [] };
     }
     try {
       const response = await apiClient.get(`/products/${id}/stock-history`);
       return response.data;
     } catch {
-      return { success: true, data: [] };
+      return { success: true, message: '', statusCode: 200, data: [] };
     }
   },
 };

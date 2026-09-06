@@ -1,30 +1,38 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/common/Button';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { DetailViewSkeleton } from '@/components/common/DetailViewSkeleton';
 import { ArrowLeft, Printer, Download, Share2, Receipt, User, CheckCircle2 } from 'lucide-react';
-import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { saleService } from '@/lib/services/sale.services';
 import { useTranslation } from 'react-i18next';
+import POSInvoiceModal from '@/components/dashboard/pos/new-sale/POSInvoiceModal';
+import { formatCurrency } from '@/utils/formatCurrency';
 
 export default function SaleDetailView() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
-  const [sale, setSale] = React.useState<any>(null);
-  const [loading, setLoading] = React.useState(true);
+  const [sale, setSale] = useState<any>(null);
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const { t } = useTranslation();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchSale = async () => {
       try {
         const res = await saleService.getSaleById(id);
-        if (res.success) setSale(res.data);
+        if (res.success && res.data) {
+          const saleObj = res.data.sale || res.data;
+          const itemsList = res.data.items || saleObj.items || [];
+          setSale(saleObj);
+          setItems(itemsList);
+        }
       } catch (e) {
-        console.error(e);
+        console.error('Failed to fetch sale details:', e);
       } finally {
         setLoading(false);
       }
@@ -33,35 +41,58 @@ export default function SaleDetailView() {
   }, [id]);
 
   if (loading) return <DetailViewSkeleton />;
-  if (!sale) return <div className="p-8">{t('sales.saleDetail.saleNotFound')}</div>;
-  
+  if (!sale) return <div className="p-8 text-on-surface font-semibold">{t('sales.saleDetail.saleNotFound')}</div>;
+
+  const totalAmount = Number(sale.totalAmount || 0);
+  const discountAmount = Number(sale.discountAmount || 0);
+  const taxAmount = Number(sale.taxAmount || 0);
+  const netAmount = Number(sale.netAmount || 0);
+  const paidAmount = Number(sale.paidAmount || 0);
+
   return (
-    <div className="flex flex-col h-full bg-background overflow-y-auto custom-scrollbar w-full ">
+    <div className="flex flex-col h-full bg-background overflow-y-auto custom-scrollbar w-full">
       {/* Header Sticky */}
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-3">
-            <Button onClick={() => router.back()} variant="outline" className="w-10 h-10 p-0 rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary/50 transition-all">
+            <Button
+              onClick={() => router.back()}
+              variant="outline"
+              className="w-10 h-10 p-0 rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary/50 transition-all"
+            >
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-2xl font-black text-on-surface tracking-tight">{sale.invoiceNumber}</h2>
-                <StatusBadge status={sale.paymentStatus} />
+                <h2 className="text-2xl font-black text-on-surface tracking-tight">{sale.invoiceNumber || 'INV'}</h2>
+                <StatusBadge status={sale.paymentStatus || 'Paid'} />
               </div>
-              <p className="text-sm font-medium text-on-surface-variant mt-0.5">{new Date(sale.saleDate).toLocaleDateString()}</p>
+              <p className="text-sm font-medium text-on-surface-variant mt-0.5">
+                {sale.saleDate ? new Date(sale.saleDate).toLocaleDateString() : ''}
+              </p>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-            <Button variant="outline" className="flex-1 sm:flex-none font-bold border-outline-variant/30 text-on-surface-variant hover:text-primary gap-2">
+            <Button
+              onClick={() => setIsInvoiceModalOpen(true)}
+              variant="outline"
+              className="flex-1 sm:flex-none font-bold border-outline-variant/30 text-on-surface-variant hover:text-primary gap-2"
+            >
               <Share2 className="w-4 h-4" />
               <span className="hidden sm:inline">{t('sales.saleDetail.share')}</span>
             </Button>
-            <Button variant="outline" className="flex-1 sm:flex-none font-bold border-outline-variant/30 text-on-surface-variant hover:text-primary gap-2">
+            <Button
+              onClick={() => setIsInvoiceModalOpen(true)}
+              variant="outline"
+              className="flex-1 sm:flex-none font-bold border-outline-variant/30 text-on-surface-variant hover:text-primary gap-2"
+            >
               <Download className="w-4 h-4" />
               <span className="hidden sm:inline">{t('sales.saleDetail.downloadPdf')}</span>
             </Button>
-            <Button className="flex-1 sm:flex-none gradient-button text-white font-bold shadow-md hover:shadow-lg gap-2 border-none">
+            <Button
+              onClick={() => setIsInvoiceModalOpen(true)}
+              className="flex-1 sm:flex-none gradient-button text-white font-bold shadow-md hover:shadow-lg gap-2 border-none"
+            >
               <Printer className="w-4 h-4" />
               {t('sales.saleDetail.printReceipt')}
             </Button>
@@ -83,7 +114,9 @@ export default function SaleDetailView() {
             <div className="flex flex-col gap-2">
               <p className="text-xl font-bold text-on-surface">{sale.customerId?.name || t('sales.saleDetail.walkInCustomer')}</p>
               {sale.customerId?.email && <p className="text-sm text-on-surface-variant font-medium">{sale.customerId.email}</p>}
-              {sale.customerId?.phone && <p className="text-sm text-on-surface-variant font-medium">{sale.customerId.phone}</p>}
+              {(sale.customerId?.mobile || sale.customerId?.phone) && (
+                <p className="text-sm text-on-surface-variant font-medium">{sale.customerId?.mobile || sale.customerId?.phone}</p>
+              )}
             </div>
           </div>
 
@@ -97,7 +130,7 @@ export default function SaleDetailView() {
               <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-sm">
                 <div>
                   <p className="text-on-surface-variant">{t('sales.saleDetail.paymentMethod')}</p>
-                  <p className="font-bold text-on-surface">{sale.paymentMethod}</p>
+                  <p className="font-bold text-on-surface">{sale.paymentMethod || 'Cash'}</p>
                 </div>
                 <div>
                   <p className="text-on-surface-variant">{t('sales.saleDetail.salesChannel')}</p>
@@ -135,15 +168,39 @@ export default function SaleDetailView() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/5">
-                <tr className="hover:bg-surface/40 transition-colors">
-                  <td className="px-6 py-4">
-                    <p className="font-bold text-on-surface">{t('sales.saleDetail.totalItems')}</p>
-                  </td>
-                  <td className="px-6 py-4 text-center font-medium text-on-surface-variant">-</td>
-                  <td className="px-6 py-4 text-right font-medium text-on-surface-variant">-</td>
-                  <td className="px-6 py-4 text-right font-medium text-on-surface-variant">-</td>
-                  <td className="px-6 py-4 text-right font-bold text-on-surface">₹{sale.totalAmount.toLocaleString()}</td>
-                </tr>
+                {items && items.length > 0 ? (
+                  items.map((item: any, idx: number) => {
+                    const name = item.productId?.name || item.name || `Item #${idx + 1}`;
+                    const sku = item.productId?.sku;
+                    const qty = item.quantity || 0;
+                    const rate = item.sellingPrice || 0;
+                    const gst = item.gstRate ? `${item.gstRate}%` : '0%';
+                    const lineTotal = item.totalPrice || (qty * rate);
+
+                    return (
+                      <tr key={item._id || idx} className="hover:bg-surface/40 transition-colors">
+                        <td className="px-6 py-4">
+                          <p className="font-bold text-on-surface">{name}</p>
+                          {sku && <p className="text-xs text-on-surface-variant">SKU: {sku}</p>}
+                        </td>
+                        <td className="px-6 py-4 text-center font-medium text-on-surface">{qty}</td>
+                        <td className="px-6 py-4 text-right font-medium text-on-surface">{formatCurrency(rate)}</td>
+                        <td className="px-6 py-4 text-right font-medium text-on-surface-variant">{gst}</td>
+                        <td className="px-6 py-4 text-right font-bold text-on-surface">{formatCurrency(lineTotal)}</td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr className="hover:bg-surface/40 transition-colors">
+                    <td className="px-6 py-4">
+                      <p className="font-bold text-on-surface">{t('sales.saleDetail.totalItems')}</p>
+                    </td>
+                    <td className="px-6 py-4 text-center font-medium text-on-surface-variant">-</td>
+                    <td className="px-6 py-4 text-right font-medium text-on-surface-variant">-</td>
+                    <td className="px-6 py-4 text-right font-medium text-on-surface-variant">-</td>
+                    <td className="px-6 py-4 text-right font-bold text-on-surface">{formatCurrency(totalAmount)}</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -154,28 +211,38 @@ export default function SaleDetailView() {
           <div className="w-full md:w-80 bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-6 shadow-sm">
             <div className="flex justify-between items-center mb-3 text-sm">
               <span className="text-on-surface-variant">{t('sales.saleDetail.subtotal')}</span>
-              <span className="font-bold text-on-surface">₹{sale.totalAmount.toLocaleString()}</span>
+              <span className="font-bold text-on-surface">{formatCurrency(totalAmount)}</span>
             </div>
             <div className="flex justify-between items-center mb-3 text-sm">
               <span className="text-on-surface-variant">{t('sales.saleDetail.taxAmount')}</span>
-              <span className="font-bold text-on-surface">₹{sale.taxAmount.toLocaleString()}</span>
+              <span className="font-bold text-on-surface">{formatCurrency(taxAmount)}</span>
             </div>
             <div className="flex justify-between items-center mb-4 text-sm text-success">
               <span className="font-medium">{t('sales.saleDetail.discountBulk')}</span>
-              <span className="font-bold">-₹{sale.discountAmount.toLocaleString()}</span>
+              <span className="font-bold">-{formatCurrency(discountAmount)}</span>
             </div>
             <div className="border-t border-outline-variant/20 pt-4 flex justify-between items-center mb-2">
               <span className="font-bold text-on-surface text-lg">{t('sales.saleDetail.grandTotal')}</span>
-              <span className="font-black text-primary text-2xl">₹{sale.netAmount.toLocaleString()}</span>
+              <span className="font-black text-primary text-2xl">{formatCurrency(netAmount)}</span>
             </div>
             <div className="flex justify-between items-center text-sm mt-4 p-3 bg-success/10 text-success rounded-xl border border-success/20">
               <span className="font-bold">{t('sales.saleDetail.amountPaid')}</span>
-              <span className="font-black">₹{sale.paidAmount.toLocaleString()}</span>
+              <span className="font-black">{formatCurrency(paidAmount)}</span>
             </div>
           </div>
         </div>
 
       </div>
+
+      {/* POS Invoice Modal for Thermal / A4 Print, WhatsApp Share, and PDF Download */}
+      {isInvoiceModalOpen && (
+        <POSInvoiceModal
+          isOpen={isInvoiceModalOpen}
+          onClose={() => setIsInvoiceModalOpen(false)}
+          sale={sale}
+          items={items}
+        />
+      )}
     </div>
   );
 }

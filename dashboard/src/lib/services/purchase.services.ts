@@ -50,4 +50,13 @@ export const purchaseService = {
     const response = await apiClient.get(`/purchases/get/${id}`);
     return response.data;
   },
+
+  /**
+   * Delete purchase by ID
+   * DELETE /purchases/delete/:id
+   */
+  deletePurchase: async (id: string): Promise<ApiResponse<any>> => {
+    const response = await apiClient.delete(`/purchases/delete/${id}`);
+    return response.data;
+  },
 };

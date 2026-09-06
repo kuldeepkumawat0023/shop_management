@@ -52,7 +52,7 @@ export default function PaymentModal({ onClose, onSuccess }: PaymentModalProps) 
 
     setIsSubmitting(true);
     const paid = method === 'credit' ? 0 : (method === 'cash' ? Math.min(received, netAmount) : netAmount);
-    
+
     const result = await checkout(method, paid, selectedCustomer?._id);
     setIsSubmitting(false);
 
@@ -64,7 +64,7 @@ export default function PaymentModal({ onClose, onSuccess }: PaymentModalProps) 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="relative w-full max-w-lg bg-surface rounded-2xl shadow-2xl border border-outline-variant/20 overflow-hidden animate-in zoom-in-95 duration-200">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-outline-variant/20 bg-surface-container-low">
           <div>
@@ -79,7 +79,7 @@ export default function PaymentModal({ onClose, onSuccess }: PaymentModalProps) 
         </div>
 
         <div className="p-5 space-y-5">
-          
+
           {/* Payable Amount Card */}
           <Card className="bg-primary/5 border border-primary/20 p-4 flex items-center justify-between">
             <div>
@@ -248,22 +248,29 @@ export default function PaymentModal({ onClose, onSuccess }: PaymentModalProps) 
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-outline-variant/20 bg-surface-container-low flex items-center gap-3">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="flex-1 border-outline-variant/30"
-          >
-            {t('pos.paymentModal.cancel')}
-          </Button>
-          <Button
-            onClick={handleCheckout}
-            disabled={isSubmitting || (method === 'credit' && !selectedCustomer) || (method === 'cash' && received < netAmount)}
-            className="flex-1 font-bold h-11 shadow-lg shadow-primary/20 disabled:opacity-50"
-          >
-            <CheckCircle2 className="w-4 h-4 mr-1.5" />
-            {isSubmitting ? t('pos.paymentModal.processing') : `${t('pos.paymentModal.completeSale')} (${formatCurrency(netAmount)})`}
-          </Button>
+        <div className="p-4 border-t border-outline-variant/20 bg-surface-container-low space-y-3">
+          <div className="flex items-center justify-between px-0.5 text-xs font-bold text-on-surface-variant">
+            <span className="uppercase tracking-wider">{t('pos.paymentModal.totalPayableAmount')}:</span>
+            <span className="text-xl font-black text-primary">{formatCurrency(netAmount)}</span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="flex-1 border-outline-variant/30 h-11 font-semibold"
+            >
+              {t('pos.paymentModal.cancel')}
+            </Button>
+            <Button
+              onClick={handleCheckout}
+              disabled={isSubmitting || (method === 'credit' && !selectedCustomer) || (method === 'cash' && received < netAmount)}
+              className="flex-1 font-bold h-11 shadow-lg shadow-primary/20 disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap text-sm"
+            >
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+              <span>{isSubmitting ? t('pos.paymentModal.processing') : t('pos.paymentModal.completeSale')}</span>
+            </Button>
+          </div>
         </div>
 
       </div>

@@ -532,7 +532,9 @@ export default function NewSaleView() {
                       "group relative flex flex-col justify-between p-3 rounded-2xl border transition-all select-none cursor-pointer bg-surface",
                       isOutOfStock
                         ? "opacity-55 cursor-not-allowed bg-surface-container-low border-outline-variant/20"
-                        : "hover:shadow-lg hover:border-primary/50 hover:-translate-y-0.5 active:scale-[0.99] border-outline-variant/30"
+                        : inCart
+                          ? "border-primary/70 shadow-md ring-1 ring-primary/20 hover:border-primary"
+                          : "hover:shadow-lg hover:border-primary/50 hover:-translate-y-0.5 active:scale-[0.99] border-outline-variant/30"
                     )}
                   >
                     {/* Top Image Container with Stock & Cart Badges */}
@@ -553,7 +555,7 @@ export default function NewSaleView() {
 
                       {/* Top-Left Stock Badge with High-Contrast Color Combination */}
                       <span className={cn(
-                        "absolute top-2 left-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide shadow-sm flex items-center gap-1 z-10",
+                        "absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide shadow-xs flex items-center gap-1 z-10 max-w-[85%] truncate",
                         isOutOfStock
                           ? "bg-rose-600 text-white"
                           : (p.currentStock <= 5
@@ -561,13 +563,14 @@ export default function NewSaleView() {
                               : "bg-emerald-600 text-white")
                       )}>
                         <span className="w-1.5 h-1.5 rounded-full bg-white/90 shrink-0" />
-                        <span>{isOutOfStock ? t('pos.newSale.outOfStock') : t('pos.newSale.inStock', { count: p.currentStock })}</span>
+                        <span className="truncate">{isOutOfStock ? t('pos.newSale.outOfStock') : t('pos.newSale.inStock', { count: p.currentStock })}</span>
                       </span>
 
-                      {/* Top-Right In-Cart Badge */}
+                      {/* Bottom-Right In-Cart Badge (Opposite corner to guarantee zero overlap) */}
                       {inCart && (
-                        <span className="absolute top-2 right-2 px-2.5 py-0.5 rounded-full bg-primary text-white text-[10px] font-black shadow-md flex items-center gap-1 animate-in zoom-in-50">
-                          {t('pos.newSale.inCart', { count: inCart.quantity })}
+                        <span className="absolute bottom-2 right-2 px-2.5 py-0.5 rounded-full bg-primary text-white text-[10px] font-black shadow-md flex items-center gap-1 z-10 animate-in zoom-in-50">
+                          <ShoppingBag className="w-3 h-3" />
+                          <span>{t('pos.newSale.inCart', { count: inCart.quantity })}</span>
                         </span>
                       )}
                     </div>
@@ -773,30 +776,56 @@ export default function NewSaleView() {
                 {/* Quantity Stepper & Line Price */}
                 <div className="flex items-center gap-3 shrink-0">
                   
-                  {/* Stepper (- 1 +) */}
-                  <div className="flex items-center bg-surface-container-low border border-outline-variant/30 rounded-xl p-0.5">
+                  {/* Stepper (- [ 8 ] +) with Direct Custom Typing */}
+                  <div className="flex items-center bg-surface-container-low border border-outline-variant/30 rounded-xl p-0.5 shadow-xs">
                     <button
                       type="button"
                       onClick={() => {
-                        if (item.quantity === 1) {
+                        if (item.quantity <= 1) {
                           removeFromCart(item.productId);
                         } else {
                           updateQuantity(item.productId, -1);
                         }
                       }}
-                      className="w-7 h-7 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface transition-colors"
+                      className="w-7 h-7 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface transition-colors shrink-0"
+                      title="Decrease"
                     >
                       <Minus className="w-3 h-3" />
                     </button>
 
-                    <span className="w-7 text-center font-black text-xs text-on-surface">
-                      {item.quantity}
-                    </span>
+                    {/* Direct Custom Quantity Input (e.g. type 100 directly) */}
+                    <input
+                      type="number"
+                      min={1}
+                      max={item.stock > 0 ? item.stock : 99999}
+                      value={item.quantity === 0 ? '' : item.quantity}
+                      onFocus={(e) => e.target.select()}
+                      onChange={(e) => {
+                        const raw = e.target.value;
+                        if (raw === '') {
+                          updateQuantity(item.productId, 0, true);
+                          return;
+                        }
+                        const val = parseInt(raw, 10);
+                        if (!isNaN(val)) {
+                          updateQuantity(item.productId, val, true);
+                        }
+                      }}
+                      onBlur={(e) => {
+                        const val = parseInt(e.target.value, 10);
+                        if (isNaN(val) || val < 1) {
+                          updateQuantity(item.productId, 1, true);
+                        }
+                      }}
+                      className="w-10 sm:w-12 text-center font-black text-xs sm:text-sm text-on-surface bg-transparent hover:bg-surface focus:bg-surface focus:ring-1.5 focus:ring-primary focus:outline-none rounded-md py-0.5 px-0.5 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none cursor-text select-all"
+                      title="Direct custom quantity (e.g. 100)"
+                    />
 
                     <button
                       type="button"
                       onClick={() => updateQuantity(item.productId, 1)}
-                      className="w-7 h-7 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface transition-colors"
+                      className="w-7 h-7 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface transition-colors shrink-0"
+                      title="Increase"
                     >
                       <Plus className="w-3 h-3" />
                     </button>

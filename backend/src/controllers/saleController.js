@@ -131,6 +131,7 @@ exports.createSale = async (req, res, next) => {
     await session.commitTransaction();
     session.endSession();
     const populatedSale = await Sale.findById(sale._id)
+      .populate('shopId', 'name address contactNumber gstNumber email logo')
       .populate('customerId', 'name mobile address')
       .populate('userId', 'fullname');
     const items = await SaleItem.find({ saleId: sale._id }).populate('productId', 'name sku unit');
@@ -160,6 +161,7 @@ exports.createSale = async (req, res, next) => {
 exports.getSales = async (req, res, next) => {
   try {
     const sales = await Sale.find({ shopId: req.scopedShopId })
+      .populate('shopId', 'name address contactNumber gstNumber email logo')
       .populate('customerId', 'name mobile')
       .populate('userId', 'fullname')
       .sort('-createdAt');
@@ -175,6 +177,7 @@ exports.getSales = async (req, res, next) => {
 exports.getSaleById = async (req, res, next) => {
   try {
     const sale = await Sale.findOne({ _id: req.params.id, shopId: req.scopedShopId })
+      .populate('shopId', 'name address contactNumber gstNumber email logo')
       .populate('customerId', 'name mobile address')
       .populate('userId', 'fullname');
 
@@ -377,6 +380,55 @@ exports.deleteSale = async (req, res, next) => {
     if (error.message === 'Sale not found') {
       return res.status(404).json({ success: false, message: 'Sale not found' });
     }
+    next(error);
+  }
+};
+
+// @desc    Download Sale Invoice as PDF
+// @route   GET /api/v1/sales/:id/pdf
+// @access  Private (SALES_VIEW)
+exports.downloadSalePDF = async (req, res, next) => {
+  try {
+    const sale = await Sale.findOne({ _id: req.params.id, shopId: req.scopedShopId })
+      .populate('shopId', 'name address contactNumber gstNumber email logo')
+      .populate('customerId', 'name mobile address gstNumber')
+      .populate('userId', 'fullname');
+
+    if (!sale) {
+      return res.status(404).json({ success: false, message: 'Sale not found' });
+    }
+
+    const items = await SaleItem.find({ saleId: sale._id }).populate('productId', 'name sku unit');
+
+    const formattedItems = items.map(item => ({
+      name: item.productId?.name || 'Item',
+      quantity: item.quantity,
+      price: item.sellingPrice,
+      gstRate: item.gstRate || 0,
+      total: item.totalPrice || (item.quantity * item.sellingPrice)
+    }));
+
+    const invoiceData = {
+      shop: sale.shopId || {},
+      entity: sale.customerId || { name: 'Walk-in Customer', mobile: '' },
+      cashier: sale.userId?.fullname || 'Cashier',
+      invoiceNumber: sale.invoiceNumber,
+      date: sale.saleDate || sale.createdAt,
+      items: formattedItems,
+      discountAmount: sale.discountAmount || 0,
+      taxAmount: sale.taxAmount || 0,
+      netAmount: sale.netAmount,
+      paidAmount: sale.paidAmount || 0,
+      paymentMethod: sale.paymentMethod || 'Cash',
+      paymentStatus: sale.paymentStatus || 'Paid',
+      type: 'SALE'
+    };
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=Invoice-${sale.invoiceNumber}.pdf`);
+
+    await generateInvoicePDF(invoiceData, res);
+  } catch (error) {
     next(error);
   }
 };
