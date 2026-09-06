@@ -52,7 +52,7 @@ export default function DashboardView() {
     const formatCurrency = (val: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val || 0);
 
     return (
-        <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full min-w-0">
+        <div className="min-h-full flex-1 flex flex-col bg-background p-4 md:p-6 lg:p-8 w-full min-w-0">
             <div className="w-full space-y-6 flex-1">
 
                 {/* Main Hero Header */}

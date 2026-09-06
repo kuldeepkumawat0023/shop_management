@@ -82,7 +82,7 @@ export default function RolesListView() {
   if (loading) return <ViewPageSkeleton />;
 
   return (
-    <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar gap-6 w-full mx-auto">
+    <div className="min-h-full flex-1 flex flex-col bg-background p-4 md:p-6 lg:p-8 gap-6 w-full mx-auto min-w-0">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-black text-on-surface tracking-tight">Roles & Permissions</h1>

@@ -155,9 +155,9 @@ export default function TeamMemberForm() {
   if (loading) return <ViewPageSkeleton />;
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col w-full ">
+    <form onSubmit={handleSubmit} className="w-full">
       {/* Header Sticky */}
-      <div className="sticky top-16 md:top-20 z-20 bg-background border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
+      <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
         <div className="flex items-center gap-3">
           <Button type="button" onClick={() => router.back()} variant="ghost" size="icon" className="w-10 h-10 rounded-xl bg-surface-container-low border border-outline-variant/20 text-on-surface hover:text-primary hover:bg-primary/10 transition-colors">
             <ArrowLeft className="w-5 h-5" />
@@ -173,7 +173,7 @@ export default function TeamMemberForm() {
         </div>
       </div>
 
-      <div className="p-4 md:p-6 lg:p-8 flex-1 w-full flex flex-col gap-6">
+      <div className="p-4 md:p-6 lg:p-8 w-full flex flex-col gap-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column - Personal Info */}
         <div className="flex flex-col gap-6">

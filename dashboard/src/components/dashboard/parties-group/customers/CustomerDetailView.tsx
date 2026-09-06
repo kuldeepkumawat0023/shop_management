@@ -75,7 +75,7 @@ export default function CustomerDetailView({ id }: { id: string }) {
   if (!customer) return <div className="p-8 text-center">{t('parties.customerDetailView.customerNotFound')}</div>;
 
   return (
-    <div className="flex flex-col h-full bg-background overflow-y-auto custom-scrollbar w-full ">
+    <div className="min-h-full flex-1 flex flex-col bg-background w-full min-w-0">
       {/* Header Sticky */}
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

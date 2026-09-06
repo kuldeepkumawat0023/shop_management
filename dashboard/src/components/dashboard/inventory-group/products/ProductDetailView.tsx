@@ -88,7 +88,7 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
   const currentStock = productData.currentStock || 0;
 
   return (
-    <div className="flex flex-col bg-background p-4 md:p-6 lg:p-8 w-full">
+    <div className="min-h-full flex-1 flex flex-col bg-background p-4 md:p-6 lg:p-8 w-full min-w-0">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">

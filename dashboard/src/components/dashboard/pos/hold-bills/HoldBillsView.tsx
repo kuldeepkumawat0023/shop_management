@@ -111,7 +111,7 @@ export default function HoldBillsView() {
   if (loadingProducts) return <ViewPageSkeleton />;
 
   return (
-    <div className="flex flex-col h-full bg-background p-4 md:p-6 overflow-y-auto custom-scrollbar">
+    <div className="min-h-full flex-1 flex flex-col bg-background p-4 md:p-6 w-full min-w-0">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-black text-on-surface tracking-tight">{t('pos.holdBills.holdBillsManagement')}</h1>

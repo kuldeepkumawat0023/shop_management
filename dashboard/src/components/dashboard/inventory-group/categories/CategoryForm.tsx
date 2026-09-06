@@ -112,8 +112,8 @@ export default function CategoryForm({ editId }: CategoryFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col w-full ">
-      <div className="sticky top-16 md:top-20 z-20 bg-background border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
+    <form onSubmit={handleSubmit} className="w-full">
+      <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
         <div className="flex items-center gap-3">
           <Button type="button" onClick={() => router.back()} variant="ghost" size="icon" className="w-10 h-10 rounded-xl bg-surface-container-low border border-outline-variant/20 text-on-surface hover:text-primary hover:bg-primary/10 transition-colors">
             <ArrowLeft className="w-5 h-5" />
@@ -130,7 +130,7 @@ export default function CategoryForm({ editId }: CategoryFormProps) {
       </div>
 
       {/* Form Content */}
-      <div className="p-4 md:p-6 lg:p-8 flex-1 w-full flex flex-col gap-6">
+      <div className="p-4 md:p-6 lg:p-8 w-full flex flex-col gap-6">
         <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
           <div className="flex items-center gap-2 mb-2">
             <FolderTree className="w-5 h-5 text-primary" />

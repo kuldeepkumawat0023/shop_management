@@ -77,7 +77,7 @@ export default function RoleDetailView({ roleId }: RoleDetailViewProps) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full mx-auto max-w-7xl">
+    <div className="min-h-full flex-1 flex flex-col bg-background p-4 md:p-6 lg:p-8 w-full mx-auto max-w-7xl min-w-0">
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
         <Button onClick={() => router.back()} variant="outline" className="w-10 h-10 p-0 rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary/50 transition-all">

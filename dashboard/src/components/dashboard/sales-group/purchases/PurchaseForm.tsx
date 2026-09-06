@@ -150,8 +150,8 @@ export default function PurchaseForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col w-full ">
-      <div className="sticky top-16 md:top-20 z-20 bg-background border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
+    <form onSubmit={handleSubmit} className="w-full">
+      <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b border-outline-variant/20 p-4 md:p-6 lg:px-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-3">
             <Button type="button" onClick={() => router.back()} variant="outline" className="w-10 h-10 p-0 rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary/50 transition-all">
@@ -166,7 +166,7 @@ export default function PurchaseForm() {
       </div>
 
       {/* Form Content */}
-      <div className="p-4 md:p-6 lg:p-8 flex-1 w-full">
+      <div className="p-4 md:p-6 lg:p-8 w-full">
         <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col gap-8">
 
           {/* General Information */}

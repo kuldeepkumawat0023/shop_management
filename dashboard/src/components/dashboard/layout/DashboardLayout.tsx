@@ -12,7 +12,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <SideNavBar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <main className="flex-1 flex flex-col md:ml-72 h-screen max-h-screen min-h-0 min-w-0 transition-all duration-300 max-w-full md:max-w-[calc(100vw-18rem)] relative overflow-hidden">
         <TopNavBar onMenuClick={() => setIsSidebarOpen(true)} />
-        <div className="flex-1 min-w-0 min-h-0 w-full flex flex-col overflow-hidden">
+        <div id="dashboard-main-content" className="flex-1 min-w-0 min-h-0 w-full flex flex-col overflow-y-auto overflow-x-hidden custom-scrollbar">
           {children}
         </div>
       </main>

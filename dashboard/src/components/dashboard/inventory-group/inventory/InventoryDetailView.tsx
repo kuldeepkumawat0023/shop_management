@@ -92,7 +92,7 @@ export default function InventoryDetailView({ productId }: InventoryDetailViewPr
   const totalValuation = currentStock * (productData.sellingPrice || productData.purchasePrice || 0);
 
   return (
-    <div className="p-4 md:p-6 flex flex-col gap-6 w-full min-w-0 max-w-full overflow-x-hidden">
+    <div className="min-h-full flex-1 flex flex-col p-4 md:p-6 gap-6 w-full min-w-0 max-w-full overflow-x-hidden">
       {/* Header Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface-container-lowest border border-outline-variant/20 rounded-3xl p-4 sm:p-5 md:p-6 shadow-sm min-w-0">
         <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">

@@ -198,7 +198,7 @@ export default function ProductsView() {
   if (loading) return <ViewPageSkeleton />;
 
   return (
-    <div className="flex flex-col h-full bg-background p-4 md:p-6 overflow-y-auto custom-scrollbar">
+    <div className="min-h-full flex-1 flex flex-col bg-background p-4 md:p-6 w-full min-w-0">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-black text-on-surface tracking-tight">{t('inventory.productsView.productsManagement')}</h1>

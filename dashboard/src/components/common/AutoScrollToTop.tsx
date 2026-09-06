@@ -8,6 +8,10 @@ export default function AutoScrollToTop() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    const mainContent = document.getElementById('dashboard-main-content');
+    if (mainContent) {
+      mainContent.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
   }, [pathname]);
 
   return null;

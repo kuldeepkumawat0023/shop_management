@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 export default function PreferencesView() {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col h-full bg-background p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar w-full ">
+    <div className="min-h-full flex-1 flex flex-col bg-background p-4 md:p-6 lg:p-8 w-full min-w-0">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
         <div>
           <h2 className="text-3xl font-black text-on-surface tracking-tight mb-1">{t('settings.preferences.title')}</h2>
