@@ -60,6 +60,9 @@ const processSingleSale = async (saleData, shopId, userId, session) => {
   if (actualPaid >= netAmount) paymentStatus = 'Paid';
   else if (actualPaid > 0) paymentStatus = 'Partial';
 
+  const methodMap = { cash: 'Cash', upi: 'UPI', card: 'Card', credit: 'Credit', 'bank transfer': 'Bank Transfer' };
+  const normalizedMethod = methodMap[String(paymentMethod || '').toLowerCase()] || paymentMethod || 'Cash';
+
   // 1. Create Sale Record
   const sale = new Sale({
     shopId,
@@ -72,7 +75,7 @@ const processSingleSale = async (saleData, shopId, userId, session) => {
     taxAmount,
     netAmount,
     paidAmount: actualPaid,
-    paymentMethod,
+    paymentMethod: normalizedMethod,
     paymentStatus,
     totalProfit,
     isOfflineSynced: saleData.isOfflineSynced || false

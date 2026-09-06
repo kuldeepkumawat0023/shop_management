@@ -14,6 +14,7 @@ interface Product {
   currentStock: number;
   category?: string;
   sku?: string;
+  image?: string;
 }
 
 interface CartItem {
@@ -22,6 +23,7 @@ interface CartItem {
   sellingPrice: number;
   quantity: number;
   stock: number;
+  image?: string;
 }
 
 interface Customer {
@@ -122,7 +124,8 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
         name: product.name,
         sellingPrice: product.sellingPrice,
         quantity: 1,
-        stock: product.currentStock
+        stock: product.currentStock,
+        image: product.image
       }];
     });
   };
@@ -195,6 +198,9 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
     if (cart.length === 0) return { success: false };
     const toastId = toast.loading('Processing sale...');
     try {
+      const methodMap: Record<string, string> = { cash: 'Cash', upi: 'UPI', card: 'Card', credit: 'Credit' };
+      const normalizedMethod = methodMap[paymentMethod.toLowerCase()] || paymentMethod || 'Cash';
+
       const saleData = {
         invoiceNumber: `INV-${Date.now()}`,
         items: cart.map(item => ({
@@ -205,7 +211,7 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
         discountAmount: discount,
         taxAmount: tax,
         paidAmount,
-        paymentMethod,
+        paymentMethod: normalizedMethod,
         customerId
       };
 
