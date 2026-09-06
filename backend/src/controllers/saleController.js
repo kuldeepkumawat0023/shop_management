@@ -164,8 +164,27 @@ exports.getSales = async (req, res, next) => {
       .populate('shopId', 'name address contactNumber gstNumber email logo')
       .populate('customerId', 'name mobile')
       .populate('userId', 'fullname')
-      .sort('-createdAt');
-    res.status(200).json({ success: true, count: sales.length, data: sales });
+      .sort('-createdAt')
+      .lean();
+
+    const saleIds = sales.map(s => s._id);
+    const itemCounts = await SaleItem.aggregate([
+      { $match: { saleId: { $in: saleIds } } },
+      { $group: { _id: '$saleId', totalQty: { $sum: '$quantity' }, itemsCount: { $sum: 1 } } }
+    ]);
+
+    const countMap = {};
+    itemCounts.forEach(c => {
+      countMap[c._id.toString()] = { totalQty: c.totalQty, itemsCount: c.itemsCount };
+    });
+
+    const enrichedSales = sales.map(s => ({
+      ...s,
+      itemCount: countMap[s._id.toString()]?.itemsCount || 0,
+      totalQuantity: countMap[s._id.toString()]?.totalQty || 0
+    }));
+
+    res.status(200).json({ success: true, count: enrichedSales.length, data: enrichedSales });
   } catch (error) {
     next(error);
   }

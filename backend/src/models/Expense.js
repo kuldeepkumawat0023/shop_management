@@ -23,7 +23,8 @@ const expenseSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['Salary', 'Rent', 'Electricity', 'Internet', 'Fuel', 'Maintenance', 'Tea/Snacks', 'Marketing', 'Miscellaneous'],
+    required: [true, 'Please add a category'],
+    trim: true,
     default: 'Miscellaneous'
   },
   expenseDate: {
@@ -34,6 +35,10 @@ const expenseSchema = new mongoose.Schema({
     type: String,
     enum: ['Cash', 'UPI', 'Bank Transfer', 'Card', 'Other'],
     default: 'Cash'
+  },
+  receiptUrl: {
+    type: String,
+    trim: true
   },
   notes: {
     type: String

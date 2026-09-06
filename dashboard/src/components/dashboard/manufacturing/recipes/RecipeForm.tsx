@@ -53,7 +53,7 @@ export default function RecipeForm() {
     setIngredients(ingredients.map(ing =>
       ing.id === id ? { ...ing, [field]: value } : ing
     ));
-    
+
     // Clear specific error on change
     if (errors['ingredients'] || errors[`ingredient_${id}_${field}`]) {
       setErrors(prev => {
@@ -98,7 +98,7 @@ export default function RecipeForm() {
     const validationResult = recipeSchema.safeParse(submissionData);
     if (!validationResult.success) {
       const newErrors: Record<string, string> = {};
-      
+
       validationResult.error.issues.forEach(err => {
         if (err.path[0] === 'ingredients' && err.path[1] !== undefined) {
           // It's an error inside a specific ingredient
@@ -112,7 +112,7 @@ export default function RecipeForm() {
           newErrors[err.path[0].toString()] = err.message;
         }
       });
-      
+
       setErrors(newErrors);
       return toast.error(t('manufacturing.recipeForm.pleaseCorrectErrors'), { id: 'please-correct-the-errors-----' });
     }
@@ -233,76 +233,77 @@ export default function RecipeForm() {
               Add Item / आइटम जोड़ें
             </Button>
           </div>
-          
+
           {errors.ingredients && <p className="text-sm text-error font-bold mb-2">{errors.ingredients}</p>}
 
           <div className="flex flex-col gap-4">
             {ingredients.map((ing, index) => {
               const prodError = errors[`ingredient_${ing.id}_productId`];
               const qtyError = errors[`ingredient_${ing.id}_quantityRequired`];
-              
+
               return (
-              <div key={ing.id} className="flex flex-col sm:flex-row gap-3 items-end bg-surface p-4 rounded-xl border border-outline-variant/10 shadow-sm">
-                <div className="w-full sm:flex-1 space-y-1.5">
-                  {index === 0 && (
-                    <label className="text-sm font-bold text-on-surface">
-                      {t('manufacturing.recipeForm.rawMaterial')} <span className="text-error ml-1">*</span>
-                    </label>
-                  )}
-                  <select
-                    value={ing.productId}
-                    onChange={(e) => updateIngredient(ing.id, 'productId', e.target.value)}
-                    className={cn(
-                      "w-full h-10 px-3 bg-surface border rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 transition-all appearance-none cursor-pointer",
-                      prodError ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                <div key={ing.id} className="flex flex-col sm:flex-row gap-3 items-end bg-surface p-4 rounded-xl border border-outline-variant/10 shadow-sm">
+                  <div className="w-full sm:flex-1 space-y-1.5">
+                    {index === 0 && (
+                      <label className="text-sm font-bold text-on-surface">
+                        {t('manufacturing.recipeForm.rawMaterial')} <span className="text-error ml-1">*</span>
+                      </label>
                     )}
+                    <select
+                      value={ing.productId}
+                      onChange={(e) => updateIngredient(ing.id, 'productId', e.target.value)}
+                      className={cn(
+                        "w-full h-10 px-3 bg-surface border rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 transition-all appearance-none cursor-pointer",
+                        prodError ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                      )}
+                    >
+                      <option value="">{t('manufacturing.recipeForm.selectMaterial')}</option>
+                      {products
+                        .filter(p => p._id !== finalProductId)
+                        .map((p: any) => (
+                          <option key={p._id} value={p._id}>{p.name} ({t('manufacturing.recipeForm.stock')} {p.currentStock || 0})</option>
+                        ))
+                      }
+                    </select>
+                    {prodError && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{prodError}</p>}
+                  </div>
+                  <div className="w-full sm:w-36">
+                    {index === 0 && (
+                      <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                        {t('manufacturing.recipeForm.qtyRequired')} <span className="text-error">*</span>
+                      </label>
+                    )}
+                    <input
+                      type="number"
+                      placeholder="e.g. 5"
+                      value={ing.quantityRequired}
+                      onChange={(e) => updateIngredient(ing.id, 'quantityRequired', e.target.value)}
+                      className={cn(
+                        "w-full h-11 px-4 bg-surface-container-low border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all",
+                        qtyError ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
+                      )}
+                    />
+                    {qtyError && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{qtyError}</p>}
+                  </div>
+                  <div className="w-full sm:w-20 text-center">
+                    {ing.productId && (
+                      <span className="text-xs font-bold text-on-surface-variant uppercase">
+                        {products.find(p => p._id === ing.productId)?.unit || 'pcs'}
+                      </span>
+                    )}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => removeIngredient(ing.id)}
+                    disabled={ingredients.length === 1}
+                    className="w-full sm:w-12 h-10 border-error/30 text-error hover:bg-error/10 shrink-0 rounded-xl"
                   >
-                    <option value="">{t('manufacturing.recipeForm.selectMaterial')}</option>
-                    {products
-                      .filter(p => p._id !== finalProductId)
-                      .map((p: any) => (
-                        <option key={p._id} value={p._id}>{p.name} ({t('manufacturing.recipeForm.stock')} {p.currentStock || 0})</option>
-                      ))
-                    }
-                  </select>
-                  {prodError && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{prodError}</p>}
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
                 </div>
-                <div className="w-full sm:w-36">
-                  {index === 0 && (
-                    <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">
-                      {t('manufacturing.recipeForm.qtyRequired')} <span className="text-error">*</span>
-                    </label>
-                  )}
-                  <input
-                    type="number"
-                    placeholder="e.g. 5"
-                    value={ing.quantityRequired}
-                    onChange={(e) => updateIngredient(ing.id, 'quantityRequired', e.target.value)}
-                    className={cn(
-                      "w-full h-11 px-4 bg-surface-container-low border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all",
-                      qtyError ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
-                    )}
-                  />
-                  {qtyError && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{qtyError}</p>}
-                </div>
-                <div className="w-full sm:w-20 text-center">
-                  {ing.productId && (
-                    <span className="text-xs font-bold text-on-surface-variant uppercase">
-                      {products.find(p => p._id === ing.productId)?.unit || 'pcs'}
-                    </span>
-                  )}
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => removeIngredient(ing.id)}
-                  disabled={ingredients.length === 1}
-                  className="w-full sm:w-12 h-10 border-error/30 text-error hover:bg-error/10 shrink-0 rounded-xl"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            )})}
+              )
+            })}
           </div>
 
           {/* Estimated Cost */}

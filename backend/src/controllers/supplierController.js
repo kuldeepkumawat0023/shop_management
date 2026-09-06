@@ -23,6 +23,16 @@ exports.getSuppliers = async (req, res, next) => {
   }
 };
 
+exports.getSupplierById = async (req, res, next) => {
+  try {
+    const supplier = await Supplier.findOne({ _id: req.params.id, shopId: req.scopedShopId });
+    if (!supplier || !supplier.isActive) return res.status(404).json({ success: false, message: 'Supplier not found' });
+    res.status(200).json({ success: true, data: supplier });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.updateSupplier = async (req, res, next) => {
   try {
     let supplier = await Supplier.findOne({ _id: req.params.id, shopId: req.scopedShopId });

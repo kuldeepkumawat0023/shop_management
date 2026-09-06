@@ -5,10 +5,8 @@ import { DataTable } from '@/components/common/DataTable';
 import { Button } from '@/components/common/Button';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { StatsCard } from '@/components/common/StatsCard';
-import { Plus, Download, Filter, Search, Truck, CheckCircle2, UserPlus, IndianRupee, Eye, Edit, Trash2 } from 'lucide-react';
+import { Plus, Download, Filter, Search, Truck, CheckCircle2, UserPlus, IndianRupee } from 'lucide-react';
 import Link from 'next/link';
-
-// We will use React state for these instead of static arrays
 
 import { supplierService } from '@/lib/services/supplier.services';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +14,7 @@ import toast from 'react-hot-toast';
 import ActionGuard from '@/components/auth/ActionGuard';
 import { ViewPageSkeleton } from '@/components/common/ViewPageSkeleton';
 import { DeleteModal } from '@/components/common/DeleteModal';
+import { ActionButtons } from '@/components/common/ActionButtons';
 
 export default function SuppliersView() {
   const [suppliers, setSuppliers] = React.useState<any[]>([]);
@@ -76,29 +75,16 @@ export default function SuppliersView() {
         <span className="text-xs text-on-surface-variant">{row.mobile}</span>
       </div>
     )},
-    { header: t('suppliers.suppliersView.gstin'), accessorKey: 'gstin', cell: (row: any) => <span className="font-mono text-sm text-on-surface-variant">{row.gstin || t('suppliers.suppliersView.na')}</span> },
+    { header: t('suppliers.suppliersView.gstin'), accessorKey: 'gstNumber', cell: (row: any) => <span className="font-mono text-sm text-on-surface-variant">{row.gstNumber || row.gstin || t('suppliers.suppliersView.na')}</span> },
     { header: t('suppliers.suppliersView.balance'), accessorKey: 'balance', cell: (row: any) => <span className="font-bold text-on-surface">₹{(row.balance || 0).toLocaleString()}</span> },
     { header: t('suppliers.suppliersView.status'), accessorKey: 'isActive', cell: (row: any) => <StatusBadge status={row.isActive !== false ? 'Active' : 'Inactive'} /> },
     { header: t('suppliers.suppliersView.actions'), accessorKey: 'actions', cell: (row: any) => (
-      <div className="flex items-center gap-2">
-        <Link href={`/suppliers/${row._id}`}>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
-            <Eye className="w-4 h-4" />
-          </Button>
-        </Link>
-        <ActionGuard permission="suppliers.update">
-          <Link href={`/suppliers/${row._id}/edit`}>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors">
-              <Edit className="w-4 h-4" />
-            </Button>
-          </Link>
-        </ActionGuard>
-        <ActionGuard permission="suppliers.delete">
-          <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(row._id, row.name)} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors">
-            <Trash2 className="w-4 h-4" />
-          </Button>
-        </ActionGuard>
-      </div>
+      <ActionButtons
+        module="suppliers"
+        view={{ href: `/suppliers/${row._id}` }}
+        edit={{ href: `/suppliers/${row._id}/edit` }}
+        delete={{ onClick: () => handleDeleteClick(row._id, row.name) }}
+      />
     )},
   ];
 
@@ -133,10 +119,6 @@ export default function SuppliersView() {
           <p className="text-sm font-medium text-on-surface-variant">{t('suppliers.suppliersView.manageSuppliers')}</p>
         </div>
         <div className="flex gap-3 w-full md:w-auto">
-          <Button variant="outline" className="flex-1 md:flex-none bg-surface-container-lowest border-primary text-primary px-4 py-2 rounded-lg font-bold hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2 shadow-sm">
-            <Download className="w-4 h-4" />
-            {t('suppliers.suppliersView.export')}
-          </Button>
           <ActionGuard permission="suppliers.create">
             <Link href="/suppliers/new" className="flex-1 md:flex-none">
               <Button className="w-full gradient-button text-white px-4 py-2 rounded-lg font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 border-none">

@@ -40,6 +40,15 @@ export const customerService = {
   },
 
   /**
+   * Get customer by ID
+   * GET /customers/get/:id
+   */
+  getCustomerById: async (id: string): Promise<ApiResponse<CustomerData>> => {
+    const response = await apiClient.get(`/customers/get/${id}`);
+    return response.data;
+  },
+
+  /**
    * Update a customer's details
    * PUT /customers/update/:id
    */

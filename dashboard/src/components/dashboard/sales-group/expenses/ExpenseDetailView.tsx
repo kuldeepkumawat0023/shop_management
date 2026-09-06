@@ -163,19 +163,33 @@ export default function ExpenseDetailView() {
         <div className="bg-surface-container-lowest rounded-3xl shadow-sm border border-outline-variant/20 p-6 md:p-8 flex flex-col gap-6">
           <h3 className="text-lg font-bold text-on-surface flex items-center gap-2">
             <Receipt className="w-5 h-5 text-primary" />
-            {t('expenses.expenseDetail.receiptsAttachments')}
+            {t('expenses.expenseDetail.receiptsAttachments', 'Receipts & Attachments')}
           </h3>
-          <div className="bg-surface border border-outline-variant/20 rounded-2xl p-6 flex flex-col items-center justify-center min-h-[200px]">
-            <div className="w-16 h-16 bg-surface-container-high rounded-full flex items-center justify-center mb-4">
-              <Receipt className="w-8 h-8 text-on-surface-variant" />
+          {expense.receiptUrl ? (
+            <div className="bg-surface border border-outline-variant/20 rounded-2xl p-6 flex flex-col items-center justify-center min-h-[160px]">
+              <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-3 text-primary">
+                <Receipt className="w-7 h-7" />
+              </div>
+              <p className="text-on-surface font-bold text-sm">Receipt Attachment</p>
+              <a
+                href={expense.receiptUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-primary/30 text-primary hover:bg-primary/5 font-bold text-xs transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                {t('expenses.expenseDetail.downloadReceipt', 'View / Download Receipt')}
+              </a>
             </div>
-            <p className="text-on-surface font-bold">reliance_bill_jul.pdf</p>
-            <p className="text-sm text-on-surface-variant mt-1 mb-4">1.2 MB</p>
-            <Button variant="outline" className="gap-2 font-bold rounded-xl border-outline-variant/30">
-              <Download className="w-4 h-4" />
-              {t('expenses.expenseDetail.downloadReceipt')}
-            </Button>
-          </div>
+          ) : (
+            <div className="bg-surface/50 border border-dashed border-outline-variant/30 rounded-2xl p-8 flex flex-col items-center justify-center text-center">
+              <div className="w-12 h-12 bg-surface-container rounded-full flex items-center justify-center mb-2 text-on-surface-variant/50">
+                <Receipt className="w-6 h-6" />
+              </div>
+              <p className="text-sm font-semibold text-on-surface-variant">No receipt attached to this expense</p>
+              <p className="text-xs text-on-surface-variant/60 mt-0.5">Proof of payment can be kept for accounting records</p>
+            </div>
+          )}
         </div>
 
         {/* Delete Zone */}

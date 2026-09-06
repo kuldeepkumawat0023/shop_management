@@ -9,10 +9,11 @@ export const productService = {
       categoryId: data.category || data.categoryId,
       brandId: data.brand || data.brandId || null,
       purchasePrice: data.costPrice !== undefined ? data.costPrice : data.purchasePrice || 0,
-      sellingPrice: data.sellingPrice || 0,
+      sellingPrice: (data.sellingPrice !== undefined && data.sellingPrice !== '') ? data.sellingPrice : (data.isRawMaterial ? (data.costPrice || 0) : 0),
       gstRate: data.taxRate !== undefined ? data.taxRate : data.gstRate || 0,
       minStock: data.minStockLevel !== undefined ? data.minStockLevel : data.minStock || 5,
-      openingStock: data.currentStock !== undefined ? data.currentStock : data.openingStock || 0
+      openingStock: data.currentStock !== undefined ? data.currentStock : data.openingStock || 0,
+      isRawMaterial: !!data.isRawMaterial
     };
 
     const formData = new FormData();
@@ -49,9 +50,10 @@ export const productService = {
       categoryId: data.category || data.categoryId,
       brandId: data.brand || data.brandId || null,
       purchasePrice: data.costPrice !== undefined ? data.costPrice : data.purchasePrice,
-      sellingPrice: data.sellingPrice,
+      sellingPrice: (data.sellingPrice !== undefined && data.sellingPrice !== '') ? data.sellingPrice : (data.isRawMaterial ? (data.costPrice || 0) : data.sellingPrice),
       gstRate: data.taxRate !== undefined ? data.taxRate : data.gstRate,
       minStock: data.minStockLevel !== undefined ? data.minStockLevel : data.minStock,
+      isRawMaterial: !!data.isRawMaterial
     };
 
     const formData = new FormData();

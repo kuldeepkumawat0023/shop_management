@@ -44,9 +44,9 @@ export default function SupplierForm({ editId }: { editId?: string }) {
       const fetchSupplier = async () => {
         try {
           setIsFetching(true);
-          const res = await supplierService.getSuppliers();
+          const res = await supplierService.getSupplierById(editId);
           if (res.success && res.data) {
-            const supplier = res.data.find((s: any) => s._id === editId);
+            const supplier = res.data;
             if (supplier) {
               setFormData({
                 name: supplier.name || '',
@@ -141,11 +141,11 @@ export default function SupplierForm({ editId }: { editId?: string }) {
         if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
       }
       setErrors(newErrors);
-      return toast.error('Please correct the errors / कृपया त्रुटियों को ठीक करें', { id: 'please-correct-the-errors-----' });
+      return toast.error(t('suppliers.supplierForm.pleaseCorrectErrors'), { id: 'please-correct-the-errors' });
     }
 
     setLoading(true);
-    const toastId = toast.loading('Saving supplier...');
+    const toastId = toast.loading(t('suppliers.supplierForm.savingSupplier'));
 
     try {
       const apiData = {
@@ -168,13 +168,13 @@ export default function SupplierForm({ editId }: { editId?: string }) {
       }
 
       if (res.success) {
-        toast.success(editId ? 'Supplier updated successfully!' : 'Supplier created successfully!', { id: toastId });
+        toast.success(editId ? t('suppliers.supplierForm.updatedSuccess') : t('suppliers.supplierForm.createdSuccess'), { id: toastId });
         router.back();
       } else {
-        toast.error(res.message || 'Failed to save supplier', { id: toastId });
+        toast.error(res.message || t('suppliers.supplierForm.failedToSave'), { id: toastId });
       }
     } catch (error) {
-      toast.error('Failed to save supplier', { id: toastId });
+      toast.error(t('suppliers.supplierForm.failedToSave'), { id: toastId });
     } finally {
       setLoading(false);
     }

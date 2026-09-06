@@ -25,15 +25,13 @@ export default function CustomerDetailView({ id }: { id: string }) {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Fetch all customers and find the specific one (since no getById exists)
         const [custRes, salesRes] = await Promise.all([
-          customerService.getCustomers(),
+          customerService.getCustomerById(id),
           saleService.getSales()
         ]);
 
         if (custRes.success && custRes.data) {
-          const found = custRes.data.find(c => c._id === id);
-          if (found) setCustomer(found);
+          setCustomer(custRes.data);
         }
 
         if (salesRes.success && salesRes.data) {
@@ -211,7 +209,9 @@ export default function CustomerDetailView({ id }: { id: string }) {
                   <Receipt className="w-5 h-5 text-primary" />
                   {t('parties.customerDetailView.recentActivity')}
                 </h3>
-                <Button variant="ghost" className="text-primary font-bold hover:bg-primary/10 rounded-lg">{t('parties.customerDetailView.viewAll')}</Button>
+                <Link href="/sales">
+                  <Button variant="ghost" className="text-primary font-bold hover:bg-primary/10 rounded-lg">{t('parties.customerDetailView.viewAll')}</Button>
+                </Link>
               </div>
 
               {recentOrders.length > 0 ? (
@@ -230,11 +230,13 @@ export default function CustomerDetailView({ id }: { id: string }) {
                       <div className="flex items-center gap-4 text-right">
                         <div>
                           <p className="font-black text-on-surface">₹{(order.netAmount || 0).toLocaleString()}</p>
-                          <StatusBadge status={order.paymentStatus === 'Paid' ? t('parties.customerDetailView.completed') : order.paymentStatus} />
+                          <StatusBadge status={order.paymentStatus || 'Paid'} />
                         </div>
-                        <Button variant="ghost" size="icon" className="text-on-surface-variant">
-                          <ArrowLeft className="w-5 h-5 rotate-180" />
-                        </Button>
+                        <Link href={`/sales/${order._id}`}>
+                          <Button variant="ghost" size="icon" className="text-on-surface-variant hover:text-primary transition-colors">
+                            <ArrowLeft className="w-5 h-5 rotate-180" />
+                          </Button>
+                        </Link>
                       </div>
                     </div>
                   ))}

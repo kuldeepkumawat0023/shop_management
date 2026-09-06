@@ -20,8 +20,10 @@ export default function CustomerForm({ editId }: { editId?: string }) {
     email: '',
     phone: '',
     company: '',
+    creditLimit: '',
+    notes: '',
     status: 'Active' as 'Active' | 'Inactive',
-    address: '' // We map the individual fields to the schema's 'address' if we want, but schema just has one address string.
+    address: ''
   });
 
   const [addressData, setAddressData] = useState({
@@ -41,35 +43,34 @@ export default function CustomerForm({ editId }: { editId?: string }) {
       const fetchCustomer = async () => {
         try {
           setIsFetching(true);
-          const res = await customerService.getCustomers();
+          const res = await customerService.getCustomerById(editId);
           if (res.success && res.data) {
-            const customer = res.data.find(c => c._id === editId);
-            if (customer) {
-              setFormData({
-                name: customer.name || '',
-                email: customer.email || '',
-                phone: customer.mobile || '',
-                company: customer.company || '',
-                status: customer.isActive !== false ? 'Active' : 'Inactive',
-                address: customer.address || ''
-              });
-              // Try to split address into addressData if formatted as "street, city, state, zip, country"
-              if (customer.address) {
-                const parts = customer.address.split(',').map(s => s.trim());
-                if (parts.length >= 5) {
-                  setAddressData({
-                    street: parts[0],
-                    city: parts[1],
-                    state: parts[2],
-                    zip: parts[3],
-                    country: parts[4],
-                  });
-                }
+            const customer = res.data;
+            setFormData({
+              name: customer.name || '',
+              email: customer.email || '',
+              phone: customer.mobile || '',
+              company: customer.company || '',
+              creditLimit: customer.creditLimit !== undefined ? customer.creditLimit.toString() : '',
+              notes: customer.notes || '',
+              status: customer.isActive !== false ? 'Active' : 'Inactive',
+              address: customer.address || ''
+            });
+            if (customer.address) {
+              const parts = customer.address.split(',').map(s => s.trim());
+              if (parts.length >= 5) {
+                setAddressData({
+                  street: parts[0],
+                  city: parts[1],
+                  state: parts[2],
+                  zip: parts[3],
+                  country: parts[4],
+                });
               }
             }
           }
         } catch (error) {
-          toast.error(t('parties.customerForm.fetchError'), { id: 'failed-to-fetch-customer-detai' });
+          toast.error(t('parties.customerForm.fetchError', 'Failed to load customer details'), { id: 'failed-to-fetch-customer-detai' });
         } finally {
           setIsFetching(false);
         }
@@ -106,6 +107,8 @@ export default function CustomerForm({ editId }: { editId?: string }) {
       email: '',
       phone: '',
       company: '',
+      creditLimit: '',
+      notes: '',
       status: 'Active',
       address: ''
     });
@@ -122,9 +125,12 @@ export default function CustomerForm({ editId }: { editId?: string }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Compile address before validation if necessary, or just validate main fields
     const fullAddress = `${addressData.street}, ${addressData.city}, ${addressData.state}, ${addressData.zip}, ${addressData.country}`.replace(/^[,\s]+|[,\s]+$/g, '');
-    const dataToValidate = { ...formData, address: fullAddress };
+    const dataToValidate = {
+      ...formData,
+      creditLimit: formData.creditLimit ? Number(formData.creditLimit) : 0,
+      address: fullAddress
+    };
 
     const validationResult = customerSchema.safeParse(dataToValidate);
     if (!validationResult.success) {
@@ -133,11 +139,11 @@ export default function CustomerForm({ editId }: { editId?: string }) {
         if (err.path[0]) newErrors[err.path[0].toString()] = err.message;
       }
       setErrors(newErrors);
-      return toast.error(t('parties.customerForm.pleaseCorrectErrors'), { id: 'please-correct-the-errors-----' });
+      return toast.error(t('parties.customerForm.pleaseCorrectErrors', 'Please correct the errors'), { id: 'please-correct-the-errors-----' });
     }
 
     setLoading(true);
-    const toastId = toast.loading(t('parties.customerForm.savingCustomer'));
+    const toastId = toast.loading(t('parties.customerForm.savingCustomer', 'Saving customer...'));
 
     try {
       const apiData = {
@@ -145,6 +151,8 @@ export default function CustomerForm({ editId }: { editId?: string }) {
         email: formData.email,
         company: formData.company,
         mobile: formData.phone,
+        creditLimit: formData.creditLimit ? Number(formData.creditLimit) : 0,
+        notes: formData.notes,
         address: dataToValidate.address,
         isActive: formData.status === 'Active'
       };
@@ -157,13 +165,13 @@ export default function CustomerForm({ editId }: { editId?: string }) {
       }
 
       if (res.success) {
-        toast.success(editId ? t('parties.customerForm.updatedSuccess') : t('parties.customerForm.createdSuccess'), { id: toastId });
-        router.back();
+        toast.success(editId ? t('parties.customerForm.updatedSuccess', 'Customer updated successfully!') : t('parties.customerForm.createdSuccess', 'Customer created successfully!'), { id: toastId });
+        router.push('/customers');
       } else {
-        toast.error(res.message || t('parties.customerForm.failedToSave'), { id: toastId });
+        toast.error(res.message || t('parties.customerForm.failedToSave', 'Failed to save customer'), { id: toastId });
       }
     } catch (error) {
-      toast.error(t('parties.customerForm.failedToSave'), { id: toastId });
+      toast.error(t('parties.customerForm.failedToSave', 'Failed to save customer'), { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -242,6 +250,17 @@ export default function CustomerForm({ editId }: { editId?: string }) {
                   onChange={handleInputChange}
                   placeholder="Company Name / कंपनी का नाम"
                 />
+                <Input
+                  label={t('parties.customerForm.creditLimit', 'Credit Limit (₹)')}
+                  name="creditLimit"
+                  type="number"
+                  value={formData.creditLimit}
+                  onChange={handleInputChange}
+                  placeholder="0.00"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="flex flex-col gap-1.5 w-full">
                   <label className="text-sm font-bold text-on-surface">{t('parties.customerForm.status')}</label>
                   <select
@@ -254,6 +273,18 @@ export default function CustomerForm({ editId }: { editId?: string }) {
                     <option value="Inactive">{t('parties.customerForm.inactive')}</option>
                   </select>
                 </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5 w-full">
+                <label className="text-sm font-bold text-on-surface">{t('parties.customerForm.notes', 'Customer Notes')}</label>
+                <textarea
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleInputChange}
+                  rows={3}
+                  placeholder="Preferences, credit terms, or customer remarks..."
+                  className="w-full rounded-xl bg-surface border border-outline-variant/30 px-3 py-3 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all resize-none"
+                />
               </div>
             </div>
           </div>
@@ -318,10 +349,10 @@ export default function CustomerForm({ editId }: { editId?: string }) {
       <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-4 pt-6 border-t border-outline-variant/20">
         <Button type="button" onClick={handleClear} variant="ghost" className="w-full sm:w-auto text-on-surface-variant hover:text-error flex items-center justify-center gap-2">
           <RefreshCcw className="w-4 h-4" />
-          Clear Form / फ़ॉर्म साफ़ करें
+          {t('parties.customerForm.clearForm', 'Clear Form')}
         </Button>
         <Button type="button" onClick={() => router.back()} variant="outline" className="w-full sm:w-auto rounded-xl border-outline-variant/30 text-on-surface-variant hover:text-on-surface font-bold tracking-wide shadow-sm">
-          Cancel / रद्द करें
+          {t('common.cancel', 'Cancel')}
         </Button>
         <Button type="submit" disabled={loading} className="w-full sm:w-auto gradient-button text-white border-none shadow-lg shadow-primary/20 gap-2 rounded-xl disabled:opacity-50">
           <Save className="w-4 h-4" />

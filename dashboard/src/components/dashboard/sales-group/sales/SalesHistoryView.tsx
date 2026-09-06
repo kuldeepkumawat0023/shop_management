@@ -37,10 +37,10 @@ export default function SalesHistoryView() {
           const mapped = response.data.map((s: any) => ({
             id: s.invoiceNumber,
             date: new Date(s.saleDate).toLocaleDateString(),
-            customer: s.customerId?.name || t('sales.salesHistory.walkInCustomer'),
+            customer: s.customerId?.name || (s.customerName ? s.customerName : t('sales.salesHistory.walkInCustomer')),
             status: s.paymentStatus,
             amount: s.netAmount,
-            items: '-', // Not available directly in sale model unless populated/joined
+            items: s.itemCount ? `${s.itemCount} ${s.itemCount === 1 ? 'item' : 'items'}` : (s.totalQuantity ? `${s.totalQuantity} items` : '1 item'),
             _id: s._id
           }));
           setSalesList(mapped);

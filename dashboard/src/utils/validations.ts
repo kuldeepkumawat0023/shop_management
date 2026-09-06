@@ -87,6 +87,7 @@ export const customerSchema = z.object({
   phone: z.string().min(1, 'Phone number is required').regex(phoneRegex, 'Invalid phone number'),
   email: z.union([z.literal(''), z.string().email('Invalid email address')]).optional(),
   company: z.string().optional(),
+  creditLimit: z.number().optional(),
   notes: z.string().optional(),
   address: z.string().max(500, 'Address is too long').optional(),
 });
@@ -109,7 +110,7 @@ export const productSchema = z.object({
   name: z.string().min(1, 'Product Name is required').max(100, 'Product Name is too long'),
   description: z.string().max(500, 'Description is too long').optional(),
   sku: z.string().optional(),
-  sellingPrice: z.number().min(0, 'Price must be positive'),
+  sellingPrice: z.number().min(0, 'Price must be positive').optional(),
   costPrice: z.number().min(0, 'Cost price must be positive'),
   taxRate: z.number().min(0).default(18),
   currentStock: z.number().min(0, 'Stock must be 0 or more'),
@@ -117,6 +118,7 @@ export const productSchema = z.object({
   category: z.string().min(1, 'Category is required'),
   brand: z.string().optional(),
   isActive: z.boolean().optional(),
+  isRawMaterial: z.boolean().optional(),
 });
 
 // --- Manufacturing Schemas ---
@@ -139,14 +141,18 @@ export const productionSchema = z.object({
 
 export const purchaseSchema = z.object({
   supplier: z.string().min(1, 'Supplier is required / आपूर्तिकर्ता आवश्यक है'),
+  poNumber: z.string().optional(),
   items: z.array(z.object({
+    productId: z.string().optional(),
     product: z.string().min(1, 'Product is required / उत्पाद आवश्यक है'),
-    quantity: z.number().min(0.01, 'Quantity must be greater than 0 / मात्रा 0 से अधिक होनी चाहिए'),
-    unitPrice: z.number().min(0, 'Unit price cannot be negative / इकाई मूल्य नकारात्मक नहीं हो सकता')
+    quantity: z.number().min(0.01, 'Quantity must be at least 1 / मात्रा कम से कम 1 होनी चाहिए'),
+    unitPrice: z.number().min(0, 'Price cannot be negative / मूल्य नकारात्मक नहीं हो सकता'),
+    tax: z.union([z.number(), z.string()]).optional(),
   })).min(1, 'At least one item is required / कम से कम एक आइटम आवश्यक है'),
   shippingFee: z.number().optional(),
   taxAmount: z.number().optional(),
   discount: z.number().optional(),
+  paidAmount: z.number().optional(),
   paymentStatus: z.string().optional(),
   paymentMethod: z.string().optional(),
   notes: z.string().optional()

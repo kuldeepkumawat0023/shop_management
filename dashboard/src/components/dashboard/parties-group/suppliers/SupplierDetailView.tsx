@@ -26,13 +26,12 @@ export default function SupplierDetailView({ id }: { id: string }) {
       try {
         setLoading(true);
         const [supRes, purRes] = await Promise.all([
-          supplierService.getSuppliers(),
+          supplierService.getSupplierById(id),
           purchaseService.getPurchases()
         ]);
 
         if (supRes.success && supRes.data) {
-          const found = supRes.data.find((s: any) => s._id === id);
-          if (found) setSupplier(found);
+          setSupplier(supRes.data);
         }
 
         if (purRes.success && purRes.data) {
@@ -208,7 +207,7 @@ export default function SupplierDetailView({ id }: { id: string }) {
               <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium text-on-surface-variant">{t('suppliers.supplierDetail.paymentTerms')}</span>
-                  <span className="text-sm font-bold text-on-surface">Net 30</span>
+                  <span className="text-sm font-bold text-on-surface">{supplier.paymentTerms || 'Net 30'}</span>
                 </div>
                 <p className="text-sm text-on-surface-variant leading-relaxed mt-2 border-t border-outline-variant/10 pt-2">
                   {supplier.notes || t('suppliers.suppliersView.na')}
@@ -225,7 +224,9 @@ export default function SupplierDetailView({ id }: { id: string }) {
                   <ShoppingCart className="w-5 h-5 text-primary" />
                   {t('suppliers.supplierDetail.recentPos')}
                 </h3>
-                <Button variant="ghost" className="text-primary font-bold hover:bg-primary/10 rounded-lg">{t('suppliers.supplierDetail.viewAll')}</Button>
+                <Link href="/purchases">
+                  <Button variant="ghost" className="text-primary font-bold hover:bg-primary/10 rounded-lg">{t('suppliers.supplierDetail.viewAll')}</Button>
+                </Link>
               </div>
 
               {recentPOs.length > 0 ? (
@@ -244,11 +245,13 @@ export default function SupplierDetailView({ id }: { id: string }) {
                       <div className="flex items-center gap-4 text-right">
                         <div>
                           <p className="font-black text-on-surface">₹{(po.netAmount || 0).toLocaleString()}</p>
-                          <StatusBadge status={po.paymentStatus === 'Paid' ? 'Delivered' : po.paymentStatus} />
+                          <StatusBadge status={po.paymentStatus || 'Paid'} />
                         </div>
-                        <Button variant="ghost" size="icon" className="text-on-surface-variant">
-                          <ArrowLeft className="w-5 h-5 rotate-180" />
-                        </Button>
+                        <Link href={`/purchases/${po._id}`}>
+                          <Button variant="ghost" size="icon" className="text-on-surface-variant hover:text-primary transition-colors">
+                            <ArrowLeft className="w-5 h-5 rotate-180" />
+                          </Button>
+                        </Link>
                       </div>
                     </div>
                   ))}

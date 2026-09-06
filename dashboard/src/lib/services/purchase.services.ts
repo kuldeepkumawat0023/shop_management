@@ -46,7 +46,7 @@ export const purchaseService = {
    * Get purchase by ID
    * GET /purchases/get/:id
    */
-  getPurchaseById: async (id: string): Promise<ApiResponse<PurchaseData>> => {
+  getPurchaseById: async (id: string): Promise<ApiResponse<any>> => {
     const response = await apiClient.get(`/purchases/get/${id}`);
     return response.data;
   },

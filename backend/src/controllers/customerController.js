@@ -23,6 +23,16 @@ exports.getCustomers = async (req, res, next) => {
   }
 };
 
+exports.getCustomerById = async (req, res, next) => {
+  try {
+    const customer = await Customer.findOne({ _id: req.params.id, shopId: req.scopedShopId });
+    if (!customer || !customer.isActive) return res.status(404).json({ success: false, message: 'Customer not found' });
+    res.status(200).json({ success: true, data: customer });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.updateCustomer = async (req, res, next) => {
   try {
     let customer = await Customer.findOne({ _id: req.params.id, shopId: req.scopedShopId });

@@ -26,6 +26,10 @@ export const supplierService = {
     const response = await apiClient.get('/suppliers/all');
     return response.data;
   },
+  getSupplierById: async (id: string): Promise<ApiResponse<SupplierData>> => {
+    const response = await apiClient.get(`/suppliers/get/${id}`);
+    return response.data;
+  },
   updateSupplier: async (id: string, data: Partial<SupplierData>): Promise<ApiResponse<SupplierData>> => {
     const response = await apiClient.put(`/suppliers/update/${id}`, data);
     return response.data;

@@ -567,6 +567,11 @@
     },
     "supplierForm": {
       "fetchFailed": "Failed to fetch supplier details",
+      "pleaseCorrectErrors": "Please correct the errors",
+      "savingSupplier": "Saving supplier...",
+      "updatedSuccess": "Supplier updated successfully!",
+      "createdSuccess": "Supplier created successfully!",
+      "failedToSave": "Failed to save supplier",
       "editSupplier": "Edit Supplier",
       "addNewSupplier": "Add New Supplier",
       "updateSupplier": "Update supplier details",

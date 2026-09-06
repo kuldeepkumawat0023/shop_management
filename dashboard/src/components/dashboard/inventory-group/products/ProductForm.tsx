@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/common/Button';
-import { ArrowLeft, Save, UploadCloud, Tag, FileText, Banknote, Package, Layers, RefreshCcw, X, Plus } from 'lucide-react';
+import { ArrowLeft, Save, UploadCloud, Tag, FileText, Banknote, Package, Layers, RefreshCcw, X, Plus, ShoppingBag, Boxes, Factory, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
@@ -39,7 +39,9 @@ export default function ProductForm({ editId }: ProductFormProps) {
     minStockLevel: '10',
     category: '',
     brand: '',
-    isActive: true
+    isActive: true,
+    isRawMaterial: false,
+    productType: 'trading' as 'trading' | 'raw' | 'manufactured'
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -63,6 +65,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
       if (prodRes && prodRes.success) {
         const prod = prodRes.data.find((p: any) => p._id === editId);
         if (prod) {
+          const isRaw = Boolean(prod.isRawMaterial);
           setFormData({
             name: prod.name || '',
             description: prod.description || '',
@@ -74,7 +77,9 @@ export default function ProductForm({ editId }: ProductFormProps) {
             minStockLevel: (prod.minStock || prod.minStockLevel || '10')?.toString() || '10',
             category: prod.categoryId?._id || prod.categoryId || prod.category?._id || prod.category || '',
             brand: prod.brandId?._id || prod.brandId || prod.brand?._id || prod.brand || '',
-            isActive: prod.isActive !== false
+            isActive: prod.isActive !== false,
+            isRawMaterial: isRaw,
+            productType: isRaw ? 'raw' : 'trading'
           });
           if (prod.image) {
             setExistingImage(prod.image);
@@ -114,7 +119,12 @@ export default function ProductForm({ editId }: ProductFormProps) {
       validationVal = value === '' ? undefined : Number(value);
     }
     
-    const result = productSchema.safeParse({ ...formData, [name]: validationVal });
+    const valObj: any = { ...formData, [name]: validationVal };
+    if (formData.isRawMaterial && (valObj.sellingPrice === undefined || valObj.sellingPrice === '')) {
+      valObj.sellingPrice = 0;
+    }
+
+    const result = productSchema.safeParse(valObj);
     if (!result.success) {
       const fieldError = result.error.issues.find(err => err.path[0] === name);
       if (fieldError) {
@@ -124,6 +134,18 @@ export default function ProductForm({ editId }: ProductFormProps) {
       }
     } else {
       setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const handleClassificationSelect = (type: 'trading' | 'raw' | 'manufactured') => {
+    const isRaw = type === 'raw';
+    setFormData(prev => ({
+      ...prev,
+      productType: type,
+      isRawMaterial: isRaw
+    }));
+    if (isRaw) {
+      setErrors(prev => ({ ...prev, sellingPrice: '' }));
     }
   };
 
@@ -139,7 +161,9 @@ export default function ProductForm({ editId }: ProductFormProps) {
       minStockLevel: '10',
       category: '',
       brand: '',
-      isActive: true
+      isActive: true,
+      isRawMaterial: false,
+      productType: 'trading'
     });
     setErrors({});
   };
@@ -184,11 +208,12 @@ export default function ProductForm({ editId }: ProductFormProps) {
 
     const submissionData = {
       ...formData,
-      sellingPrice: formData.sellingPrice === '' ? undefined : Number(formData.sellingPrice),
+      sellingPrice: formData.sellingPrice === '' ? (formData.isRawMaterial ? 0 : undefined) : Number(formData.sellingPrice),
       costPrice: formData.costPrice === '' ? undefined : Number(formData.costPrice),
       taxRate: formData.taxRate === '' ? 18 : Number(formData.taxRate),
       currentStock: formData.currentStock === '' ? undefined : Number(formData.currentStock),
       minStockLevel: formData.minStockLevel === '' ? undefined : Number(formData.minStockLevel),
+      isRawMaterial: formData.isRawMaterial,
       images: undefined,
       image: selectedFile || undefined,
       existingImages: undefined
@@ -250,6 +275,107 @@ export default function ProductForm({ editId }: ProductFormProps) {
       {/* Form Content */}
       <div className="p-4 md:p-6 lg:p-8 w-full flex flex-col gap-6">
         
+        {/* Product Type / Classification */}
+        <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Package className="w-5 h-5 text-primary" />
+              <h2 className="text-lg font-bold text-on-surface">
+                {t('inventory.productForm.productType', 'Product Classification / वर्गीकरण')}
+              </h2>
+            </div>
+            <p className="text-xs text-on-surface-variant">
+              {t('inventory.productForm.productTypeDesc', 'Select whether this item is a standard trading product, raw material for manufacturing, or manufactured good')}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+            {/* 1. Trading Product */}
+            <div
+              onClick={() => handleClassificationSelect('trading')}
+              className={cn(
+                "relative p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 flex flex-col justify-between gap-3",
+                formData.productType === 'trading'
+                  ? "border-primary bg-primary/5 shadow-sm"
+                  : "border-outline-variant/30 hover:border-primary/40 bg-surface-container-low/30"
+              )}
+            >
+              <div className="flex items-start justify-between">
+                <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                  <ShoppingBag className="w-5 h-5" />
+                </div>
+                {formData.productType === 'trading' && (
+                  <CheckCircle2 className="w-5 h-5 text-primary fill-primary/20" />
+                )}
+              </div>
+              <div>
+                <h4 className="font-bold text-sm text-on-surface">
+                  {t('inventory.productForm.typeTrading', 'Trading Product / व्यापारिक')}
+                </h4>
+                <p className="text-xs text-on-surface-variant mt-0.5">
+                  {t('inventory.productForm.typeTradingDesc', 'Directly bought from suppliers & sold to customers')}
+                </p>
+              </div>
+            </div>
+
+            {/* 2. Raw Material */}
+            <div
+              onClick={() => handleClassificationSelect('raw')}
+              className={cn(
+                "relative p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 flex flex-col justify-between gap-3",
+                formData.productType === 'raw'
+                  ? "border-amber-500 bg-amber-500/5 shadow-sm"
+                  : "border-outline-variant/30 hover:border-amber-500/40 bg-surface-container-low/30"
+              )}
+            >
+              <div className="flex items-start justify-between">
+                <div className="w-9 h-9 rounded-lg bg-amber-500/10 text-amber-600 flex items-center justify-center">
+                  <Boxes className="w-5 h-5" />
+                </div>
+                {formData.productType === 'raw' && (
+                  <CheckCircle2 className="w-5 h-5 text-amber-600 fill-amber-500/20" />
+                )}
+              </div>
+              <div>
+                <h4 className="font-bold text-sm text-on-surface">
+                  {t('inventory.productForm.typeRaw', 'Raw Material / कच्चा माल')}
+                </h4>
+                <p className="text-xs text-on-surface-variant mt-0.5">
+                  {t('inventory.productForm.typeRawDesc', 'Purchased as ingredient for recipes / internal manufacturing')}
+                </p>
+              </div>
+            </div>
+
+            {/* 3. Manufactured Good */}
+            <div
+              onClick={() => handleClassificationSelect('manufactured')}
+              className={cn(
+                "relative p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 flex flex-col justify-between gap-3",
+                formData.productType === 'manufactured'
+                  ? "border-indigo-500 bg-indigo-500/5 shadow-sm"
+                  : "border-outline-variant/30 hover:border-indigo-500/40 bg-surface-container-low/30"
+              )}
+            >
+              <div className="flex items-start justify-between">
+                <div className="w-9 h-9 rounded-lg bg-indigo-500/10 text-indigo-600 flex items-center justify-center">
+                  <Factory className="w-5 h-5" />
+                </div>
+                {formData.productType === 'manufactured' && (
+                  <CheckCircle2 className="w-5 h-5 text-indigo-600 fill-indigo-500/20" />
+                )}
+              </div>
+              <div>
+                <h4 className="font-bold text-sm text-on-surface">
+                  {t('inventory.productForm.typeManufactured', 'Manufactured Good / उत्पादित')}
+                </h4>
+                <p className="text-xs text-on-surface-variant mt-0.5">
+                  {t('inventory.productForm.typeManufacturedDesc', 'Produced in-house through recipes & sold to customers')}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Basic Information */}
         <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 p-6 flex flex-col gap-6">
           <div className="flex items-center gap-2 mb-2">
@@ -366,7 +492,7 @@ export default function ProductForm({ editId }: ProductFormProps) {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div className="space-y-2">
               <label className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                {t('inventory.productForm.sellingPrice')} <span className="text-error">*</span>
+                {t('inventory.productForm.sellingPrice')} {formData.isRawMaterial ? <span className="text-[10px] text-on-surface-variant font-normal tracking-normal capitalize">({t('common.optional', 'Optional')})</span> : <span className="text-error">*</span>}
               </label>
               <input 
                 type="text" 

@@ -16,12 +16,13 @@ export default function ExpenseForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [customCategory, setCustomCategory] = useState('');
   const [formData, setFormData] = useState({
     payee: '',
     category: '',
     amount: '',
-    date: '',
-    paymentMethod: 'Bank Transfer',
+    date: new Date().toISOString().split('T')[0],
+    paymentMethod: 'Cash',
     status: 'Paid',
     description: ''
   });
@@ -46,11 +47,12 @@ export default function ExpenseForm() {
       payee: '',
       category: '',
       amount: '',
-      date: '',
-      paymentMethod: 'Bank Transfer',
+      date: new Date().toISOString().split('T')[0],
+      paymentMethod: 'Cash',
       status: 'Paid',
       description: ''
     });
+    setCustomCategory('');
     setErrors({});
   };
 
@@ -89,8 +91,13 @@ export default function ExpenseForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    const finalCategory = formData.category === '__custom__' 
+      ? customCategory.trim() 
+      : formData.category;
+
     const submissionData = {
       ...formData,
+      category: finalCategory,
       amount: Number(formData.amount) || 0
     };
 
@@ -112,7 +119,7 @@ export default function ExpenseForm() {
         expenseName: submissionData.payee,
         amount: submissionData.amount,
         category: submissionData.category,
-        paymentMethod: submissionData.paymentMethod,
+        paymentMethod: submissionData.paymentMethod || 'Cash',
         notes: submissionData.description,
         expenseDate: submissionData.date || new Date().toISOString()
       };
@@ -120,12 +127,12 @@ export default function ExpenseForm() {
       const response = await expenseService.createExpense(payload);
       if (response.success) {
         toast.success(t('expenses.expenseForm.expenseSavedSuccess'), { id: toastId });
-        router.back();
+        router.push('/expenses');
       } else {
         toast.error(response.message || t('expenses.expenseForm.failedToSaveExpense'), { id: toastId });
       }
     } catch (err: any) {
-      toast.error(t('expenses.expenseForm.failedToSaveExpense'), { id: toastId });
+      toast.error(err.response?.data?.message || t('expenses.expenseForm.failedToSaveExpense'), { id: toastId });
     } finally {
       setSubmitting(false);
     }
@@ -163,7 +170,7 @@ export default function ExpenseForm() {
                   name="payee"
                   value={formData.payee}
                   onChange={handleInputChange}
-                  placeholder="e.g. Office Supplies Inc"
+                  placeholder="e.g. Reliance Electricity / Office Supplies"
                   className={cn(
                     "w-full h-10 px-3 bg-surface border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all",
                     errors.payee ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
@@ -183,18 +190,33 @@ export default function ExpenseForm() {
                   )}
                 >
                   <option value="">{t('expenses.expenseForm.selectCategory')}</option>
-                  <option value="Utilities">{t('expenses.expenseForm.utilities')}</option>
-                  <option value="Rent">{t('expenses.expenseForm.rent')}</option>
-                  <option value="Maintenance">{t('expenses.expenseForm.maintenance')}</option>
-                  <option value="Marketing">{t('expenses.expenseForm.marketing')}</option>
-                  <option value="Office Supplies">{t('expenses.expenseForm.officeSupplies')}</option>
-                  <option value="Salaries">{t('expenses.expenseForm.salaries')}</option>
-                  <option value="Software">{t('expenses.expenseForm.software')}</option>
-                  <option value="Misc">{t('expenses.expenseForm.misc')}</option>
+                  <option value="Electricity">Electricity</option>
+                  <option value="Rent">Rent</option>
+                  <option value="Salary">Salary / Wages</option>
+                  <option value="Maintenance">Maintenance & Repairs</option>
+                  <option value="Office Supplies">Office Supplies</option>
+                  <option value="Internet">Internet / Phone</option>
+                  <option value="Fuel">Fuel / Transport</option>
+                  <option value="Tea/Snacks">Tea & Refreshments</option>
+                  <option value="Marketing">Marketing / Ads</option>
+                  <option value="Miscellaneous">Miscellaneous</option>
+                  <option value="__custom__">+ Custom Category...</option>
                 </select>
                 {errors.category && <p className="text-[10px] text-error mt-1 font-bold tracking-tight px-1">{errors.category}</p>}
               </div>
             </div>
+
+            {formData.category === '__custom__' && (
+              <div className="flex flex-col gap-1.5 w-full p-4 bg-primary/5 border border-primary/20 rounded-2xl animate-in fade-in">
+                <label className="text-sm font-bold text-primary">Enter Custom Category Name <span className="text-error ml-1">*</span></label>
+                <input
+                  value={customCategory}
+                  onChange={(e) => setCustomCategory(e.target.value)}
+                  placeholder="e.g. Legal Fees, Packaging, Travelling"
+                  className="w-full h-10 px-3 bg-surface border border-primary/30 rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                />
+              </div>
+            )}
 
             <div className="flex flex-col gap-1.5 w-full">
               <label className="text-sm font-bold text-on-surface">{t('expenses.expenseForm.descriptionOpt')}</label>
@@ -222,12 +244,13 @@ export default function ExpenseForm() {
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-on-surface-variant">₹</span>
                   <input
                     type="number"
+                    step="any"
                     name="amount"
                     value={formData.amount}
                     onChange={handleInputChange}
                     placeholder="0.00"
                     className={cn(
-                      "w-full h-10 pl-8 pr-3 bg-surface border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all",
+                      "w-full h-10 pl-8 pr-3 bg-surface border rounded-xl text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 transition-all font-mono",
                       errors.amount ? "border-error focus:border-error focus:ring-error/20" : "border-outline-variant/30 focus:border-primary/50 focus:ring-primary/20"
                     )}
                   />
@@ -261,10 +284,10 @@ export default function ExpenseForm() {
                   className="flex w-full h-10 rounded-xl bg-surface border border-outline-variant/30 px-3 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all appearance-none"
                 >
                   <option value="Cash">Cash</option>
-                  <option value="Credit Card">Credit Card</option>
+                  <option value="UPI">UPI / QR</option>
                   <option value="Bank Transfer">Bank Transfer (NEFT/RTGS)</option>
-                  <option value="UPI">UPI</option>
-                  <option value="Cheque">Cheque</option>
+                  <option value="Card">Debit / Credit Card</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
               <div className="flex flex-col gap-1.5 w-full">
@@ -277,7 +300,6 @@ export default function ExpenseForm() {
                 >
                   <option value="Paid">Paid</option>
                   <option value="Pending">Pending</option>
-                  <option value="Overdue">Overdue</option>
                 </select>
               </div>
             </div>
