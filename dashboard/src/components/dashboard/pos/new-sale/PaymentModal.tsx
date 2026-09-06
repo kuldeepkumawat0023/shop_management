@@ -16,19 +16,21 @@ interface PaymentModalProps {
   onSuccess: (saleData: any) => void;
 }
 
-const PAYMENT_METHODS = [
-  { id: 'cash', name: 'Cash / नकद', icon: Banknote, color: 'text-emerald-500' },
-  { id: 'upi', name: 'UPI / QR कोड', icon: Smartphone, color: 'text-blue-500' },
-  { id: 'card', name: 'Card / कार्ड', icon: CreditCard, color: 'text-purple-500' },
-  { id: 'credit', name: 'Udhar / खाता', icon: BookOpen, color: 'text-amber-500' },
-];
+
 
 const QUICK_AMOUNTS = [10, 50, 100, 200, 500, 2000];
 
 export default function PaymentModal({ onClose, onSuccess }: PaymentModalProps) {
   const { netAmount, checkout, selectedCustomer } = usePOS();
   const { t } = useTranslation();
-  
+
+  const PAYMENT_METHODS = [
+    { id: 'cash', name: t('pos.paymentModal.cash'), icon: Banknote, color: 'text-emerald-500' },
+    { id: 'upi', name: t('pos.paymentModal.upiQr'), icon: Smartphone, color: 'text-blue-500' },
+    { id: 'card', name: t('pos.paymentModal.card'), icon: CreditCard, color: 'text-purple-500' },
+    { id: 'credit', name: t('pos.paymentModal.credit'), icon: BookOpen, color: 'text-amber-500' },
+  ];
+
   const [method, setMethod] = useState<'cash' | 'upi' | 'card' | 'credit'>('cash');
   const [amountReceived, setAmountReceived] = useState<string>(netAmount.toString());
   const [referenceNote, setReferenceNote] = useState('');
@@ -39,12 +41,12 @@ export default function PaymentModal({ onClose, onSuccess }: PaymentModalProps) 
 
   const handleCheckout = async () => {
     if (method === 'credit' && !selectedCustomer) {
-      toast.error('उधार (Udhar) के लिए कृपया पहले ग्राहक चुनें! / Please select a customer for Udhar');
+      toast.error(t('pos.paymentModal.selectCustomerForCredit'));
       return;
     }
 
     if (method === 'cash' && received < netAmount) {
-      toast.error('प्राप्त राशि कुल राशि से कम है / Received amount is less than total');
+      toast.error(t('pos.paymentModal.receivedLessThanTotal'));
       return;
     }
 
@@ -66,9 +68,9 @@ export default function PaymentModal({ onClose, onSuccess }: PaymentModalProps) 
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-outline-variant/20 bg-surface-container-low">
           <div>
-            <h2 className="text-lg font-bold text-on-surface">Payment / भुगतान करें</h2>
+            <h2 className="text-lg font-bold text-on-surface">{t('pos.paymentModal.title')}</h2>
             <p className="text-xs text-on-surface-variant mt-0.5">
-              Customer: <span className="font-bold text-on-surface">{selectedCustomer?.name || 'Walk-in Customer'}</span>
+              {t('pos.paymentModal.customer')} <span className="font-bold text-on-surface">{selectedCustomer?.name || t('pos.newSale.walkInCustomer')}</span>
             </p>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 text-on-surface-variant hover:text-error hover:bg-error/10">
@@ -81,8 +83,7 @@ export default function PaymentModal({ onClose, onSuccess }: PaymentModalProps) 
           {/* Payable Amount Card */}
           <Card className="bg-primary/5 border border-primary/20 p-4 flex items-center justify-between">
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Total Payable Amount</span>
-              <p className="text-xs text-on-surface-variant/70 mt-0.5">कुल देय राशि</p>
+              <span className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">{t('pos.paymentModal.totalPayableAmount')}</span>
             </div>
             <span className="text-3xl font-black text-primary">{formatCurrency(netAmount)}</span>
           </Card>
@@ -90,7 +91,7 @@ export default function PaymentModal({ onClose, onSuccess }: PaymentModalProps) 
           {/* Payment Method Selector */}
           <div>
             <label className="text-xs font-bold uppercase tracking-wider text-on-surface-variant block mb-2">
-              Select Payment Method / भुगतान का माध्यम
+              {t('pos.paymentModal.selectPaymentMethod')}
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               {PAYMENT_METHODS.map((m) => {
@@ -126,14 +127,14 @@ export default function PaymentModal({ onClose, onSuccess }: PaymentModalProps) 
             <div className="space-y-3 bg-surface-container-low/60 p-4 rounded-xl border border-outline-variant/20">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-on-surface uppercase tracking-wider">
-                  Cash Received / प्राप्त राशि:
+                  {t('pos.paymentModal.amountReceived')}:
                 </label>
                 <button
                   type="button"
                   onClick={() => setAmountReceived(netAmount.toString())}
                   className="text-xs text-primary font-bold hover:underline cursor-pointer"
                 >
-                  Exact Amount (₹{netAmount})
+                  {t('pos.paymentModal.exact')} ({formatCurrency(netAmount)})
                 </button>
               </div>
 
@@ -169,7 +170,7 @@ export default function PaymentModal({ onClose, onSuccess }: PaymentModalProps) 
               {/* Change Due */}
               <div className="flex items-center justify-between pt-2 border-t border-outline-variant/20">
                 <span className="text-xs font-bold text-on-surface-variant">
-                  Change to Return / वापस देने योग्य:
+                  {t('pos.paymentModal.changeDue')}:
                 </span>
                 <span className={cn(
                   "text-base font-black",
@@ -188,14 +189,14 @@ export default function PaymentModal({ onClose, onSuccess }: PaymentModalProps) 
                 <Smartphone className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-sm font-bold text-on-surface">Scan Shop QR / GPay / PhonePe / Paytm</p>
-                <p className="text-xs text-on-surface-variant mt-0.5">ग्राहक से ₹{netAmount} का यूपीआई भुगतान प्राप्त करें</p>
+                <p className="text-sm font-bold text-on-surface">{t('pos.paymentModal.upiQr')}</p>
+                <p className="text-xs text-on-surface-variant mt-0.5">{formatCurrency(netAmount)}</p>
               </div>
               <Input
                 type="text"
                 value={referenceNote}
                 onChange={(e) => setReferenceNote(e.target.value)}
-                placeholder="UTR / Ref No. (Optional)"
+                placeholder={t('pos.paymentModal.referencePlaceholder')}
                 className="text-xs text-center"
               />
             </div>
@@ -209,15 +210,15 @@ export default function PaymentModal({ onClose, onSuccess }: PaymentModalProps) 
                   <CreditCard className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-on-surface">POS Card Swipe / Tap</p>
-                  <p className="text-xs text-on-surface-variant">स्वाइप मशीन पर ₹{netAmount} का लेनदेन करें</p>
+                  <p className="text-sm font-bold text-on-surface">{t('pos.paymentModal.card')}</p>
+                  <p className="text-xs text-on-surface-variant">{formatCurrency(netAmount)}</p>
                 </div>
               </div>
               <Input
                 type="text"
                 value={referenceNote}
                 onChange={(e) => setReferenceNote(e.target.value)}
-                placeholder="Card Approval Code / Last 4 digits (Optional)"
+                placeholder={t('pos.paymentModal.referencePlaceholder')}
                 className="text-xs"
               />
             </div>
@@ -230,15 +231,14 @@ export default function PaymentModal({ onClose, onSuccess }: PaymentModalProps) 
                 <div className="flex items-start gap-2.5 text-amber-600 dark:text-amber-400 text-xs">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold">Customer Required!</span>
-                    <p className="text-[11px] mt-0.5">उधार पर बिल बनाने के लिए ग्राहक का नाम होना आवश्यक है। कृपया पहले ग्राहक चुनें।</p>
+                    <span className="font-bold">{t('pos.paymentModal.selectCustomerForCredit')}</span>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-1.5 text-xs">
-                  <p className="font-bold text-amber-600 dark:text-amber-400">उधार खाता (Credit Sale):</p>
+                  <p className="font-bold text-amber-600 dark:text-amber-400">{t('pos.paymentModal.credit')}:</p>
                   <p className="text-on-surface-variant">
-                    यह ₹{netAmount} की राशि ग्राहक <span className="font-bold text-on-surface">{selectedCustomer.name}</span> के खाते में जुड़ जाएगी।
+                    {formatCurrency(netAmount)} &bull; {selectedCustomer.name}
                   </p>
                 </div>
               )}
@@ -254,7 +254,7 @@ export default function PaymentModal({ onClose, onSuccess }: PaymentModalProps) 
             onClick={onClose}
             className="flex-1 border-outline-variant/30"
           >
-            Cancel / रद्द करें
+            {t('pos.paymentModal.cancel')}
           </Button>
           <Button
             onClick={handleCheckout}
@@ -262,7 +262,7 @@ export default function PaymentModal({ onClose, onSuccess }: PaymentModalProps) 
             className="flex-1 font-bold h-11 shadow-lg shadow-primary/20 disabled:opacity-50"
           >
             <CheckCircle2 className="w-4 h-4 mr-1.5" />
-            {isSubmitting ? 'Recording Sale...' : `Complete Bill (₹${netAmount})`}
+            {isSubmitting ? t('pos.paymentModal.processing') : `${t('pos.paymentModal.completeSale')} (${formatCurrency(netAmount)})`}
           </Button>
         </div>
 

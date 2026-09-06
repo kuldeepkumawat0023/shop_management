@@ -78,7 +78,7 @@ export default function POSInvoiceModal({
         {/* Top Control Bar (Hidden when printing) */}
         <div className="px-5 py-3.5 border-b border-outline-variant/20 flex flex-wrap items-center justify-between gap-3 bg-surface-container-low shrink-0 print:hidden">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Format:</span>
+            <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">{t('pos.invoiceModal.format')}</span>
             <div className="flex bg-surface-container rounded-lg p-1 border border-outline-variant/20">
               <Button
                 variant={format === 'thermal' ? 'default' : 'ghost'}
@@ -90,7 +90,7 @@ export default function POSInvoiceModal({
                 )}
               >
                 <Receipt className="w-3.5 h-3.5" />
-                Thermal (80mm)
+                {t('pos.invoiceModal.thermal')}
               </Button>
               <Button
                 variant={format === 'a4' ? 'default' : 'ghost'}
@@ -102,7 +102,7 @@ export default function POSInvoiceModal({
                 )}
               >
                 <FileText className="w-3.5 h-3.5" />
-                A4 Tax Invoice
+                {t('pos.invoiceModal.a4')}
               </Button>
             </div>
           </div>
@@ -115,7 +115,7 @@ export default function POSInvoiceModal({
               className="text-success border-success/30 hover:bg-success/10 font-bold gap-1.5 h-8 px-3"
             >
               <Share2 className="w-3.5 h-3.5" />
-              WhatsApp
+              {t('pos.invoiceModal.whatsapp')}
             </Button>
             <Button
               size="sm"
@@ -123,7 +123,7 @@ export default function POSInvoiceModal({
               className="font-bold gap-1.5 h-8 px-4"
             >
               <Printer className="w-3.5 h-3.5" />
-              Print
+              {t('pos.invoiceModal.print')}
             </Button>
             <Button
               variant="ghost"
@@ -146,33 +146,33 @@ export default function POSInvoiceModal({
               {/* Header */}
               <div className="text-center pb-3 border-b border-dashed border-gray-400">
                 <h2 className="text-base font-black uppercase tracking-wider">{shopName}</h2>
-                <p className="text-[11px] text-gray-600 mt-0.5">Retail POS Receipt</p>
+                <p className="text-[11px] text-gray-600 mt-0.5">{t('pos.invoiceModal.retailReceipt')}</p>
                 {shopAddress && <p className="text-[10px] text-gray-500 mt-0.5">{shopAddress}</p>}
-                {shopPhone && <p className="text-[10px] text-gray-500">Phone: {shopPhone}</p>}
-                {shopGstin && <p className="text-[10px] font-bold text-gray-700">GSTIN: {shopGstin}</p>}
+                {shopPhone && <p className="text-[10px] text-gray-500">{t('pos.invoiceModal.phone')} {shopPhone}</p>}
+                {shopGstin && <p className="text-[10px] font-bold text-gray-700">{t('pos.invoiceModal.gstin')} {shopGstin}</p>}
               </div>
 
               {/* Bill Details */}
               <div className="py-2.5 space-y-1 text-[11px] border-b border-dashed border-gray-400">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Invoice:</span>
+                  <span className="text-gray-500">{t('pos.invoiceModal.invoice')}</span>
                   <span className="font-bold">{saleData.invoiceNumber}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Date & Time:</span>
+                  <span className="text-gray-500">{t('pos.invoiceModal.dateTime')}</span>
                   <span>{new Date(saleData.saleDate || saleData.createdAt || Date.now()).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' })}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Cashier:</span>
+                  <span className="text-gray-500">{t('pos.invoiceModal.cashier')}</span>
                   <span>{cashierName}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Customer:</span>
+                  <span className="text-gray-500">{t('pos.invoiceModal.customer')}</span>
                   <span className="font-semibold">{customerName}</span>
                 </div>
                 {customerMobile && (
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Mobile:</span>
+                    <span className="text-gray-500">{t('pos.invoiceModal.mobile')}</span>
                     <span>{customerMobile}</span>
                   </div>
                 )}
@@ -183,10 +183,10 @@ export default function POSInvoiceModal({
                 <table className="w-full text-left">
                   <thead>
                     <tr className="border-b border-gray-300 text-[10px] font-bold uppercase text-gray-600">
-                      <th className="py-1">Item</th>
-                      <th className="py-1 text-center">Qty</th>
-                      <th className="py-1 text-right">Rate</th>
-                      <th className="py-1 text-right">Amt</th>
+                      <th className="py-1">{t('pos.invoiceModal.item')}</th>
+                      <th className="py-1 text-center">{t('pos.invoiceModal.qty')}</th>
+                      <th className="py-1 text-right">{t('pos.invoiceModal.rate')}</th>
+                      <th className="py-1 text-right">{t('pos.invoiceModal.amt')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 text-[11px]">
@@ -211,23 +211,23 @@ export default function POSInvoiceModal({
               {/* Summary */}
               <div className="py-2.5 space-y-1.5 text-[11px] border-b border-dashed border-gray-400">
                 <div className="flex justify-between">
-                  <span>Subtotal:</span>
+                  <span>{t('pos.invoiceModal.subtotal')}</span>
                   <span>₹{Number(saleData.totalAmount || 0).toFixed(2)}</span>
                 </div>
                 {saleData.discountAmount > 0 && (
                   <div className="flex justify-between text-gray-700">
-                    <span>Discount:</span>
+                    <span>{t('pos.invoiceModal.discount')}</span>
                     <span>-₹{Number(saleData.discountAmount).toFixed(2)}</span>
                   </div>
                 )}
                 {saleData.taxAmount > 0 && (
                   <div className="flex justify-between">
-                    <span>GST / Tax:</span>
+                    <span>{t('pos.invoiceModal.tax')}</span>
                     <span>+₹{Number(saleData.taxAmount).toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm font-black pt-1 border-t border-gray-300">
-                  <span>GRAND TOTAL:</span>
+                  <span>{t('pos.invoiceModal.grandTotal')}</span>
                   <span>₹{Number(saleData.netAmount || 0).toFixed(2)}</span>
                 </div>
               </div>
@@ -235,29 +235,29 @@ export default function POSInvoiceModal({
               {/* Payment Details */}
               <div className="py-2.5 space-y-1 text-[11px] border-b border-dashed border-gray-400">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500">Payment Mode:</span>
+                  <span className="text-gray-500">{t('pos.invoiceModal.paymentMode')}</span>
                   <span className="font-bold uppercase">{saleData.paymentMethod || 'CASH'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Paid Amount:</span>
+                  <span className="text-gray-500">{t('pos.invoiceModal.paidAmount')}</span>
                   <span className="font-bold">₹{Number(saleData.paidAmount || saleData.netAmount || 0).toFixed(2)}</span>
                 </div>
                 {saleData.paidAmount > saleData.netAmount && (
                   <div className="flex justify-between text-gray-700">
-                    <span className="text-gray-500">Change Returned:</span>
+                    <span className="text-gray-500">{t('pos.invoiceModal.changeReturned')}</span>
                     <span className="font-bold">₹{(saleData.paidAmount - saleData.netAmount).toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500">Status:</span>
+                  <span className="text-gray-500">{t('pos.invoiceModal.status', 'Status:')}</span>
                   <StatusBadge status={saleData.paymentStatus || 'Paid'} variant="dot" />
                 </div>
               </div>
 
               {/* Footer */}
               <div className="pt-3 text-center text-[10px] text-gray-500 space-y-1">
-                <p className="font-bold uppercase text-gray-700">*** THANK YOU FOR YOUR VISIT ***</p>
-                <p>Goods once sold can be returned within 7 days with invoice.</p>
+                <p className="font-bold uppercase text-gray-700">*** {t('pos.invoiceModal.thankYouMessage')} ***</p>
+                <p>{t('pos.invoiceModal.visitAgain')}</p>
                 <p className="font-mono text-[9px] tracking-widest text-gray-400 pt-1">POWERED BY SHOP SYSTEM</p>
               </div>
 
@@ -271,17 +271,17 @@ export default function POSInvoiceModal({
                   <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tight">{shopName}</h1>
                   <p className="text-gray-500 text-xs mt-1">Retail & Wholesale Distribution</p>
                   {shopAddress && <p className="text-gray-600 mt-0.5">{shopAddress}</p>}
-                  {shopPhone && <p className="text-gray-600">Phone: {shopPhone}</p>}
-                  {shopGstin && <p className="text-gray-800 font-bold mt-1">GSTIN: {shopGstin}</p>}
+                  {shopPhone && <p className="text-gray-600">{t('pos.invoiceModal.phone')} {shopPhone}</p>}
+                  {shopGstin && <p className="text-gray-800 font-bold mt-1">{t('pos.invoiceModal.gstin')} {shopGstin}</p>}
                 </div>
                 <div className="text-right">
                   <div className="inline-block px-3 py-1 bg-gray-100 border border-gray-300 rounded font-black text-sm uppercase tracking-wider mb-2">
-                    Tax Invoice
+                    {t('pos.invoiceModal.taxInvoice')}
                   </div>
                   <p className="font-bold text-sm text-gray-900"># {saleData.invoiceNumber}</p>
-                  <p className="text-gray-500 mt-0.5">Date: {new Date(saleData.saleDate || saleData.createdAt || Date.now()).toLocaleDateString('en-IN')}</p>
+                  <p className="text-gray-500 mt-0.5">{t('pos.invoiceModal.dateTime')} {new Date(saleData.saleDate || saleData.createdAt || Date.now()).toLocaleDateString('en-IN')}</p>
                   <div className="mt-1 flex items-center justify-end gap-1.5">
-                    <span className="text-gray-500">Mode:</span>
+                    <span className="text-gray-500">{t('pos.invoiceModal.paymentMode')}</span>
                     <StatusBadge status={saleData.paymentMethod} />
                   </div>
                 </div>
@@ -289,9 +289,9 @@ export default function POSInvoiceModal({
 
               {/* Bill To */}
               <div className="py-4 border-b border-gray-200">
-                <p className="text-[10px] uppercase tracking-wider font-bold text-gray-400">Bill To Customer:</p>
+                <p className="text-[10px] uppercase tracking-wider font-bold text-gray-400">{t('pos.invoiceModal.billedTo')}:</p>
                 <p className="text-sm font-bold text-gray-900 mt-0.5">{customerName}</p>
-                {customerMobile && <p className="text-gray-600">Mobile: {customerMobile}</p>}
+                {customerMobile && <p className="text-gray-600">{t('pos.invoiceModal.mobile')} {customerMobile}</p>}
               </div>
 
               {/* Items Table */}
@@ -300,10 +300,10 @@ export default function POSInvoiceModal({
                   <thead className="bg-gray-50 text-[10px] font-bold uppercase text-gray-600 border-b border-gray-200">
                     <tr>
                       <th className="py-2 px-3">#</th>
-                      <th className="py-2 px-3">Item Description</th>
-                      <th className="py-2 px-3 text-center">Qty</th>
-                      <th className="py-2 px-3 text-right">Price (₹)</th>
-                      <th className="py-2 px-3 text-right">Total (₹)</th>
+                      <th className="py-2 px-3">{t('pos.invoiceModal.item')}</th>
+                      <th className="py-2 px-3 text-center">{t('pos.invoiceModal.qty')}</th>
+                      <th className="py-2 px-3 text-right">{t('pos.invoiceModal.rate')} (₹)</th>
+                      <th className="py-2 px-3 text-right">{t('pos.invoiceModal.amt')} (₹)</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -330,27 +330,27 @@ export default function POSInvoiceModal({
               <div className="flex justify-end pt-2">
                 <div className="w-64 space-y-1.5 text-xs">
                   <div className="flex justify-between text-gray-600">
-                    <span>Subtotal:</span>
+                    <span>{t('pos.invoiceModal.subtotal')}</span>
                     <span>{formatCurrency(saleData.totalAmount)}</span>
                   </div>
                   {saleData.discountAmount > 0 && (
                     <div className="flex justify-between text-red-600">
-                      <span>Discount:</span>
+                      <span>{t('pos.invoiceModal.discount')}</span>
                       <span>-{formatCurrency(saleData.discountAmount)}</span>
                     </div>
                   )}
                   {saleData.taxAmount > 0 && (
                     <div className="flex justify-between text-gray-600">
-                      <span>Tax / GST:</span>
+                      <span>{t('pos.invoiceModal.tax')}</span>
                       <span>+{formatCurrency(saleData.taxAmount)}</span>
                     </div>
                   )}
                   <div className="flex justify-between text-sm font-black pt-2 border-t border-gray-300 text-gray-900">
-                    <span>Total Amount:</span>
+                    <span>{t('pos.invoiceModal.grandTotal')}</span>
                     <span>{formatCurrency(saleData.netAmount)}</span>
                   </div>
                   <div className="flex justify-between text-xs text-gray-600 pt-1">
-                    <span>Amount Paid:</span>
+                    <span>{t('pos.invoiceModal.paidAmount')}</span>
                     <span className="font-semibold">{formatCurrency(saleData.paidAmount || saleData.netAmount)}</span>
                   </div>
                 </div>
@@ -359,13 +359,13 @@ export default function POSInvoiceModal({
               {/* Signature & Terms */}
               <div className="mt-10 pt-6 border-t border-gray-200 flex justify-between items-end text-[11px] text-gray-500">
                 <div>
-                  <p className="font-bold text-gray-700 mb-1">Terms & Conditions:</p>
-                  <p>1. Certified that all information is true and correct.</p>
-                  <p>2. Subject to local jurisdiction.</p>
+                  <p className="font-bold text-gray-700 mb-1">{t('pos.invoiceModal.terms')}:</p>
+                  <p>1. {t('pos.invoiceModal.terms1')}</p>
+                  <p>2. {t('pos.invoiceModal.terms2')}</p>
                 </div>
                 <div className="text-center">
                   <div className="w-36 border-b border-gray-400 pb-8 mb-1"></div>
-                  <p className="font-bold text-gray-700">Authorized Signatory</p>
+                  <p className="font-bold text-gray-700">{t('pos.invoiceModal.authorisedSignatory')}</p>
                 </div>
               </div>
             </div>
@@ -382,7 +382,7 @@ export default function POSInvoiceModal({
             className="text-xs text-on-surface-variant gap-1.5"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-success" /> : null}
-            {copied ? 'Copied Receipt Info' : 'Copy Summary'}
+            {copied ? t('pos.invoiceModal.copied') : t('pos.invoiceModal.copyInfo')}
           </Button>
 
           <div className="flex items-center gap-2">
@@ -394,7 +394,7 @@ export default function POSInvoiceModal({
                 }}
                 className="font-bold gap-2 px-5 shadow-lg shadow-primary/20"
               >
-                <span>New Sale / अगला बिल</span>
+                <span>{t('pos.invoiceModal.newSale')}</span>
                 <ArrowRight className="w-4 h-4" />
               </Button>
             )}
@@ -403,7 +403,7 @@ export default function POSInvoiceModal({
               onClick={onClose}
               className="border-outline-variant/30 text-on-surface"
             >
-              Done / बंद करें
+              {t('common.close', 'Close')}
             </Button>
           </div>
         </div>

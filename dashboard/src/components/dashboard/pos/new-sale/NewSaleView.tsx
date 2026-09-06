@@ -41,10 +41,12 @@ import { customerService } from '@/lib/services/customer.services';
 import { productService } from '@/lib/services/product.services';
 import { categoryService } from '@/lib/services/category.services';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import PaymentModal from './PaymentModal';
 import POSInvoiceModal from './POSInvoiceModal';
 
 export default function NewSaleView() {
+  const { t } = useTranslation();
   const {
     products,
     loadingProducts,
@@ -226,7 +228,7 @@ export default function NewSaleView() {
       toast.success(`+1 ${matched.name}`);
       setBarcodeInput('');
     } else {
-      toast.error(`Barcode '${barcodeInput}' not found! / बारकोड नहीं मिला`);
+      toast.error(t('pos.newSale.barcodeNotFound', { code: barcodeInput.trim() }));
     }
   };
 
@@ -234,7 +236,7 @@ export default function NewSaleView() {
   const handleCreateCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCustName || !newCustPhone) {
-      toast.error('नाम और मोबाइल नंबर आवश्यक है / Name & Phone required');
+      toast.error(t('pos.customerCreateModal.nameMobileRequired'));
       return;
     }
     try {
@@ -251,10 +253,10 @@ export default function NewSaleView() {
         setIsCustomerModalOpen(false);
         setNewCustName('');
         setNewCustPhone('');
-        toast.success('ग्राहक सफलतापूर्वक जोड़ा गया! / Customer added');
+        toast.success(t('pos.customerCreateModal.customerAddedSuccess'));
       }
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to add customer');
+      toast.error(err.response?.data?.message || t('pos.customerCreateModal.failedToAdd'));
     }
   };
 
@@ -264,11 +266,11 @@ export default function NewSaleView() {
     const price = parseFloat(customPrice);
     const qty = parseInt(customQty) || 1;
     if (!customName.trim() || isNaN(price) || price < 0) {
-      toast.error('कृपया मान्य नाम और मूल्य दर्ज करें / Enter valid name & price');
+      toast.error(t('pos.customItemModal.validNamePriceRequired'));
       return;
     }
 
-    const toastId = toast.loading('Adding item...');
+    const toastId = toast.loading(t('pos.customItemModal.addingItem'));
     try {
       const res = await productService.createProduct({
         name: customName.trim(),
@@ -287,12 +289,12 @@ export default function NewSaleView() {
         setCustomName('');
         setCustomPrice('');
         setCustomQty('1');
-        toast.success(`Added ${customName} to bill!`, { id: toastId });
+        toast.success(t('pos.customItemModal.itemAdded', { name: customName.trim() }), { id: toastId });
       } else {
-        toast.error('Failed to create item', { id: toastId });
+        toast.error(t('pos.customItemModal.failedToAdd'), { id: toastId });
       }
     } catch (err) {
-      toast.error('Could not add custom item', { id: toastId });
+      toast.error(t('pos.customItemModal.failedToAdd'), { id: toastId });
     }
   };
 
@@ -318,12 +320,12 @@ export default function NewSaleView() {
   // Complete Sale Action
   const handleCompleteSaleClick = () => {
     if (cart.length === 0) {
-      toast.error('Cart is empty / कार्ट खाली है');
+      toast.error(t('pos.newSale.cartEmptyError'));
       return;
     }
 
     if (selectedPaymentMethod === 'credit' && !selectedCustomer) {
-      toast.error('उधार (Udhar) के लिए कृपया पहले ग्राहक चुनें! / Please select a customer for Udhar');
+      toast.error(t('pos.newSale.selectCustomerForCredit'));
       setIsCustDropdownOpen(true);
       return;
     }
@@ -365,9 +367,9 @@ export default function NewSaleView() {
           {/* Header Title and Search Bar */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div>
-              <h1 className="text-2xl font-black text-on-surface tracking-tight">Point of Sale</h1>
+              <h1 className="text-2xl font-black text-on-surface tracking-tight">{t('pos.newSale.title')}</h1>
               <p className="text-xs font-medium text-on-surface-variant mt-0.5">
-                Select items or scan barcode to add to cart
+                {t('pos.newSale.subtitle')}
               </p>
             </div>
 
@@ -382,7 +384,7 @@ export default function NewSaleView() {
                       setSearchQuery(e.target.value);
                       setBarcodeInput(e.target.value);
                     }}
-                    placeholder="Scan Barcode or Search Product..."
+                    placeholder={t('pos.newSale.searchPlaceholder')}
                     leftIcon={<Barcode className="w-4 h-4 text-on-surface-variant" />}
                     rightIcon={
                       (searchQuery || barcodeInput) ? (
@@ -411,8 +413,8 @@ export default function NewSaleView() {
                 className="shrink-0 rounded-full font-bold border-primary/40 text-primary hover:bg-primary/10 h-10 px-4 gap-1.5"
               >
                 <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">Custom Item</span>
-                <span className="sm:hidden">Custom</span>
+                <span className="hidden sm:inline">{t('pos.newSale.customItem')}</span>
+                <span className="sm:hidden">{t('pos.newSale.customItemShort')}</span>
               </Button>
             </div>
           </div>
@@ -424,7 +426,7 @@ export default function NewSaleView() {
               type="button"
               onClick={() => scrollCategories('left')}
               className="hidden sm:flex w-8 h-8 rounded-full bg-surface border border-outline-variant/30 shadow-xs items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container-low shrink-0 mr-1.5 transition-colors cursor-pointer z-10"
-              title="Previous Categories"
+              title={t('pos.newSale.prevCategories')}
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -440,10 +442,10 @@ export default function NewSaleView() {
                 let label = cat;
                 let count = 0;
                 if (cat === 'all') {
-                  label = 'All Categories';
+                  label = t('pos.newSale.allCategories');
                   count = products.length;
                 } else if (cat === 'top-selling') {
-                  label = '★ Top Selling';
+                  label = t('pos.newSale.topSelling');
                   count = Math.min(8, products.length);
                 } else {
                   count = categoryCounts[cat] || 0;
@@ -478,7 +480,7 @@ export default function NewSaleView() {
               type="button"
               onClick={() => scrollCategories('right')}
               className="hidden sm:flex w-8 h-8 rounded-full bg-surface border border-outline-variant/30 shadow-xs items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container-low shrink-0 ml-1.5 transition-colors cursor-pointer z-10"
-              title="Next Categories"
+              title={t('pos.newSale.nextCategories')}
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -499,9 +501,9 @@ export default function NewSaleView() {
           ) : displayedProducts.length === 0 ? (
             <div className="h-72 flex flex-col items-center justify-center text-center p-6 text-on-surface-variant">
               <ShoppingBag className="w-14 h-14 stroke-[1.2] text-on-surface-variant/30 mb-2" />
-              <p className="font-bold text-base text-on-surface">No products found / कोई उत्पाद नहीं मिला</p>
+              <p className="font-bold text-base text-on-surface">{t('pos.newSale.noProductsFound')}</p>
               <p className="text-xs text-on-surface-variant/70 mt-1 max-w-xs">
-                Check the product name or add a new unlisted item directly with &quot;Custom Item&quot;.
+                {t('pos.newSale.noProductsDesc')}
               </p>
               <Button
                 variant="outline"
@@ -510,7 +512,7 @@ export default function NewSaleView() {
                 className="mt-4 rounded-full text-xs font-bold text-primary border-primary/30 gap-1.5"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Add Quick Item / तुरंत सामान जोड़ें</span>
+                <span>{t('pos.newSale.addQuickItem')}</span>
               </Button>
             </div>
           ) : (
@@ -559,13 +561,13 @@ export default function NewSaleView() {
                               : "bg-emerald-600 text-white")
                       )}>
                         <span className="w-1.5 h-1.5 rounded-full bg-white/90 shrink-0" />
-                        <span>{isOutOfStock ? 'Out of Stock' : `${p.currentStock} in stock`}</span>
+                        <span>{isOutOfStock ? t('pos.newSale.outOfStock') : t('pos.newSale.inStock', { count: p.currentStock })}</span>
                       </span>
 
                       {/* Top-Right In-Cart Badge */}
                       {inCart && (
                         <span className="absolute top-2 right-2 px-2.5 py-0.5 rounded-full bg-primary text-white text-[10px] font-black shadow-md flex items-center gap-1 animate-in zoom-in-50">
-                          {inCart.quantity} in Cart
+                          {t('pos.newSale.inCart', { count: inCart.quantity })}
                         </span>
                       )}
                     </div>
@@ -588,7 +590,7 @@ export default function NewSaleView() {
                         <div className="min-w-0 flex flex-col">
                           {p.mrp && p.mrp > p.sellingPrice ? (
                             <span className="text-[10px] text-on-surface-variant line-through font-medium leading-none mb-0.5">
-                              MRP ₹{p.mrp}
+                              {t('pos.newSale.mrp')} ₹{p.mrp}
                             </span>
                           ) : null}
                           <span className="text-sm sm:text-base font-black text-on-surface tracking-tight leading-none">
@@ -605,7 +607,7 @@ export default function NewSaleView() {
                           }}
                           disabled={isOutOfStock}
                           className="w-8 h-8 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white flex items-center justify-center transition-all shrink-0 disabled:opacity-30 active:scale-90 cursor-pointer shadow-xs"
-                          title="Add to Cart"
+                          title={t('pos.customItemModal.addToCart')}
                         >
                           <Plus className="w-4 h-4" />
                         </button>
@@ -620,14 +622,14 @@ export default function NewSaleView() {
           {/* Infinite Scroll Footer indicator */}
           {filteredProducts.length > visibleCount && (
             <div className="py-6 flex flex-col items-center justify-center gap-2 text-xs text-on-surface-variant font-semibold">
-              <span>Showing {displayedProducts.length} of {filteredProducts.length} products</span>
+              <span>{t('pos.newSale.showingProducts', { displayed: displayedProducts.length, total: filteredProducts.length })}</span>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setVisibleCount(prev => Math.min(prev + 24, filteredProducts.length))}
                 className="rounded-full text-xs font-bold"
               >
-                Load More Products / और उत्पाद देखें
+                {t('pos.newSale.loadMore')}
               </Button>
             </div>
           )}
@@ -650,7 +652,7 @@ export default function NewSaleView() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
                     <span className="text-sm font-black text-on-surface truncate">
-                      {selectedCustomer ? selectedCustomer.name : 'Walk-in Customer'}
+                      {selectedCustomer ? selectedCustomer.name : t('pos.newSale.walkInCustomer')}
                     </span>
                   </div>
                   <span className="text-xs text-on-surface-variant block truncate">
@@ -668,14 +670,14 @@ export default function NewSaleView() {
                   className="h-8 px-2.5 text-xs font-bold text-primary hover:bg-primary/10 gap-1 rounded-xl"
                 >
                   <Edit2 className="w-3.5 h-3.5" />
-                  <span>Change</span>
+                  <span>{t('pos.newSale.change')}</span>
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setIsCustomerModalOpen(true)}
                   className="h-8 w-8 text-on-surface-variant hover:text-primary rounded-xl"
-                  title="New Customer"
+                  title={t('pos.newSale.newCustomer')}
                 >
                   <UserPlus className="w-4 h-4" />
                 </Button>
@@ -687,7 +689,7 @@ export default function NewSaleView() {
               <div className="absolute left-0 right-0 top-16 z-40 bg-surface border border-outline-variant/30 rounded-2xl shadow-2xl max-h-60 overflow-y-auto p-3">
                 <Input
                   type="text"
-                  placeholder="Search customer name or phone..."
+                  placeholder={t('pos.newSale.searchCustomer')}
                   value={customerSearch}
                   onChange={(e) => setCustomerSearch(e.target.value)}
                   className="text-xs mb-2 h-9 rounded-xl"
@@ -701,7 +703,7 @@ export default function NewSaleView() {
                   }}
                   className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-on-surface hover:bg-surface-container-low transition-colors"
                 >
-                  Walk-in Customer (सामान्य ग्राहक)
+                  {t('pos.newSale.walkInCustomer')}
                 </button>
                 <div className="divide-y divide-outline-variant/10">
                   {allCustomers
@@ -728,9 +730,9 @@ export default function NewSaleView() {
 
         {/* Current Order Header */}
         <div className="px-5 py-3 border-b border-outline-variant/20 flex items-center justify-between shrink-0 bg-surface-container-lowest">
-          <h3 className="text-sm font-black text-on-surface">Current Order</h3>
+          <h3 className="text-sm font-black text-on-surface">{t('pos.newSale.currentOrder')}</h3>
           <span className="px-2.5 py-0.5 rounded-full bg-surface-container text-xs font-bold text-on-surface-variant border border-outline-variant/30">
-            {totalItemsCount} items
+            {t('pos.newSale.itemsCount', { count: totalItemsCount })}
           </span>
         </div>
 
@@ -739,8 +741,8 @@ export default function NewSaleView() {
           {cart.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center p-6 text-on-surface-variant/50">
               <ShoppingBag className="w-14 h-14 stroke-[1] mb-2 text-on-surface-variant/30" />
-              <p className="font-bold text-base text-on-surface">Cart is empty / कार्ट खाली है</p>
-              <p className="text-xs mt-1">Tap any item from the left catalogue to add to this bill.</p>
+              <p className="font-bold text-base text-on-surface">{t('pos.newSale.cartEmpty')}</p>
+              <p className="text-xs mt-1">{t('pos.newSale.cartEmptyDesc')}</p>
             </div>
           ) : (
             cart.map((item) => (
@@ -825,12 +827,12 @@ export default function NewSaleView() {
           {/* Summary Breakdown */}
           <div className="space-y-1.5 text-xs font-medium text-on-surface-variant">
             <div className="flex justify-between">
-              <span>Items Subtotal ({totalItemsCount} items)</span>
+              <span>{t('pos.newSale.subtotal')} ({t('pos.newSale.itemsCount', { count: totalItemsCount })})</span>
               <span className="font-bold text-on-surface">{formatCurrency(subtotal)}</span>
             </div>
 
             <div className="flex justify-between">
-              <span>Tax (GST {taxPercent}%)</span>
+              <span>{t('pos.newSale.tax')} ({taxPercent}%)</span>
               <span className="font-bold text-on-surface">+{formatCurrency(tax)}</span>
             </div>
 
@@ -841,7 +843,7 @@ export default function NewSaleView() {
                 className="text-primary font-bold hover:underline flex items-center gap-1 cursor-pointer"
               >
                 <Tag className="w-3 h-3" />
-                {discount > 0 ? `Discount Applied (${formatCurrency(discount)})` : '+ Add Discount'}
+                {discount > 0 ? `${t('pos.newSale.discount')} (${formatCurrency(discount)})` : `+ ${t('pos.newSale.discount')}`}
               </button>
               {discount > 0 ? (
                 <span className="font-bold text-error">-{formatCurrency(discount)}</span>
@@ -857,7 +859,7 @@ export default function NewSaleView() {
                   type="number"
                   value={discountVal}
                   onChange={(e) => setDiscountVal(e.target.value)}
-                  placeholder="Discount value"
+                  placeholder={t('pos.discountModal.discountValue')}
                   className="h-8 text-xs flex-1 rounded-lg"
                   autoFocus
                 />
@@ -876,7 +878,7 @@ export default function NewSaleView() {
                   onClick={handleApplyDiscount}
                   className="h-8 px-3 text-xs font-bold"
                 >
-                  Apply
+                  {t('pos.discountModal.apply')}
                 </Button>
               </div>
             )}
@@ -885,8 +887,8 @@ export default function NewSaleView() {
           {/* Grand Total Row */}
           <div className="flex justify-between items-baseline pt-2 border-t border-outline-variant/20">
             <div>
-              <span className="text-base font-black text-on-surface">Total</span>
-              <p className="text-[10px] text-on-surface-variant">Total Payable Amount</p>
+              <span className="text-base font-black text-on-surface">{t('pos.newSale.totalPayable')}</span>
+              <p className="text-[10px] text-on-surface-variant">{t('pos.paymentModal.totalPayableAmount')}</p>
             </div>
             <span className="text-3xl font-black text-primary tracking-tight">
               {formatCurrency(netAmount)}
@@ -906,7 +908,7 @@ export default function NewSaleView() {
               )}
             >
               <Banknote className="w-4 h-4" />
-              <span>CASH</span>
+              <span>{t('pos.newSale.cash')}</span>
             </button>
 
             <button
@@ -920,7 +922,7 @@ export default function NewSaleView() {
               )}
             >
               <CreditCard className="w-4 h-4" />
-              <span>CARD</span>
+              <span>{t('pos.newSale.card')}</span>
             </button>
 
             <button
@@ -934,11 +936,11 @@ export default function NewSaleView() {
               )}
             >
               <Smartphone className="w-4 h-4" />
-              <span>UPI / QR</span>
+              <span>{t('pos.newSale.upi')}</span>
             </button>
           </div>
 
-          {/* Quick Actions Row: Hold Order & Save Draft/Clear */}
+          {/* Quick Actions Row: Hold Order & Clear */}
           <div className="grid grid-cols-2 gap-2">
             <Button
               variant="outline"
@@ -948,14 +950,14 @@ export default function NewSaleView() {
               className="h-10 rounded-xl border-outline-variant/30 font-bold text-xs gap-1.5 text-on-surface-variant hover:text-primary"
             >
               <Clock className="w-4 h-4" />
-              <span>Hold Order</span>
+              <span>{t('pos.newSale.holdBill')}</span>
             </Button>
 
             <Button
               variant="outline"
               size="sm"
               onClick={() => {
-                if (window.confirm('Clear current cart? / क्या आप कार्ट खाली करना चाहते हैं?')) {
+                if (window.confirm(t('pos.newSale.cartEmptyDesc'))) {
                   clearCart();
                 }
               }}
@@ -963,7 +965,7 @@ export default function NewSaleView() {
               className="h-10 rounded-xl border-outline-variant/30 font-bold text-xs gap-1.5 text-on-surface-variant hover:text-error"
             >
               <RefreshCw className="w-4 h-4" />
-              <span>Save as Draft</span>
+              <span>{t('pos.newSale.clearCart')}</span>
             </Button>
           </div>
 
@@ -974,7 +976,7 @@ export default function NewSaleView() {
             className="w-full h-12 rounded-xl text-white font-black text-sm shadow-xl shadow-primary/25 flex items-center justify-center gap-2 disabled:opacity-50 transition-all active:scale-[0.99]"
           >
             <Receipt className="w-5 h-5" />
-            <span>Complete Sale</span>
+            <span>{t('pos.newSale.completeSale')}</span>
             <ArrowRight className="w-4 h-4" />
           </Button>
 
@@ -1014,8 +1016,8 @@ export default function NewSaleView() {
                   <Coffee className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-on-surface">Custom / Ad-hoc Item</h3>
-                  <p className="text-[11px] text-on-surface-variant">खुला सामान तुरंत बिल में जोड़ें</p>
+                  <h3 className="text-sm font-bold text-on-surface">{t('pos.customItemModal.title')}</h3>
+                  <p className="text-[11px] text-on-surface-variant">{t('pos.customItemModal.itemNamePlaceholder')}</p>
                 </div>
               </div>
               <Button variant="ghost" size="icon" onClick={() => setIsCustomItemOpen(false)} className="h-8 w-8 text-on-surface-variant hover:text-error">
@@ -1025,9 +1027,9 @@ export default function NewSaleView() {
 
             <form onSubmit={handleAddCustomItem} className="space-y-3">
               <Input
-                label="Item Name / सामान का नाम"
+                label={t('pos.customItemModal.itemNameLabel')}
                 type="text"
-                placeholder="e.g. Masala Tea, Special Samosa..."
+                placeholder={t('pos.customItemModal.itemNamePlaceholder')}
                 value={customName}
                 onChange={(e) => setCustomName(e.target.value)}
                 autoFocus
@@ -1036,7 +1038,7 @@ export default function NewSaleView() {
 
               <div className="grid grid-cols-2 gap-2">
                 <Input
-                  label="Price (₹) / मूल्य"
+                  label={t('pos.customItemModal.priceLabel')}
                   type="number"
                   step="0.01"
                   placeholder="0.00"
@@ -1045,7 +1047,7 @@ export default function NewSaleView() {
                   required
                 />
                 <Input
-                  label="Quantity / मात्रा"
+                  label={t('pos.customItemModal.qtyLabel')}
                   type="number"
                   min="1"
                   value={customQty}
@@ -1060,13 +1062,13 @@ export default function NewSaleView() {
                   onClick={() => setIsCustomItemOpen(false)}
                   className="flex-1 border-outline-variant/30"
                 >
-                  Cancel
+                  {t('pos.customItemModal.cancel')}
                 </Button>
                 <Button
                   type="submit"
                   className="flex-1 font-bold"
                 >
-                  Add to Bill
+                  {t('pos.customItemModal.addToCart')}
                 </Button>
               </div>
             </form>
@@ -1081,7 +1083,7 @@ export default function NewSaleView() {
             <div className="flex items-center justify-between border-b border-outline-variant/20 pb-3">
               <div className="flex items-center gap-2">
                 <Clock className="w-5 h-5 text-warning" />
-                <h3 className="text-sm font-bold text-on-surface">Hold Current Bill / बिल होल्ड करें</h3>
+                <h3 className="text-sm font-bold text-on-surface">{t('pos.holdBillModal.title')}</h3>
               </div>
               <Button variant="ghost" size="icon" onClick={() => setIsHoldModalOpen(false)} className="h-8 w-8 text-on-surface-variant hover:text-error">
                 <X className="w-4 h-4" />
@@ -1089,13 +1091,13 @@ export default function NewSaleView() {
             </div>
 
             <p className="text-xs text-on-surface-variant">
-              इस बिल को अस्थायी रूप से रोकें ताकि आप अगले ग्राहक का बिल बना सकें। इसे कभी भी <strong>Hold Bills</strong> से पुनः खोला जा सकता है।
+              {t('pos.holdBillModal.holdBillModalDesc')}
             </p>
 
             <Input
-              label="Reference Note (Optional)"
+              label={t('pos.holdBillModal.referenceNote')}
               type="text"
-              placeholder="e.g. Customer getting cash / गाड़ी में पैसे हैं"
+              placeholder={t('pos.holdBillModal.placeholder')}
               value={holdNote}
               onChange={(e) => setHoldNote(e.target.value)}
             />
@@ -1106,13 +1108,13 @@ export default function NewSaleView() {
                 onClick={() => setIsHoldModalOpen(false)}
                 className="flex-1 border-outline-variant/30"
               >
-                Cancel
+                {t('pos.holdBillModal.cancel')}
               </Button>
               <Button
                 onClick={handleConfirmHold}
                 className="flex-1 font-bold"
               >
-                Confirm Hold
+                {t('pos.holdBillModal.confirmHold')}
               </Button>
             </div>
           </Card>
@@ -1126,7 +1128,7 @@ export default function NewSaleView() {
             <div className="flex items-center justify-between border-b border-outline-variant/20 pb-3">
               <div className="flex items-center gap-2">
                 <UserPlus className="w-5 h-5 text-primary" />
-                <h3 className="text-sm font-bold text-on-surface">New Customer / नया ग्राहक</h3>
+                <h3 className="text-sm font-bold text-on-surface">{t('pos.customerCreateModal.title')}</h3>
               </div>
               <Button variant="ghost" size="icon" onClick={() => setIsCustomerModalOpen(false)} className="h-8 w-8 text-on-surface-variant hover:text-error">
                 <X className="w-4 h-4" />
@@ -1135,9 +1137,9 @@ export default function NewSaleView() {
 
             <form onSubmit={handleCreateCustomer} className="space-y-3">
               <Input
-                label="Full Name / पूरा नाम"
+                label={t('pos.customerCreateModal.fullNameLabel')}
                 type="text"
-                placeholder="e.g. Ramesh Kumar"
+                placeholder={t('pos.customerCreateModal.fullNamePlaceholder')}
                 value={newCustName}
                 onChange={(e) => setNewCustName(e.target.value)}
                 autoFocus
@@ -1145,9 +1147,9 @@ export default function NewSaleView() {
               />
 
               <Input
-                label="Mobile Number / मोबाइल नंबर"
+                label={t('pos.customerCreateModal.mobileNumberLabel')}
                 type="tel"
-                placeholder="e.g. 9876543210"
+                placeholder={t('pos.customerCreateModal.mobileNumberPlaceholder')}
                 value={newCustPhone}
                 onChange={(e) => setNewCustPhone(e.target.value)}
                 required
@@ -1160,13 +1162,13 @@ export default function NewSaleView() {
                   onClick={() => setIsCustomerModalOpen(false)}
                   className="flex-1 border-outline-variant/30"
                 >
-                  Cancel
+                  {t('pos.customerCreateModal.cancel')}
                 </Button>
                 <Button
                   type="submit"
                   className="flex-1 font-bold"
                 >
-                  Save & Select
+                  {t('pos.customerCreateModal.saveCustomer')}
                 </Button>
               </div>
             </form>
